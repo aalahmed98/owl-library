@@ -1,0 +1,264 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Sampling Temperature Explorer</title>
+  <meta name="archive-tags" content="sampling, llm, interactive">
+  <meta name="archive-summary" content="An interactive look at how temperature reshapes a softmax distribution over next tokens.">
+  <meta name="archive-created" content="2026-08-03">
+  <meta name="archive-updated" content="2026-08-03">
+  <meta name="archive-status" content="final">
+  <style>
+    /* ==tokens== (synced from design/tokens.css — do not edit inside the markers) */
+    :root {
+      --color-bg: #faf9f7;
+      --color-surface: #ffffff;
+      --color-fg: #1a1a1e;
+      --color-muted: #6b6b76;
+      --color-border: #e4e2dd;
+      --color-accent: #2f6fed;
+      --color-accent-fg: #ffffff;
+      --color-accent-soft: #e8effd;
+      --color-danger: #c4483c;
+      --color-warn-bg: #fdf6e3;
+      --color-code-bg: #f2f1ee;
+      --color-mark: #fff3bf;
+      --font-body: "Charter", "Georgia", "Cambria", "Times New Roman", serif;
+      --font-ui: system-ui, -apple-system, "Segoe UI", sans-serif;
+      --font-mono: "SFMono-Regular", "Cascadia Code", "Consolas", "Menlo", monospace;
+      --text-xs: 0.75rem;
+      --text-sm: 0.875rem;
+      --text-base: 1.0625rem;
+      --text-lg: 1.25rem;
+      --text-xl: 1.5rem;
+      --text-2xl: 1.875rem;
+      --text-3xl: 2.375rem;
+      --leading-body: 1.65;
+      --leading-tight: 1.25;
+      --measure: 68ch;
+      --space-1: 0.25rem;
+      --space-2: 0.5rem;
+      --space-3: 0.75rem;
+      --space-4: 1rem;
+      --space-5: 1.5rem;
+      --space-6: 2rem;
+      --space-7: 3rem;
+      --space-8: 4rem;
+      --radius-sm: 4px;
+      --radius-md: 8px;
+      --radius-lg: 12px;
+      --shadow-sm: 0 1px 2px rgba(20, 20, 25, 0.06);
+      --shadow-md: 0 2px 8px rgba(20, 20, 25, 0.1);
+    }
+    [data-theme="dark"] {
+      --color-bg: #16161a;
+      --color-surface: #1e1e24;
+      --color-fg: #e8e6e3;
+      --color-muted: #9a98a0;
+      --color-border: #32323a;
+      --color-accent: #6b9bff;
+      --color-accent-fg: #10101c;
+      --color-accent-soft: #23304d;
+      --color-danger: #e0685c;
+      --color-warn-bg: #2e2a1e;
+      --color-code-bg: #24242b;
+      --color-mark: #4d4425;
+      --shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.4);
+      --shadow-md: 0 2px 8px rgba(0, 0, 0, 0.5);
+    }
+    /* ==/tokens== */
+
+    /* When opened standalone (not in the app frame), follow the OS theme. */
+    @media (prefers-color-scheme: dark) {
+      :root:not([data-theme]) {
+        --color-bg: #16161a;
+        --color-surface: #1e1e24;
+        --color-fg: #e8e6e3;
+        --color-muted: #9a98a0;
+        --color-border: #32323a;
+        --color-accent: #6b9bff;
+        --color-accent-fg: #10101c;
+        --color-accent-soft: #23304d;
+        --color-danger: #e0685c;
+        --color-warn-bg: #2e2a1e;
+        --color-code-bg: #24242b;
+        --color-mark: #4d4425;
+      }
+    }
+
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      background: var(--color-bg);
+      color: var(--color-fg);
+      font-family: var(--font-body);
+      font-size: var(--text-base);
+      line-height: var(--leading-body);
+    }
+    .paper {
+      max-width: var(--measure);
+      margin: 0 auto;
+      padding: var(--space-6) var(--space-4) var(--space-8);
+    }
+    h1 { font-size: var(--text-3xl); line-height: var(--leading-tight); margin: 0 0 var(--space-2); }
+    h2 { font-size: var(--text-xl); line-height: var(--leading-tight); margin: var(--space-6) 0 var(--space-3); border-bottom: 1px solid var(--color-border); padding-bottom: var(--space-2); }
+    h3 { font-size: var(--text-lg); margin: var(--space-5) 0 var(--space-2); }
+    .byline { color: var(--color-muted); font-family: var(--font-ui); font-size: var(--text-sm); margin-bottom: var(--space-6); }
+    a { color: var(--color-accent); }
+    code { font-family: var(--font-mono); font-size: 0.88em; background: var(--color-code-bg); padding: 1px 5px; border-radius: var(--radius-sm); }
+    pre { background: var(--color-code-bg); padding: var(--space-4); border-radius: var(--radius-md); overflow-x: auto; }
+    pre code { background: none; padding: 0; font-size: var(--text-sm); }
+    blockquote { margin: var(--space-4) 0; padding: var(--space-2) var(--space-4); border-left: 3px solid var(--color-accent); background: var(--color-surface); color: var(--color-muted); }
+
+    /* interactive widgets */
+    .widget {
+      font-family: var(--font-ui);
+      background: var(--color-surface);
+      border: 1px solid var(--color-border);
+      border-radius: var(--radius-lg);
+      padding: var(--space-4);
+      margin: var(--space-5) 0;
+      box-shadow: var(--shadow-sm);
+    }
+    .widget-title { font-weight: 600; font-size: var(--text-sm); margin: 0 0 var(--space-3); color: var(--color-muted); text-transform: uppercase; letter-spacing: 0.05em; }
+    .control { display: flex; align-items: center; gap: var(--space-3); margin: var(--space-2) 0; font-size: var(--text-sm); }
+    .control label { min-width: 9rem; }
+    .control input[type="range"] { flex: 1; accent-color: var(--color-accent); }
+    .control output { min-width: 4rem; text-align: right; font-family: var(--font-mono); font-size: var(--text-sm); }
+    .chart { width: 100%; height: auto; display: block; margin-top: var(--space-3); }
+    .chart .axis { stroke: var(--color-border); stroke-width: 1; }
+    .chart .axis-label { fill: var(--color-muted); font-family: var(--font-ui); font-size: 11px; }
+    .chart .series { fill: none; stroke: var(--color-accent); stroke-width: 2; }
+    .chart .series-2 { fill: none; stroke: var(--color-danger); stroke-width: 2; }
+    .chart .bar { fill: var(--color-accent); }
+    figure { margin: var(--space-5) 0; }
+    figcaption { font-family: var(--font-ui); font-size: var(--text-sm); color: var(--color-muted); margin-top: var(--space-2); }
+    details.derivation { margin: var(--space-4) 0; border: 1px solid var(--color-border); border-radius: var(--radius-md); padding: var(--space-3) var(--space-4); background: var(--color-surface); }
+    details.derivation summary { cursor: pointer; font-family: var(--font-ui); font-weight: 600; font-size: var(--text-sm); }
+  </style>
+</head>
+<body>
+  <main class="paper">
+    <h1>Sampling Temperature Explorer</h1>
+    <p class="byline">Interactive companion to the softmax-temperature notes &middot; 2026</p>
+
+    <p>Language models pick the next token by sampling from a softmax over logits. A single
+    scalar &mdash; the <em>temperature</em> &mdash; decides whether that distribution is a
+    near-deterministic spike or a near-uniform spread. Drag the slider and watch the same five
+    logits produce very different distributions.</p>
+
+    <h2>The distribution, live</h2>
+    <div class="widget">
+      <p class="widget-title">Softmax over fixed logits [3.2, 2.8, 1.9, 1.1, 0.4]</p>
+      <div class="control">
+        <label for="temp">Temperature T</label>
+        <input type="range" id="temp" min="0.05" max="4" step="0.05" value="1">
+        <output id="temp-out">1.00</output>
+      </div>
+      <svg id="dist-chart" class="chart" viewBox="0 0 640 280" role="img" aria-label="Token probability distribution"></svg>
+      <div class="control"><span id="entropy" style="font-family: var(--font-mono); font-size: var(--text-sm); color: var(--color-muted);"></span></div>
+    </div>
+
+    <p>At <code>T &rarr; 0</code> the largest logit takes everything (greedy decoding); at
+    <code>T = 1</code> you get the raw softmax; past <code>T &asymp; 2</code> the choice is close
+    to a coin flip across all candidates.</p>
+
+    <details class="derivation">
+      <summary>Why entropy rises monotonically with T</summary>
+      <p>The softmax ratio between two tokens is <code>exp((z_i - z_j)/T)</code>. As T grows every
+      pairwise odds ratio decays toward 1, so the distribution approaches uniform &mdash; the
+      maximum-entropy distribution over the support. Differentiating the entropy with respect to T
+      shows it is proportional to the variance of the logits under the current distribution, which
+      is non-negative.</p>
+    </details>
+
+    <h2>Entropy vs temperature</h2>
+    <figure>
+      <svg id="entropy-chart" class="chart" viewBox="0 0 640 280" role="img" aria-label="Entropy as a function of temperature"></svg>
+      <figcaption><strong>Figure 1.</strong> Shannon entropy of the distribution as temperature sweeps 0.05&ndash;4. The marker tracks the slider.</figcaption>
+    </figure>
+  </main>
+  <script>
+    // All JS inline. No external requests of any kind (page runs sandboxed & offline).
+    const LOGITS = [3.2, 2.8, 1.9, 1.1, 0.4];
+    const LABELS = ["the", "a", "its", "one", "'"];
+
+    function softmaxT(logits, T) {
+      const z = logits.map(v => v / Math.max(T, 1e-8));
+      const m = Math.max(...z);
+      const e = z.map(v => Math.exp(v - m));
+      const s = e.reduce((a, b) => a + b, 0);
+      return e.map(v => v / s);
+    }
+    function entropy(p) {
+      return -p.reduce((a, v) => a + (v > 0 ? v * Math.log2(v) : 0), 0);
+    }
+
+    function barChart(svgId, labels, values) {
+      const svg = document.getElementById(svgId);
+      const W = 640, H = 280, m = { t: 12, r: 12, b: 40, l: 44 };
+      const max = 1;
+      const bw = (W - m.l - m.r) / values.length;
+      let out = `<line class="axis" x1="${m.l}" y1="${H - m.b}" x2="${W - m.r}" y2="${H - m.b}"/>`;
+      values.forEach((v, i) => {
+        const h = (v / max) * (H - m.t - m.b);
+        out += `<rect class="bar" x="${(m.l + i * bw + bw * 0.15).toFixed(1)}" y="${(H - m.b - h).toFixed(1)}" width="${(bw * 0.7).toFixed(1)}" height="${h.toFixed(1)}" rx="3"/>`;
+        out += `<text class="axis-label" x="${(m.l + (i + 0.5) * bw).toFixed(1)}" y="${H - m.b + 16}" text-anchor="middle">${labels[i]}</text>`;
+        out += `<text class="axis-label" x="${(m.l + (i + 0.5) * bw).toFixed(1)}" y="${(H - m.b - h - 5).toFixed(1)}" text-anchor="middle">${(v * 100).toFixed(1)}%</text>`;
+      });
+      svg.innerHTML = out;
+    }
+
+    function lineChart(svgId, seriesList, opts = {}) {
+      const svg = document.getElementById(svgId);
+      const W = 640, H = 280, m = { t: 12, r: 12, b: 28, l: 44 };
+      const pts = seriesList.flatMap(s => s.points);
+      const xs = pts.map(p => p[0]), ys = pts.map(p => p[1]);
+      const x0 = opts.xMin ?? Math.min(...xs), x1 = opts.xMax ?? Math.max(...xs);
+      const y0 = opts.yMin ?? Math.min(...ys), y1 = opts.yMax ?? Math.max(...ys);
+      const X = v => m.l + ((v - x0) / (x1 - x0 || 1)) * (W - m.l - m.r);
+      const Y = v => H - m.b - ((v - y0) / (y1 - y0 || 1)) * (H - m.t - m.b);
+      const tickFmt = v => +v.toFixed(2);
+      let out = `<line class="axis" x1="${m.l}" y1="${H - m.b}" x2="${W - m.r}" y2="${H - m.b}"/>` +
+                `<line class="axis" x1="${m.l}" y1="${m.t}" x2="${m.l}" y2="${H - m.b}"/>`;
+      for (let i = 0; i <= 4; i++) {
+        const xv = x0 + (i / 4) * (x1 - x0), yv = y0 + (i / 4) * (y1 - y0);
+        out += `<text class="axis-label" x="${X(xv)}" y="${H - m.b + 16}" text-anchor="middle">${tickFmt(xv)}</text>`;
+        out += `<text class="axis-label" x="${m.l - 6}" y="${Y(yv) + 4}" text-anchor="end">${tickFmt(yv)}</text>`;
+      }
+      seriesList.forEach((s, i) => {
+        const d = s.points.map((p, j) => `${j ? "L" : "M"}${X(p[0]).toFixed(1)},${Y(p[1]).toFixed(1)}`).join("");
+        out += `<path class="${i === 0 ? "series" : "series-2"}" d="${d}"/>`;
+      });
+      if (opts.marker) {
+        out += `<circle cx="${X(opts.marker[0])}" cy="${Y(opts.marker[1])}" r="5" fill="var(--color-danger)"/>`;
+      }
+      if (opts.xLabel) out += `<text class="axis-label" x="${(W + m.l) / 2}" y="${H - 4}" text-anchor="middle">${opts.xLabel}</text>`;
+      svg.innerHTML = out;
+    }
+
+    const entropyCurve = [];
+    for (let T = 0.05; T <= 4.001; T += 0.05) {
+      entropyCurve.push([T, entropy(softmaxT(LOGITS, T))]);
+    }
+
+    function bindSlider(id, outId, fmt, onChange) {
+      const el = document.getElementById(id), out = document.getElementById(outId);
+      const update = () => { out.textContent = fmt(el.valueAsNumber); onChange(el.valueAsNumber); };
+      el.addEventListener("input", update);
+      update();
+    }
+
+    bindSlider("temp", "temp-out", v => v.toFixed(2), (T) => {
+      const p = softmaxT(LOGITS, T);
+      barChart("dist-chart", LABELS, p);
+      const H_bits = entropy(p);
+      document.getElementById("entropy").textContent =
+        `entropy = ${H_bits.toFixed(3)} bits (max ${Math.log2(LOGITS.length).toFixed(3)})`;
+      lineChart("entropy-chart", [{ points: entropyCurve }],
+        { yMin: 0, xMin: 0, xMax: 4, xLabel: "temperature T", marker: [T, H_bits] });
+    });
+  </script>
+</body>
+</html>
