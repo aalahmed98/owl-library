@@ -1,0 +1,11 @@
+{
+  "mcpServers": {
+    "the-archive": {
+      "command": "npx",
+      "args": ["tsx", "src/mcp/main.ts"],
+      "env": {
+        "ARCHIVE_ROOT": "/home/haman/nbb/theArchive"
+      }
+    }
+  }
+}
