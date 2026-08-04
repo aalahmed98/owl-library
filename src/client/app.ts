@@ -104,6 +104,36 @@ document.addEventListener("keydown", (e) => {
   }
 });
 
+// ── fullscreen doc view ──────────────────────────────
+const fsBtn = document.getElementById("fullscreen-btn");
+const docView = document.getElementById("doc-view");
+
+async function toggleFullscreen(): Promise<void> {
+  if (document.fullscreenElement) {
+    await document.exitFullscreen();
+  } else if (docView) {
+    await docView.requestFullscreen().catch(() => {});
+  }
+}
+
+fsBtn?.addEventListener("click", () => void toggleFullscreen());
+document.addEventListener("fullscreenchange", () => {
+  if (fsBtn) fsBtn.textContent = document.fullscreenElement ? "⛶ Exit fullscreen" : "⛶ Fullscreen";
+});
+
+// "f" toggles fullscreen when not typing
+document.addEventListener("keydown", (e) => {
+  const tag = document.activeElement?.tagName;
+  if (
+    e.key === "f" && !e.ctrlKey && !e.metaKey && !e.altKey && docView &&
+    tag !== "INPUT" && tag !== "TEXTAREA" &&
+    !(document.activeElement?.className ?? "").includes("cm-")
+  ) {
+    void toggleFullscreen();
+    e.preventDefault();
+  }
+});
+
 // ── TOC scroll-spy ───────────────────────────────────
 const tocLinks = [...document.querySelectorAll<HTMLAnchorElement>(".toc-link")];
 if (tocLinks.length) {

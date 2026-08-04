@@ -249,6 +249,20 @@ a:hover { text-decoration: underline; }
   background: #fff;
 }
 
+/* ── fullscreen doc view ────────────────────────────── */
+.doc-view:fullscreen {
+  background: var(--color-bg);
+  overflow-y: auto;
+  padding: var(--space-7) var(--space-6);
+}
+.doc-view:fullscreen .prose { margin: 0 auto; }
+iframe.paper-frame:fullscreen,
+iframe.pdf-frame:fullscreen {
+  border: none;
+  border-radius: 0;
+  background: #fff;
+}
+
 /* ── search page ────────────────────────────────────── */
 .search-form { display: flex; gap: var(--space-2); margin: var(--space-4) 0 var(--space-5); max-width: 34rem; }
 .search-form input { flex: 1; padding: var(--space-2) var(--space-3); border: 1px solid var(--color-border); border-radius: var(--radius-md); background: var(--color-surface); color: var(--color-fg); font: inherit; }

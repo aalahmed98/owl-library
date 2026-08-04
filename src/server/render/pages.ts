@@ -87,6 +87,8 @@ function docHeader(doc: DocRead, actions: string): string {
 ${doc.meta.summary ? `<p class="doc-summary">${esc(doc.meta.summary)}</p>` : ""}`;
 }
 
+const fullscreenBtn = `<button id="fullscreen-btn" class="btn" title="Fullscreen (f)">⛶ Fullscreen</button>`;
+
 export function markdownDocPage(sidebar: string, doc: DocRead, html: string, toc: TocEntry[]): string {
   const rail = toc.length
     ? `<div class="toc"><p class="toc-title">On this page</p>
@@ -97,10 +99,12 @@ ${toc.map((t) => `<a class="toc-link toc-d${t.depth}" href="#${esc(t.id)}">${esc
     title: doc.meta.title,
     sidebar,
     rail,
-    content: `${docHeader(doc, `<a class="btn" href="/edit/${encodeURI(doc.path)}">Edit</a>`)}
+    content: `${docHeader(doc, `${fullscreenBtn}<a class="btn" href="/edit/${encodeURI(doc.path)}">Edit</a>`)}
+<div id="doc-view" class="doc-view">
 <article class="prose">
 ${html}
-</article>`,
+</article>
+</div>`,
   });
 }
 
@@ -109,8 +113,8 @@ export function htmlDocPage(sidebar: string, doc: DocRead): string {
   return layout({
     title: doc.meta.title,
     sidebar,
-    content: `${docHeader(doc, `<a class="btn" href="${raw}" target="_blank" rel="noopener">Open raw ↗</a>`)}
-<iframe class="paper-frame" sandbox="allow-scripts" src="${raw}" title="${esc(doc.meta.title)}"></iframe>`,
+    content: `${docHeader(doc, `${fullscreenBtn}<a class="btn" href="${raw}" target="_blank" rel="noopener">Open raw ↗</a>`)}
+<iframe id="doc-view" class="paper-frame" sandbox="allow-scripts" src="${raw}" title="${esc(doc.meta.title)}"></iframe>`,
   });
 }
 
@@ -119,8 +123,8 @@ export function pdfDocPage(sidebar: string, doc: DocRead): string {
   return layout({
     title: doc.meta.title,
     sidebar,
-    content: `${docHeader(doc, `<a class="btn" href="${raw}" target="_blank" rel="noopener">Open raw ↗</a>`)}
-<iframe class="pdf-frame" src="${raw}" title="${esc(doc.meta.title)}"></iframe>`,
+    content: `${docHeader(doc, `${fullscreenBtn}<a class="btn" href="${raw}" target="_blank" rel="noopener">Open raw ↗</a>`)}
+<iframe id="doc-view" class="pdf-frame" src="${raw}" title="${esc(doc.meta.title)}"></iframe>`,
   });
 }
 
