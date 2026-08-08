@@ -860,6 +860,24 @@ crowding-decisive — 2011-02-22 (pre-composite era), 2020-07-23/30,
 2020-10-21 — all FPs; no HIT depends on crowding timing; the Feb-2020 fire
 had crowding = 0 points.
 
+**RESULT (single re-run, 2026-08-08; before/after records preserved).**
+1,051 Tuesday-stamped rows replaced by 1,052 Friday-stamped rows
+(2006-06-16→). The oil flag record re-derived:
+- **The hit set is IDENTICAL — 19/19 hits unchanged**, including the
+  2020-02-28 composite fire (crowding contributed 0 points to it, as the
+  audit predicted).
+- False positives moved exactly where the lookahead lived: **removed**
+  2020-07-23, 2020-09-10, 2020-10-21, 2020-10-28 (the post-crash
+  crowding-decisive fires — with publication-correct timing the composite
+  never crossed 50 on those days); **added** 2011-02-25 and 2011-05-11
+  (the pre-composite-era 2011 crowding fire lands on its publication date
+  and edge-triggering re-arms once more); **shifted by 1–3 days** the two
+  2015-04 FPs.
+- Net records: `oil_stress` 12h/29fp → **12h/27fp (39 flags)**;
+  `contango_flip` unchanged 7/30 (crowding isn't an input to it). The
+  correction slightly IMPROVES measured precision — reported as a
+  correction, not claimed as skill.
+
 ### Pre-registered spec C-R4v2 — distress dwell/exit asymmetry (hysteresis revision, VERSIONED)
 
 **Motivation (from the record, mechanism not outcome-scan):** the hysteresis
@@ -886,6 +904,49 @@ record; the LIVE persisted regime stays v1 (adopting v2 live would be a
 further pre-registered step, not taken here). Success criteria stated in
 advance: fewer intra-crisis re-escalation FPs and fewer premature releases,
 without losing the 2018/2020/2022/2025 first-entry hits; published either way.
+
+**RESULT (single run, 2026-08-08; reproducible via
+`scripts/research/cr4v2-evaluate.mjs`; served live on /domino4):**
+
+| Variant | Escalations | Hit rate | 90% lift CI | De-escalations |
+|---|---|---|---|---|
+| **v1 (LIVE, citable)** | **8/17** (+1 pending) | 47.1% | **1.66×–3.64×** | 16 — incl. the premature 2025-03-27/05-12 releases (+175/+185bp after) |
+| **C-R4v2** | **6/13** (+1 pending) | 46.2% | **1.30×–3.90×** | 12 — the 2025 premature releases GONE (distress held Mar-2025→May-2026) |
+
+Success criteria: **met.** (i) Premature releases eliminated — under v2
+distress entered 2025-03-07 and held through the crisis (release 2026-05-26,
+followed by +90bp — still early, noted). (ii) Intra-crisis re-escalation FPs
+fell (2020-05-29 and 2025-04-09 disappear; 2020-07-15/09-24 remain). (iii)
+Every FIRST-entry hit kept: 2018-05-21, 2020-03-02, 2020-03-10, 2022-11-25,
+2023-03-17, 2025-03-07. What v2 loses: the 2025-05-26 and 2025-12-23
+re-entry "hits" — which existed only BECAUSE v1 released early; counting them
+as fresh skill was the exact artifact the audit flagged. Honest netting: v2's
+hit rate is the same, its CI is wider (fewer events) but still excludes 1×,
+and its event log is cleaner. **Disposition per spec: both records published
+permanently; v1 remains the live regime and the citable number. Adopting v2
+as the live hysteresis is a candidate future spec, not taken now.**
+
+### Corrections (audit latent-bug fixes, 2026-08-08 — measurement guards, no grade changed)
+
+- **transitionStats degraded-rank fix**: `degraded` days previously ranked 0,
+  so distress→degraded→distress sequences miscounted as fresh entries into
+  distress in the DIRECTIONAL stats (display-level; the C-R4 extractor was
+  always correct). Degraded days now carry the last known regime everywhere.
+  Effect: Bahrain /api/evaluation unchanged (no mid-crisis degraded gaps);
+  Oman's directional stats shifted (its history has degraded stretches).
+  README's stale "distress widened 64% at +20bd" updated to the corrected
+  55% (n=11) WITH its 43% any-calm-day baseline.
+- **Grading coverage guard**: a false positive now additionally requires ≥1
+  reference observation INSIDE the grading window (a window spanning a pure
+  data gap can never prove the move didn't happen). Re-derived every grade:
+  **zero changes** — the guard is protective for future gaps, not
+  retroactive.
+- Also fixed with no record impact: benchmark v1-fallback long-leg hardened
+  to `leg==="long" && !fitOnly`; Ariva parse-time price sanity gate (20–130);
+  stored-param schema failures now log loudly (a frozen threshold silently
+  reverting to default must be seen); partial fetch runs log `warn` (not
+  `ok`) in fetch_log and surface as "partial" in the UI; CFTC $limit
+  headroom documented.
 
 ### Pre-registered decision — rejected recovery rules stop generating live rows
 
