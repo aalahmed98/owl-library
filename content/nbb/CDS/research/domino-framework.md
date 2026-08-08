@@ -956,6 +956,121 @@ generating rows dated after its rejection date; historical rows are retained,
 labeled `experimental` on every surface (API row field + UI suffix), and stay
 out of scoreboard headlines. No grades change.
 
+## Candidate-signal specs P2-C1/C2/C3 (registered 2026-08-08, BEFORE any solve or evaluation)
+
+Owner objective, which sets the acceptance frame: **reduce false positives
+reaching the desk without losing hits.** Each candidate is evaluated in TWO
+roles inside ONE registered evaluation: (a) standalone alert rule, (b)
+conditioning/confirmation input on the historical desk-view items (the P2-P1
+population) — the wall-lens precedent. Common commitments, frozen now:
+
+- **Eligibility convention** (reused, not invented): live, non-fitOnly bonds
+  more than 550 days from maturity (the bundle's pull-to-par constant) —
+  this addresses C1's short-leg pull-to-par confound by the standing rule.
+- **Standalone grading**: new rules grade on the RESIDUAL (P2-L1
+  re-expression), widening, 60d window, era bars 80/110bp; C-R2 episodes
+  (60d chain), flags before 2017-08-22 unresolvable. **Standalone
+  acceptance — pre-committed hard bar**: a NEW desk-reaching rule is adopted
+  only if its episode-level lift 90% CI EXCLUDES 1× in the single run
+  (adding a rule ADDS desk items, so point-estimate lift is not enough given
+  the owner's objective); otherwise not generated live, record kept.
+- **Conditioning role (b)**: for every gradable P2-P1 desk item, the
+  candidate's confirmation STATE is computed as-of the item's date
+  (walk-forward by construction — all measures are trailing-window; state
+  uses the latest measure date ≤ item date, ≤7d stale; items before the
+  measure exists are "unknown" and reported separately). Measured: hit rate
+  of confirmed vs unconfirmed items, era-split, with a seeded bootstrap
+  (10k, seed 42) 90% CI on the hit-rate DIFFERENCE. **Adoption =
+  display-layer confidence badge on desk cards ONLY** (like the wall
+  annotation): pre-committed tradeoff price is ZERO — no suppression, so no
+  hit can be lost by construction; suppression would require its own
+  stronger registration. Adopted iff the pooled difference CI excludes 0 in
+  the mechanism's direction.
+- **Firing thresholds**: solved OUTCOME-BLIND before grading by frequency
+  matching at the frozen 19.9% target (the drainFromPct procedure), rounded
+  AGAINST us (toward rarer firing), grids stated per candidate. Solves are
+  recorded with neighbors.
+- One evaluation per candidate; era-split everything; flag-unit caveats as
+  usual; published whatever it says. Any change to what reaches the desk is
+  itself a registered decision (this spec registers only: possible new
+  standalone rules per the hard bar, and possible display badges).
+
+### P2-C1 — price compression ("trading on price", the domino-4→5 marker)
+
+**Mechanism:** as restructuring becomes priced, bonds across maturities
+converge toward a common dollar price (expected recovery); the market stops
+trading yield and starts trading price. Definitionally the domino-4→5
+transition.
+
+**Measure:** daily cross-sectional **dispersion = max − min clean price**
+($ points) across eligible bonds, requiring ≥3 eligible bonds; ≤7d-stale
+as-of prices; evaluated on the proxy's trading days. Not normalized —
+dollar-price dispersion is the object the mechanism talks about. **The state
+is JOINT, because low dispersion also happens near par in calm markets:**
+`compression = (avgPrice < 85) AND (dispersion ≤ D)` — 85 is the FROZEN
+`price_floor_threshold` (the existing distress convention, not a new
+number). D solved on a $1 grid: the LARGEST whole-dollar D whose
+unconditional state share ≤ 19.9% (rounding DOWN = against us).
+
+**Standalone rule** `price_compression` (tier curve-speed): edge-triggered
+on state entry; claims further deterioration (the transition completes
+toward domino 5) → graded on residual widening per the common frame.
+**Conditioning state**: compression active as-of the desk item's date.
+
+### P2-C2 — GCC-support decoupling
+
+**Mechanism:** Bahrain trading as "Saudi's problem" = tight co-movement with
+GCC peers. Bahrain widening while peers don't = the market repricing the
+support assumption — the difference between a 2018-style caught chain and a
+completion.
+
+**How this differs from the residual lens (stated at registration):** the
+residual strips GLOBAL EM beta + US rates; this candidate strips the PEER
+co-movement specifically — the support-premium channel. The overlap risk is
+real, so a **redundancy criterion is pre-committed**: if the weekly-change
+correlation between the decoupling measure and the residual over their
+common window is ≥ 0.8 in absolute value, the verdict is "redundant — fold
+into a future residual-lens peer variant", with NO adoption in either role.
+
+**Peer basket, honest:** Oman only — the sole peer with seeded price history
+(Jordan/Egypt exist as verified ISINs in the recon, unseeded; a future data
+addition can widen the basket under a new spec). The Oman proxy LEVEL
+carries the borrowed-ratio assumption; the measure below is a CHANGE, which
+that constant largely cancels out of (documented).
+
+**Measure:** `decoupling_60` = (BH proxy − OM proxy) at t minus the same gap
+60 common observations earlier — Bahrain widening RELATIVE to Oman over
+~3 months. Threshold: smallest 10bp level whose unconditional exceedance
+share ≤ 19.9% (rounded UP = against us).
+
+**Standalone rule** `gcc_decoupling`: edge-triggered crossing ≥ the bar;
+graded on residual widening per the common frame. **Conditioning state**:
+`decoupling_60 ≥ bar` as-of the item's date.
+
+### P2-C3 — liquidity evaporation
+
+**Mechanism:** markets empty before they crash — "no bid" is domino 4 from
+the inside. We have treated Ariva print gaps as a data quirk; this spec
+inverts them into a signal.
+
+**Infrastructure-vs-market confound, addressed:** historical prints were
+seeded from full Ariva MONTH pages (and the daily fetcher re-fetches
+current + prior month, self-healing transient outages) — so a missing
+business day in the stored history is genuine venue no-print evidence, not
+a fetch failure; fetch_log confirms failed runs leave no partial months.
+Residual noise: German exchange holidays count as market gaps for all bonds
+symmetrically (stated; affects the level, not changes).
+
+**Measure:** `noPrintShare_20` = mean across eligible bonds (that have
+traded for at least the full window) of the share of the trailing 20
+business days with NO print, evaluated on proxy trading days. Threshold:
+smallest 5%-grid level whose unconditional exceedance share ≤ 19.9%
+(rounded UP = against us).
+
+**Standalone rule** `liquidity_dry`: edge-triggered crossing ≥ the bar;
+graded on residual widening per the common frame. **Conditioning state**:
+`noPrintShare_20 ≥ bar` as-of the item's date.
+
 ## External code review & remediation (2026-08-07)
 
 An independent reviewer audited the engine, grading code, and this doc's claims.
