@@ -841,6 +841,60 @@ of today as **v1**. From here on:
   rejected-by-a-hair 1.90× vs 1.97× — a difference well inside noise. C2 is
   NOT retroactively adopted; the rule applies forward only.)
 
+## Audit remediation specs (2026-08-08) — registered BEFORE their evaluations
+
+### Pre-registered spec B1 — CFTC publication gate (correction-log class: lookahead fix)
+
+**Defect (audit B1):** `fetchers/cftcCot.ts` stamps COT rows at the Tuesday
+`report_date`; the CFTC publishes Friday ~3:30pm ET. The composite therefore
+read positioning ~3 days before it was public — the same defect class as the
+OPEC announced-date fix (correction 3).
+
+**Fix, frozen:** stamp each row's `obs_date` = report_date **+ 3 days** (the
+Friday it became knowable); `meta.report_date` keeps the Tuesday. No
+threshold, weight, or window changes; the crowding percentile and composite
+read the same values 3 days later. One backfill re-run; the full oil-tier
+flag-record diff is published below whatever it shows. Audit's measured
+expectation (recorded before our run): only four historical fires were
+crowding-decisive — 2011-02-22 (pre-composite era), 2020-07-23/30,
+2020-10-21 — all FPs; no HIT depends on crowding timing; the Feb-2020 fire
+had crowding = 0 points.
+
+### Pre-registered spec C-R4v2 — distress dwell/exit asymmetry (hysteresis revision, VERSIONED)
+
+**Motivation (from the record, mechanism not outcome-scan):** the hysteresis
+releases distress at the chatter time-scale (dwell 5bd, exit at entry−10)
+while distress is GRADED at the 60-trading-day scale. Consequence, visible
+twice: 2025's two distress→watch releases were each followed by +175/+185bp
+inside the open crisis, and 2020's three post-crash re-escalation FPs are the
+same mechanism mirrored (fast release → prompt re-entry → each re-entry
+graded as a fresh escalation into an exhausted move).
+
+**Parameterization, fixed blind (time-scale argument only):** leaving
+DISTRESS (only) requires **dwell ≥ 20 business days** (≈ one grading month —
+a quarter of the 60d exam window; the chatter scale stays for watch) AND
+**score < distressAt − 20** (double the generic exitBelow=10 — symmetric
+with how distress entry is twice watch's severity). Watch entry/exit and all
+scoring components untouched. Frozen: `distressDwellDays = 20`,
+`distressExitBelow = 20`.
+
+**Evaluation (ONE run):** replay the full history with v2 hysteresis (all
+else byte-identical), extract escalations, grade by the frozen C-R4 method
+(era curve bars, 60d, seeded bootstrap). **Publish v1 and v2 side by side,
+permanently**; the original C-R4 record remains the citable historical
+record; the LIVE persisted regime stays v1 (adopting v2 live would be a
+further pre-registered step, not taken here). Success criteria stated in
+advance: fewer intra-crisis re-escalation FPs and fewer premature releases,
+without losing the 2018/2020/2022/2025 first-entry hits; published either way.
+
+### Pre-registered decision — rejected recovery rules stop generating live rows
+
+Mirroring the peg disposition: a recovery rule REJECTED at evaluation
+(currently exactly `oil_above_breakeven`, rejected 2026-08-08 at 0/1) stops
+generating rows dated after its rejection date; historical rows are retained,
+labeled `experimental` on every surface (API row field + UI suffix), and stay
+out of scoreboard headlines. No grades change.
+
 ## External code review & remediation (2026-08-07)
 
 An independent reviewer audited the engine, grading code, and this doc's claims.
