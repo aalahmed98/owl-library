@@ -1201,6 +1201,65 @@ confirmations active — historically X% verified"), with active components
 listed and the tier table in the explainer; the existing individual badges
 remain. The open pending items' current tiers are reported in the results.
 
+### P2-C4 / P2-C5 RESULTS (single run, 2026-08-08; reproducible via `scripts/research/p2c45-evaluate.mjs`)
+
+**P2-C4 attribution conditioner — NOT ADOPTED, and the direction is the
+honest headline:** confirmed (Bahrain-driven) items hit 13/52 = 25% vs
+unconfirmed 13/36 = 36%; difference 90% CI **−27pp…+6pp** (includes 0,
+leaning NEGATIVE). Mechanistic reading, recorded (not acted on): the 20-obs
+window measures the move that ALREADY happened — by the time a move is
+majority-Bahrain-driven in the rearview, much of it may be spent; the
+conditioner as specified looks backward while the grade looks forward. NOT
+flipped into a reverse signal (that would be outcome-peeking; any inverse
+or leading variant needs a fresh spec). **The exemplar behaved exactly as
+motivated: 2022-09-02 reads share = −0.31 (global-dominated) →
+UNMARKED** — the conditioner does correctly identify beta-noise flags; it
+just doesn't predict their outcomes pairwise. 38 items unknown (pre-residual
+or de-minimis), reported per spec.
+
+**P2-C5 confluence — PRIMARY analysis: ADOPTED.** No tier was sparse
+(all n ≥ 8; the merge rule was not needed). The gradient is monotone:
+
+| Tier | Record | Rate | 90% CI | CDS era | Ariva era |
+|---|---|---|---|---|---|
+| 0 | 2/20 | **10%** | 0–20% | 0/2 | 2/18 |
+| 1 | 10/47 | **21%** | 13–32% | 7/24 | 3/23 |
+| 2 | 13/38 | **34%** | 21–47% | 3/8 | 10/30 |
+| 3+ | 9/21 | **43%** | 24–62% | 3/5 | 6/16 |
+
+Top (3+) vs bottom (0) difference 90% CI: **+13pp…+52pp — EXCLUDES 0 →
+tier badge adopted** (display-only, zero suppression). Type stratifier
+(display): escalations 3+ went 2/2; first-flags 3+ 7/19 — small strata,
+shown not claimed. Note against the owner's "above 50%" ask, answered
+honestly: NO tier crosses 50% at the point estimate; tier 3+ is 43% with a
+CI reaching 62% — the desk's best-confirmed items approach coin-flip-plus,
+they do not exceed it on the primary analysis.
+
+**SECONDARY (EXPLORATORY — all 16 cells published; at 90% CIs, 1–2 spurious
+standouts are EXPECTED; nothing here may become a badge or claim without
+fresh out-of-sample validation under a future spec):** the cells at or above
+50%: wall+oil (C0W1A0O1) **7/14 = 50% (CI 29–71%)** — the largest ≥50%
+cell and the best "which combination" answer available, hypothesis-
+generating only; compression-only 2/4; compression+attribution 2/4;
+all-four (C1W1A1O1) 2/2 = 100% (n=2); wall+compression 1/2; attribution
+cells at 0% include C0W0A1O0 0/11 (the C4 negative lean visible again).
+Framing permanently attached: with these cell sizes, the wall+oil standout
+is exactly the kind of result multiple-comparisons manufacture — it becomes
+testable, not citable.
+
+**Live items at adoption (2026-08-08):** the open **2026-07-03
+watch→distress escalation sits at tier 3+ with ALL FOUR confirmations
+active** (compression, wall, attribution, oil-precursor); the open
+2026-06-15 breakeven_gap first-flag sits at tier 3+ (wall, attribution,
+oil-precursor). The current crisis is maximally confirmed by every adopted
+conditioning lens the system has.
+
+**Shipped:** additive `confluence` field on /api/alerts and /api/transitions
+rows (Bahrain; Oman null); desk/transition cards show "confidence k/4 ·
+hist. X%" with active components and the tier table in the tooltip;
+individual badges retained. Nothing suppressed; no grade, threshold, or
+desk composition touched.
+
 ## External code review & remediation (2026-08-07)
 
 An independent reviewer audited the engine, grading code, and this doc's claims.
