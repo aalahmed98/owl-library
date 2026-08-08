@@ -1309,6 +1309,55 @@ Action-list live record at adoption: **0/0 resolved · 2 windows open**.
 Verified: every grade byte-stable, all snapshot endpoints byte-identical,
 Research view untouched, Oman presentation unchanged (null ≠ zero).
 
+### Registered spec P2-C6 — market-corroboration requirement for the action list (2026-08-08, BEFORE evaluation)
+
+**Mechanism rationale:** the four P2-C5 conditioners split into two classes.
+**Market-state** conditioners — compression (bonds trading on recovery
+value) and oil-precursor (an upstream domino demonstrably fell) — are live
+market corroboration. **Context** conditioners — wall proximity (near-wall
+is Bahrain's usual state; cheap to hold) and attribution (backward-looking;
+P2-C4 showed it does not predict pairwise) — can reach "2 of 4" by
+technicality without any market voice. Hypothesis: count matters less than
+class.
+
+**Rule:** action-list placement for episode FIRST-FLAGS requires confluence
+≥ 2 AND at least one market-state conditioner active. ESCALATIONS are
+exempt. **Honesty about the exemption:** it is motivated BOTH by mechanism
+(the composite regime score is itself multi-signal market corroboration —
+an escalation cannot happen without market inputs moving) AND by inspection
+of the historical record (the 2025-03-07 +150bp escalation hit fired on
+context-only confluence; the owner's keep-the-big-ones constraint is a
+stated design input). That is a disclosed post-hoc element — which is
+exactly why this rule's real verdict is prospective, not historical.
+
+**Multiplicity disclosure (mandatory):** this is the THIRD composition
+refinement derived from inspecting the same ~59-item action population,
+and the context-pair miss signature was FOUND by outcome inspection with
+the mechanism story attached afterwards-ish. The historical evaluation
+below is therefore **confirmatory in form only**; the binding verdict
+accrues on the prospective action-list scoreboard (P2-P2's live record,
+which tracks the P2-C6 composition from its adoption date). **Stated
+explicitly: no further composition refinements from historical slicing —
+this population is statistically exhausted; any future change requires
+live out-of-sample data.**
+
+**Evaluation (one run, FULL history):** recompute the historical action
+list under P2-C6 vs P2-P2 — items kept/dropped, hits/FPs in each, and the
+explicit list of every dropped HIT with its measured follow-through (peak
+move). **STOP rule, binding:** if any dropped hit is MAJOR — an ESCALATION
+hit (which the exemption should make impossible; verified, not assumed), or
+a first-flag hit with measured peak move ≥ 100bp — do NOT adopt; write the
+result here and report back for an owner decision instead.
+
+**UI on adoption (if not stopped):** demoted first-flags (count ≥2,
+context-only) go to the watch list with the distinct label "2
+confirmations, but no market corroboration — historically noise-prone";
+watch-list header caveat updated; the desk-header action-list record notes
+composition v2 (P2-C6) from adoption with the prior P2-P2 population line
+retained; the tier chart gains the placement footnote. Oman unchanged
+(null ≠ zero stands). Zero deletion, zero Research-view/grading/generation
+changes.
+
 ## External code review & remediation (2026-08-07)
 
 An independent reviewer audited the engine, grading code, and this doc's claims.
