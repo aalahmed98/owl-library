@@ -1358,6 +1358,62 @@ retained; the tier chart gains the placement footnote. Oman unchanged
 (null ≠ zero stands). Zero deletion, zero Research-view/grading/generation
 changes.
 
+### P2-C6 RESULT (single run, 2026-08-08) — **STOPPED BY THE PRE-REGISTERED RULE; NOT ADOPTED**
+
+Reproducible via `scripts/research/p2c6-evaluate.mjs`. Full history: 133
+desk items (126 gradable, 2 open).
+
+| List | BEFORE (P2-P2, count ≥2) | AFTER (P2-C6) |
+|---|---|---|
+| Action | **22/59 = 37%** (37 FP) | **21/49 = 43%** (28 FP) |
+| Watch | 12/67 = 18% (55 FP) | 13/77 = 17% (64 FP) |
+| — escalations | 6/11 = 55% | 6/11 = 55% (exempt, unchanged) |
+| — first-flags | 16/48 = 33% (32 FP) | 15/38 = 39% (23 FP) |
+
+Demoted by the rule: **10 items — 9 false positives and 1 hit.** The nine
+FPs are exactly the predicted signature (every one active on
+`[wall, attribution]` only): 2023-05-19, 2023-06-15, 2023-09-19,
+2023-10-13, 2023-11-07, 2024-05-29, 2024-08-22, 2024-12-05, 2025-10-27.
+
+**The dropped hit triggers the STOP rule:**
+
+| Dropped hit | Type | Active conditioners | Measured peak |
+|---|---|---|---|
+| **2025-01-27 `fundamental/rollover_wall`** | first-flag | wall, attribution (context-only) | **+325bp** |
+
+Independently recomputed from the persisted proxy: −4bp on 2025-01-27 →
+**peak +325bp on 2025-07-01**, against a 180bp era bar — not the "modest"
+hit anticipated when the rule was drafted, but the single largest
+first-flag follow-through in the 2025 arc, and the flag that opened it.
+Per the binding STOP rule (major = escalation hit, or first-flag hit with
+peak ≥ 100bp), **P2-C6 is NOT adopted; the desk composition remains P2-P2
+unchanged.** No UI change was made; no grade, generation, or record was
+touched.
+
+**What the run teaches (recorded, not acted on):** the market-corroboration
+hypothesis is *directionally* supported — it removes 9 FPs for 1 hit and
+lifts first-flag action precision 33%→39% — but the one hit it removes is a
+big one, and it is removed for a mechanically instructive reason: the
+January-2025 rollover-wall flag fired BEFORE the market corroborated,
+which is precisely what an early-warning fundamental flag is supposed to
+do. Requiring market confirmation on fundamental-tier flags is, in that
+light, requiring the early-warning tier to stop being early. Any successor
+spec should confront that directly (e.g. exempting the fundamental tier as
+well as escalations, or requiring corroboration only for market-speed
+tiers) — but per the multiplicity disclosure above, **this population is
+statistically exhausted: no successor may be selected by re-slicing this
+history.** A tier-scoped variant would need to be justified from mechanism
+alone and judged on live data.
+
+**Owner decision required** (options stated neutrally, none adopted):
+(1) leave composition at P2-P2 (status quo, the default this result
+implies); (2) adopt a mechanism-justified tier-scoped variant — corroboration
+required for curve/recovery first-flags only, fundamental and escalations
+exempt — registered fresh, with its historical record published as
+descriptive-only and its verdict prospective; (3) accept the 1-hit-for-9-FPs
+trade explicitly as an owner risk preference, overriding the STOP rule in
+full knowledge of the +325bp miss.
+
 ## External code review & remediation (2026-08-07)
 
 An independent reviewer audited the engine, grading code, and this doc's claims.
