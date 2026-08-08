@@ -34,9 +34,11 @@ alert fires crossing 50; graded hit if Brent falls ≥15% within 45 days (base r
 15.2%). Current scorecard, both units (spec C-R2): flag-level 12/41 = 29%;
 **episode-level 4/14 = 28.6%, 90% CI 7–50%, lift CI 0.47×–3.29×** — the point
 estimate is ≈2× base rate but 14 episodes cannot yet statistically exclude
-no-skill; provisional until live flags accumulate. Fired 2020-02-27, six trading
-days before the OPEC collapse (a scheduled-meeting fire — survives the
-announced-date audit).
+no-skill; provisional until live flags accumulate. Fired **2020-02-28** (the
+stored alert; an earlier "02-27" here was a transcription slip — correction-log
+entry 3 has always said 02-28), **six trading days counted to the 2020-03-09
+OPEC collapse** (Feb-28 → Mar 2/3/4/5/6 → Mar-9); a scheduled-meeting fire —
+survives the announced-date audit.
 
 ### Signal registry (what feeds this domino)
 
@@ -143,7 +145,8 @@ ACCEPTANCE: episodes preserved; lift not below the post-C1 baseline; one run.
   baseline graded FP) but added 4 FPs elsewhere. Under the precision-must-not-
   degrade rule: rejected. Noted as the nearest miss so far; a stricter-persistence
   variant may be pre-registered in the future, but NOT iterated-until-it-passes.
-- Composite stands unchanged: **12h/28fp = 30%, 1.97× lift.** Untested queue
+- Composite stands unchanged: **12h/28fp = 30%, 1.97× lift** *(flag-level;
+  C-R2's episode CI includes 1× — quote as "≈2×, provisional")*. Untested queue
   items remain: de-seasonalized crack spreads (#3, demand-side — the gap in our
   coverage), financial-stress left-tail composite (#4), Cushing×contango (#5),
   OVX VRP (#6), CFTC crowding+unwind refinement (#7).
@@ -236,8 +239,8 @@ not the haircut; an oil trader watches these, a bonds desk doesn't). Composite
 
 **Backtest verdict — after the EIA out-of-sample test (2010→today, frozen v1
 thresholds, contango history added AFTER thresholds were fixed):**
-- `oil_stress` composite: 15 hits / 25 FP (~38%) — fired **2020-02-27, six trading
-  days before the OPEC collapse** (hit). **Measured base rate: 31%** of ALL days
+- `oil_stress` composite: 15 hits / 25 FP (~38%) — fired **2020-02-28, six
+  trading days counted to the 2020-03-09 OPEC collapse** (hit). **Measured base rate: 31%** of ALL days
   are followed by an 8%/30d drop (oil is just that volatile), so the aggregate
   precision lift is only ~1.2× — the tier's demonstrated value is the TIMING on
   the big episodes (Feb-2020 lead), not aggregate precision. Earlier "2× base
@@ -274,7 +277,9 @@ exceed v1's ~1.2×, (b) the Feb-2020 oil_stress flag must still grade a hit,
 results recorded below, adopt or reject.
 
 **RESULT — ADOPTED (same day).** Base rate 31.1% → 15.2%. `oil_stress`: 12h/28fp
-= 30% accuracy = **1.97× lift** (vs 1.2× before) ✓. Feb-2020 composite flag still
+= 30% accuracy = **1.97× lift** (vs 1.2× before) ✓. *[Flag-level; superseded as
+a headline by C-R2: episode-level 90% lift CI 0.47×–3.29× includes 1× —
+"≈2×, provisional" is the citable phrasing.]* Feb-2020 composite flag still
 hits ✓ — and the Feb-3 contango flip now grades HIT (the old 30d window marked the
 dataset's earliest, best warning a false positive because the crash landed on day
 33 — the metric was punishing earliness). `contango_flip` 7/37 = 1.24× lift;
@@ -593,8 +598,10 @@ doesn't, that gets published too. Frozen before any outcome is looked at:
   number is inherited frozen (regime thresholds untouched since adoption;
   bars from C-R3).
 
-**RESULT (single run, 2026-08-08) — the flag has skill; first CI in the system
-to exclude no-skill.**
+**RESULT (single run, 2026-08-08) — the flag has skill; the first (and, after
+the audit's Oman calm→watch demotion, the only BAHRAIN) CI in the system to
+exclude no-skill. Audit 2026-08-08: reproduced exactly from the DB and
+strengthened under cluster/joint bootstrap stress — P(no-skill) ≈ 1.2%.**
 
 | Slice | Record | Hit rate | 90% CI | Lift vs 17.76% base |
 |---|---|---|---|---|
@@ -781,6 +788,13 @@ The anti-overfitting contract. All scoring thresholds across every tier (credit
 regime, oil-stress composite, alarm families, alert grading rules) are frozen as
 of today as **v1**. From here on:
 
+0. **Version-control choreography (adopted 2026-08-08, audit A1).** This doc is
+   git-tracked in theArchive; its history is the pre-registration audit trail.
+   Every spec change is TWO commits: a **spec-commit** (the registered spec,
+   before any evaluation runs) and a **results-commit** (the recorded outcome,
+   after the single run). A spec whose evaluation cannot point at an earlier
+   spec-commit is self-attestation and does not count as pre-registered.
+
 1. **Any proposed change must be specified before it is evaluated** — write the
    rule down first, then test it. No browsing history for what "would have worked".
 2. **Leave-one-episode-out**: improvements motivated by one episode (e.g. 2018-Q4)
@@ -789,11 +803,43 @@ of today as **v1**. From here on:
 3. **Data additions are not tuning**: activating an already-specified component on
    new history (e.g. EIA WTI contango, thresholds fixed before its history was
    seen) is a true out-of-sample test — the re-scored backtest is evidence, not fitting.
-4. **Both operating points are reported**: `oil_stress` (sensitive, ~2× base-rate
-   hit ratio, more false alarms) and `oil_alarm` (2-of-3 independent families +
-   falling-trend gate; strict). The alarm tier is data-starved until the EIA
-   contango history lands — its verdict is pending, not failed.
+4. **Both operating points are reported**: `oil_stress` (sensitive, more false
+   alarms) and `oil_alarm` (2-of-3 independent families + falling-trend gate;
+   strict). *[SUPERSEDED markers, audit 2026-08-08: the "~2× base-rate hit
+   ratio" here is the flag-level point estimate — C-R2's episode-level 90% lift
+   CI (0.47×–3.29×) includes 1×, so "~2×, provisional" is the only honest
+   phrasing. `oil_alarm`'s verdict is no longer "pending": it was measured at
+   1.05× at crash scale and RETIRED 2026-08-07 — see the retirement record.]*
 5. **The scoreboard is never curated.** False positives stay on the page.
+
+### Protocol additions (2026-08-08, adopted from the independent audit — forward rules, no past verdicts relitigated)
+
+- **Robustness annex is standing method for headline claims.** Any claim
+  presented as a headline (a CI excluding no-skill, an adopted lens's lift)
+  must also report the audit's two stress variants: (i) an **arc-cluster
+  bootstrap** (resample crisis arcs, not individual events — events inside one
+  arc are not exchangeable) and (ii) a **joint bootstrap** over the base-rate
+  estimate and the hit rate. Audit reference results: Bahrain C-R4 escalations
+  survive both (**P(no-skill) ≈ 1.2%** under cluster/joint stress —
+  reproduced independently from the DB); Oman inversion survives (P 0.8–2.2%);
+  Oman calm→watch does NOT (P ≈ 9.7%) and was demoted accordingly.
+- **O-R1 rounding fork, recorded:** O-R1 solved its bars by NEAREST match
+  (fundamental 50bp → 22.43% vs target 19.9%) where C-R1/C-R3 round AGAINST
+  us (next level with exceedance ≤ target — which would have picked 60bp →
+  16.15%). Sensitivity row, computed at audit: at the against-us 60bp bar the
+  Oman fundamental record's only graded rule (breakeven_gap 1/2) is
+  unchanged; the curve bar fork (30bp nearest vs 40bp against-us → 10.84%)
+  would harden the inversion exam — the inversion episode CI excluding
+  no-skill survives at 30bp and is expected to survive at 40bp but that run
+  has NOT been performed; any future Oman re-derivation must use the
+  against-us convention and note this fork. Convention now unified: ALL
+  future bar solves round against us.
+- **Noise-aware acceptance for FUTURE specs:** a candidate is rejected on
+  precision grounds only if precision degrades beyond bootstrap-CI overlap of
+  the incumbent's record, OR by an explicitly pre-committed false-positive vs
+  missed-episode price stated in the spec. (Motivated by C2's
+  rejected-by-a-hair 1.90× vs 1.97× — a difference well inside noise. C2 is
+  NOT retroactively adopted; the rule applies forward only.)
 
 ## External code review & remediation (2026-08-07)
 
@@ -1052,15 +1098,18 @@ displays — difference negligible):
 | Split | Record | Lift 90% CI |
 |---|---|---|
 | All escalations | 5/18 = 27.8% | 0.63×–2.50× (includes 1×) |
-| calm→watch | **4/10 = 40.0%** | **1.13×–3.94× — excludes 1×** |
+| calm→watch | **4/10 = 40.0%** | 1.13×–3.94× naive — **DEMOTED 2026-08-08**: under the audit's arc-cluster bootstrap the CI is **0.62×–3.72× (P≈9.7%)** — does NOT exclude no-skill; cite only as a caveated secondary |
 | watch→distress | 1/8 = 12.5% | 0×–2.11× (no skill shown) |
 
 **Interpretation (out-of-sample verdict on the frozen system):**
 
 1. **The inversion signal generalizes.** The single strongest Bahrain-era curve
-   rule shows a lift CI excluding no-skill on a credit it never saw — the
-   system's second-ever CI above 1×, earned out-of-sample. calm→watch
-   escalations also clear 1×.
+   rule shows a lift CI excluding no-skill on a credit it never saw — earned
+   out-of-sample, and ROBUST under the audit's cluster/joint bootstrap
+   (P(no-skill) 0.8–2.2%). **Oman inversion carries the out-of-sample story
+   alone**; calm→watch's naive CI cleared 1× but did not survive arc-cluster
+   stress (P≈9.7%, demoted above) — it is a caveated secondary, never a
+   headline.
 2. **watch→distress does NOT generalize on Oman (1/8).** The distress entries
    cluster in 2017–2018 early-sample days; several fired off the persistent
    curve component. Recorded as a genuine limitation, not explained away.
@@ -1075,9 +1124,11 @@ displays — difference negligible):
    the 2020 distress window.
 
 Comparison anchor: Bahrain C-R4 escalations 8/17 = 47.1% (CI 1.66×–3.64×);
-Oman pooled escalations are weaker, Oman calm→watch and inversion-episodes are
-comparable. Net: the frozen thresholds carried a real, measurable part of their
-skill to a second sovereign without any re-tuning.
+Oman pooled escalations are weaker; **Oman inversion-episodes are the
+comparable, robust result** (calm→watch demoted per the audit — secondary
+only). Net: the frozen thresholds carried a real, measurable part of their
+skill to a second sovereign without any re-tuning, demonstrated by the
+inversion record.
 
 ## Phase 2 — the four lenses (2026-08-08→)
 
@@ -1098,9 +1149,11 @@ Branch `lenses-phase2` in the repo; Bahrain/Oman API regression guard active
 | P2-L3 wall | **ADOPTED (conditioning)** | Near-wall flags hit 33% vs 7% away (Ariva era, caveated); the 2026-09-08 $500mn maturity was missing from the wall data — found, sourced, countdown live 31 days out |
 | P2-L4 recovery | **3 rules LIVE, 1 gated** | market_access 1.29× / curve_uninversion 2.18× / trend_reversal 1.21× (all CIs include 1×; symmetric counterpart, not a skill claim); oil_above_breakeven failed (0/1) |
 
-Regression guard final audit: zero outcome changes across all 444 pre-existing
-alert rows (both countries); existing scoreboard rules byte-stable; every
-endpoint diff classified deliberate. Tests 80 → 91, green throughout.
+Regression guard final audit: zero outcome changes across all **366 distinct
+pre-existing alert rows** (444 endpoint rows — the shared oil tier is served
+to both countries, so per-country endpoint counts double-count it); existing
+scoreboard rules byte-stable; every endpoint diff classified deliberate.
+Tests 80 → 91, green throughout.
 
 ### Presentation convention — Desk view vs Research view (2026-08-08)
 
@@ -1174,6 +1227,11 @@ Published whatever it says; never re-tuned.
 | Bahrain, real-CDS era | 38 | 13 | **34.2%** | 21.1–47.4% | 0 |
 | Bahrain, Ariva era | 87 | 21 | **24.1%** | 17.2–32.2% | 2 |
 | Oman (single era) | 80 | 25 | **31.3%** | 22.5–40.0% | 0 |
+
+Composition note (audit): 26 of Oman's 80 gradable desk items are SHARED
+oil-tier episode-firsts (Domino Zero is computed once and served to both
+countries) — the Oman-specific portion is 54 items. Stated wherever the Oman
+desk record is quoted.
 
 Reading, honestly: roughly one desk-level item in four (Ariva era) to one in
 three verifies against its own frozen bar. That is the composite record of
