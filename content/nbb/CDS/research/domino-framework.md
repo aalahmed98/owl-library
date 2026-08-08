@@ -1260,6 +1260,44 @@ hist. X%" with active components and the tier table in the tooltip;
 individual badges retained. Nothing suppressed; no grade, threshold, or
 desk composition touched.
 
+### Registered decision P2-P2 — desk composition v2: action list / watch list (2026-08-08)
+
+**Owner decision:** Desk view no longer PRESENTS 0-and-1-confirmation items
+as actionable flags. This is a composition revision to the P2-P1-frozen desk
+selection — registered here as its own decision, per the desk-view guard.
+
+**Decision basis (the P2-C5 primary stratification, flag-unit caveats as
+always):** tier 0: 2/20 · tier 1: 10/47 · tier 2: 13/38 · tier 3+: 9/21;
+**2+ combined: 22/59 = 37%** vs 0–1 combined: 12/67 = 18% (≈1 hit per 4.6
+false alarms).
+
+**Composition rule (frozen):**
+- **ACTION LIST** = desk items (transitions + episode-firsts + open windows)
+  with confluence count **≥ 2** at fire time — closed or open.
+- **WATCH LIST** = items with count 0–1 — VISIBLY PRESENT but demoted:
+  collapsed section, muted styling, labeled *"watch — historically 1 hit per
+  ~4.6 false alarms, no action expected"*, tier shown per item. Open pending
+  sub-2 items sit in the watch list WITH their open-window label — an open
+  window is never hidden, it is just not presented as actionable.
+- **ZERO deletion, zero suppression from Research view, zero generation or
+  grading changes.** The uncurated record and the P2-P1 composite remain
+  untouched and citable exactly as computed.
+
+**Prospective grading:** the action-list population (count ≥ 2) is a NEW
+registered composite; its live record accrues from **2026-08-08** forward
+(it starts empty except the currently-open ≥2 items) and is published on the
+desk header alongside P2-P1, labeled **"action-list record — live since
+2026-08-08"**. P2-P1 stays the historical composite; its headline is NOT
+retroactively re-cut.
+
+**Oman, decided explicitly:** Oman items keep the current (undivided)
+presentation until Oman conditioners exist — **confluence null ≠ zero;
+absence of instrumentation is not absence of confirmation**; nothing is
+demoted on missing data.
+
+**Not bundled:** the C-R4v2 hysteresis adoption remains a separate pending
+owner decision.
+
 ## External code review & remediation (2026-08-07)
 
 An independent reviewer audited the engine, grading code, and this doc's claims.
