@@ -1414,6 +1414,57 @@ descriptive-only and its verdict prospective; (3) accept the 1-hit-for-9-FPs
 trade explicitly as an owner risk preference, overriding the STOP rule in
 full knowledge of the +325bp miss.
 
+### Registered spec P2-C7 — TIER-SCOPED market corroboration (2026-08-08, BEFORE evaluation)
+
+Owner decision after the P2-C6 stop: option (2), the tier-scoped variant.
+
+**Mechanism rationale (the rule's only legitimate basis, stated first):**
+the domino chain's tiers differ in what they are FOR.
+- **Curve- and recovery-tier** signals are themselves derived from market
+  prices. Demanding that a second, independent MARKET state corroborate
+  them is coherent: it asks the market to agree with itself across
+  channels (price-curve behaviour vs recovery-value compression / an
+  upstream oil domino having demonstrably fallen).
+- **Fundamental-tier** signals (oil below breakeven, rollover wall) are by
+  construction PRE-market. Their entire value proposition is months of lead
+  BEFORE the market reprices. Requiring market corroboration there is a
+  category error: it would systematically delete the earliest and most
+  valuable warnings. P2-C6 demonstrated this concretely — its only dropped
+  hit was the fundamental-tier 2025-01-27 `rollover_wall` flag (+325bp),
+  which was valuable precisely because it did NOT wait for corroboration.
+- **Escalations** remain exempt (as under P2-C6): the composite regime
+  score is multi-signal market corroboration by construction.
+
+**Rule:** action-list placement requires confluence ≥ 2 AND — for
+CURVE-tier and RECOVERY-tier FIRST-FLAGS only — at least one market-state
+conditioner (compression or oil-precursor) active. Fundamental-tier
+first-flags and all escalations are exempt from the corroboration
+requirement; the ≥2 count still applies to them.
+
+**Mandatory disclosure (not softened):** the tier scoping was SUGGESTED BY
+the P2-C6 failure — it is outcome-informed in its timing, even though the
+mechanism argument is a priori and follows the framework's own tier
+semantics. Therefore the historical before/after table below is
+**DESCRIPTIVE ONLY and explicitly NOT evidence for the rule**; it is
+reported so the record is complete and **may not be quoted as validation**.
+The binding verdict accrues PROSPECTIVELY on the live action-list
+scoreboard from the adoption date. **Exhaustion clause, restated: this
+population supports no further composition refinements; any future variant
+requires live out-of-sample data.**
+
+**STOP condition (restated):** if the tier-scoped rule would drop ANY
+escalation hit, or any first-flag hit with peak follow-through ≥ 100bp, do
+NOT adopt — report back for an owner decision.
+
+**On adoption:** curve/recovery first-flags with ≥2 count but no
+market-state conditioner move to the watch list, labeled "market-derived
+signal without market corroboration — historically noise-prone"; the desk
+header notes composition v3 (P2-C7) with the prior P2-P2/P2-C6 lines
+retained; the tier-chart footnote states the tier scoping precisely; the
+watch-list header caveat is updated. Oman unchanged (null ≠ zero).
+Presentation-layer only: zero deletion, zero Research-view change, zero
+grading or generation change.
+
 ## External code review & remediation (2026-08-07)
 
 An independent reviewer audited the engine, grading code, and this doc's claims.
