@@ -1071,7 +1071,72 @@ smallest 5%-grid level whose unconditional exceedance share ≤ 19.9%
 graded on residual widening per the common frame. **Conditioning state**:
 `noPrintShare_20 ≥ bar` as-of the item's date.
 
-## External code review & remediation (2026-08-07)
+### P2-C1/C2/C3 RESULTS (single run, 2026-08-08; reproducible via `scripts/research/p2c-evaluate.mjs`)
+
+**Solves (outcome-blind, recorded with neighbors):** C1 D = **$50**
+(state share 15.9%: the joint avg<85 condition binds — even a generous
+dispersion cap keeps the state rare because prices are rarely that
+distressed); C2 bar = **+60bp**/60obs (17.5%; 50bp → 20.2%); C3 bar =
+**10%** no-print share (13.7%; 5% → 28.2%). Measure coverage: C1 from
+2017-09-18 (needs 3 eligible bonds), C2 from 2017-07-05 (needs Oman), C3
+from 2016-11-10.
+
+**C2 redundancy check:** weekly-change corr vs the residual = **0.575** —
+below the 0.8 pre-commit; the peer channel is a DISTINCT measure (not
+folded). It failed on its own merits instead (below).
+
+**Standalone role — ALL THREE FAIL the pre-committed hard bar (lift CI must
+exclude 1×). No new desk-reaching rules:**
+
+| Rule | Flags | Episodes (first-flag) | Lift 90% CI | Verdict |
+|---|---|---|---|---|
+| `price_compression` | 21 | 1/8 = 13% | 0.00×–2.43× | NOT adopted |
+| `gcc_decoupling` | 34 | 2/13 = 15% | 0.00×–2.00× | NOT adopted |
+| `liquidity_dry` | 19 | 2/17 = 12% | 0.00×–1.53× | NOT adopted |
+
+Instructive honesty, recorded: decoupling's episode hits are exactly the
+support-repricing episodes the mechanism names (2018-05, 2025-03) but the
+rule drowns in 2023 FPs — with a single peer, OMAN's own idiosyncratic
+moves masquerade as Bahrain decoupling; a wider basket is the obvious
+future variant. `liquidity_dry`'s flag dates cluster at year-ends
+(2017-12-26, 2018-12-25, 2019-12-27, 2020-12-28, 2022-01-03, 2023-12-27,
+2024-12-27, 2025-12-29): the German-holiday confound STATED in the spec is
+plainly the dominant driver — the measure as built detects the Frankfurt
+calendar, not Bahrain liquidity. Any retry must be holiday-adjusted (new
+spec).
+
+**Conditioning role on the P2-P1 desk items (126 gradable; badge criterion:
+confirmed − unconfirmed hit-rate difference CI excludes 0):**
+
+| Candidate | Confirmed | Unconfirmed | Difference 90% CI | Verdict |
+|---|---|---|---|---|
+| `price_compression` | **10/19 = 53%** | 20/89 = 22% | **+10pp…+50pp — EXCLUDES 0** | **ADOPTED (display badge)** |
+| `gcc_decoupling` | 7/21 = 33% | 23/87 = 26% | −11pp…+26pp | not adopted |
+| `liquidity_dry` | 3/12 = 25% | 27/99 = 27% | −23pp…+21pp | not adopted |
+
+**price_compression era-robustness (the pooled difference is NOT an era-mix
+artifact):** CDS era confirmed 8/16 = 50% vs unconfirmed 1/5 = 20%; Ariva
+era confirmed 2/3 = 67% vs unconfirmed 19/84 = 23% — the confirmed rate is
+higher WITHIN both eras. Caveats attached wherever the badge appears:
+flag-unit numbers; confirmed items concentrate in deep-distress periods
+(that is the mechanism, and also the caveat); 18 desk items predate the
+measure (reported "unknown", unbadged).
+
+**Adoption implemented as registered:** a display-layer badge on desk cards
+whose date falls in the compression state ("trading-on-price state —
+desk items in this state verified 53% vs 22% historically") — computed
+walk-forward from `derived.price_compression` (persisted each backfill;
+state = avgPrice < 85 [frozen threshold] AND dispersion ≤ $50 [this solve],
+≥3 eligible bonds, 550d pull-to-par exclusion). NO suppression, NO
+composition change to Desk view, no grade touched. gcc_decoupling and
+liquidity_dry: code retained as research measures, nothing generated, no
+badge; both may return only under new specs (wider peer basket /
+holiday-adjusted calendar).
+
+Live observation at adoption (dated 2026-08-08, context not claim): the
+compression state is ACTIVE now — the 2026-06/07 desk items, including the
+open 2026-07-03 watch→distress escalation, carry the badge. The market is
+currently trading Bahrain on price.
 
 An independent reviewer audited the engine, grading code, and this doc's claims.
 Verdict accepted in full (see `haircut-monitor/review-response.md` for the
