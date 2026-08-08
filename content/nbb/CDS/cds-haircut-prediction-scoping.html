@@ -1,0 +1,557 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Predicting Sovereign CDS Haircuts — Scoping Note (Bahrain)</title>
+  <meta name="archive-tags" content="banking, bahrain, cds, credit-risk">
+  <meta name="archive-summary" content="Scoping note: can we predict changes in sovereign CDS haircut (loss-given-default) for an oil-driven credit like Bahrain — which indicators lead, at what horizon, how reliably, and example scenarios of when we act versus when typical banks react.">
+  <meta name="archive-created" content="2026-08-06">
+  <meta name="archive-updated" content="2026-08-06">
+  <meta name="archive-status" content="draft">
+  <style>
+    /* ==tokens== (synced from design/tokens.css — do not edit inside the markers) */
+    :root {
+      --color-bg: #faf9f7;
+      --color-surface: #ffffff;
+      --color-fg: #1a1a1e;
+      --color-muted: #6b6b76;
+      --color-border: #e4e2dd;
+      --color-accent: #2f6fed;
+      --color-accent-fg: #ffffff;
+      --color-accent-soft: #e8effd;
+      --color-danger: #c4483c;
+      --color-warn-bg: #fdf6e3;
+      --color-code-bg: #f2f1ee;
+      --color-mark: #fff3bf;
+      --font-body: "Charter", "Georgia", "Cambria", "Times New Roman", serif;
+      --font-ui: system-ui, -apple-system, "Segoe UI", sans-serif;
+      --font-mono: "SFMono-Regular", "Cascadia Code", "Consolas", "Menlo", monospace;
+      --text-xs: 0.75rem;
+      --text-sm: 0.875rem;
+      --text-base: 1.0625rem;
+      --text-lg: 1.25rem;
+      --text-xl: 1.5rem;
+      --text-2xl: 1.875rem;
+      --text-3xl: 2.375rem;
+      --leading-body: 1.65;
+      --leading-tight: 1.25;
+      --measure: 68ch;
+      --space-1: 0.25rem;
+      --space-2: 0.5rem;
+      --space-3: 0.75rem;
+      --space-4: 1rem;
+      --space-5: 1.5rem;
+      --space-6: 2rem;
+      --space-7: 3rem;
+      --space-8: 4rem;
+      --radius-sm: 4px;
+      --radius-md: 8px;
+      --radius-lg: 12px;
+      --shadow-sm: 0 1px 2px rgba(20, 20, 25, 0.06);
+      --shadow-md: 0 2px 8px rgba(20, 20, 25, 0.1);
+    }
+    [data-theme="dark"] {
+      --color-bg: #16161a;
+      --color-surface: #1e1e24;
+      --color-fg: #e8e6e3;
+      --color-muted: #9a98a0;
+      --color-border: #32323a;
+      --color-accent: #6b9bff;
+      --color-accent-fg: #10101c;
+      --color-accent-soft: #23304d;
+      --color-danger: #e0685c;
+      --color-warn-bg: #2e2a1e;
+      --color-code-bg: #24242b;
+      --color-mark: #4d4425;
+      --shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.4);
+      --shadow-md: 0 2px 8px rgba(0, 0, 0, 0.5);
+    }
+    /* ==/tokens== */
+
+    /* When opened standalone (not in the app frame), follow the OS theme. */
+    @media (prefers-color-scheme: dark) {
+      :root:not([data-theme]) {
+        --color-bg: #16161a;
+        --color-surface: #1e1e24;
+        --color-fg: #e8e6e3;
+        --color-muted: #9a98a0;
+        --color-border: #32323a;
+        --color-accent: #6b9bff;
+        --color-accent-fg: #10101c;
+        --color-accent-soft: #23304d;
+        --color-danger: #e0685c;
+        --color-warn-bg: #2e2a1e;
+        --color-code-bg: #24242b;
+        --color-mark: #4d4425;
+      }
+    }
+
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      background: var(--color-bg);
+      color: var(--color-fg);
+      font-family: var(--font-body);
+      font-size: var(--text-base);
+      line-height: var(--leading-body);
+    }
+    .paper {
+      max-width: var(--measure);
+      margin: 0 auto;
+      padding: var(--space-6) var(--space-4) var(--space-8);
+    }
+    h1 { font-size: var(--text-3xl); line-height: var(--leading-tight); margin: 0 0 var(--space-2); }
+    h2 { font-size: var(--text-xl); line-height: var(--leading-tight); margin: var(--space-6) 0 var(--space-3); border-bottom: 1px solid var(--color-border); padding-bottom: var(--space-2); }
+    h3 { font-size: var(--text-lg); margin: var(--space-5) 0 var(--space-2); }
+    .byline { color: var(--color-muted); font-family: var(--font-ui); font-size: var(--text-sm); margin-bottom: var(--space-6); }
+    a { color: var(--color-accent); }
+    code { font-family: var(--font-mono); font-size: 0.88em; background: var(--color-code-bg); padding: 1px 5px; border-radius: var(--radius-sm); }
+    pre { background: var(--color-code-bg); padding: var(--space-4); border-radius: var(--radius-md); overflow-x: auto; }
+    pre code { background: none; padding: 0; font-size: var(--text-sm); }
+    blockquote { margin: var(--space-4) 0; padding: var(--space-2) var(--space-4); border-left: 3px solid var(--color-accent); background: var(--color-surface); color: var(--color-muted); }
+
+    /* interactive widgets */
+    .widget {
+      font-family: var(--font-ui);
+      background: var(--color-surface);
+      border: 1px solid var(--color-border);
+      border-radius: var(--radius-lg);
+      padding: var(--space-4);
+      margin: var(--space-5) 0;
+      box-shadow: var(--shadow-sm);
+    }
+    .widget-title { font-weight: 600; font-size: var(--text-sm); margin: 0 0 var(--space-3); color: var(--color-muted); text-transform: uppercase; letter-spacing: 0.05em; }
+    .control { display: flex; align-items: center; gap: var(--space-3); margin: var(--space-2) 0; font-size: var(--text-sm); }
+    .control label { min-width: 9rem; }
+    .control input[type="range"] { flex: 1; accent-color: var(--color-accent); }
+    .control output { min-width: 4rem; text-align: right; font-family: var(--font-mono); font-size: var(--text-sm); }
+    .chart { width: 100%; height: auto; display: block; margin-top: var(--space-3); }
+    .chart .axis { stroke: var(--color-border); stroke-width: 1; }
+    .chart .axis-label { fill: var(--color-muted); font-family: var(--font-ui); font-size: 11px; }
+    .chart .series { fill: none; stroke: var(--color-accent); stroke-width: 2; }
+    .chart .series-2 { fill: none; stroke: var(--color-danger); stroke-width: 2; }
+    .chart .bar { fill: var(--color-accent); }
+    figure { margin: var(--space-5) 0; }
+    figcaption { font-family: var(--font-ui); font-size: var(--text-sm); color: var(--color-muted); margin-top: var(--space-2); }
+    details.derivation { margin: var(--space-4) 0; border: 1px solid var(--color-border); border-radius: var(--radius-md); padding: var(--space-3) var(--space-4); background: var(--color-surface); }
+    details.derivation summary { cursor: pointer; font-family: var(--font-ui); font-weight: 600; font-size: var(--text-sm); }
+
+    /* ---- custom styles for this paper (after token markers) ---- */
+    table { border-collapse: collapse; width: 100%; font-family: var(--font-ui); font-size: var(--text-sm); margin: var(--space-4) 0; }
+    th, td { border: 1px solid var(--color-border); padding: var(--space-2) var(--space-3); text-align: left; vertical-align: top; }
+    th { background: var(--color-code-bg); font-weight: 600; }
+    .table-wrap { overflow-x: auto; }
+    .callout { background: var(--color-warn-bg); border: 1px solid var(--color-border); border-radius: var(--radius-md); padding: var(--space-3) var(--space-4); margin: var(--space-4) 0; font-family: var(--font-ui); font-size: var(--text-sm); }
+    .callout strong { display: block; margin-bottom: var(--space-1); }
+    .tldr { background: var(--color-accent-soft); border-radius: var(--radius-md); padding: var(--space-4); margin: var(--space-5) 0; }
+    .tldr p { margin: var(--space-2) 0; }
+    .pill-row { display: flex; flex-wrap: wrap; gap: var(--space-2); margin-bottom: var(--space-3); }
+    .pill {
+      font-family: var(--font-ui); font-size: var(--text-sm); font-weight: 600;
+      border: 1px solid var(--color-border); border-radius: 999px;
+      background: var(--color-bg); color: var(--color-fg);
+      padding: var(--space-1) var(--space-3); cursor: pointer;
+    }
+    .pill[aria-pressed="true"] { background: var(--color-accent); color: var(--color-accent-fg); border-color: var(--color-accent); }
+    .legend { display: flex; flex-wrap: wrap; gap: var(--space-4); font-size: var(--text-xs); color: var(--color-muted); margin-top: var(--space-2); }
+    .legend span::before { content: "●"; margin-right: 4px; }
+    .legend .lg-event::before { color: var(--color-fg); }
+    .legend .lg-us::before { color: var(--color-accent); }
+    .legend .lg-bank::before { color: var(--color-danger); }
+    .scenario-note { font-size: var(--text-sm); color: var(--color-muted); margin-top: var(--space-2); min-height: 3.2em; }
+    .tl-lane-label { fill: var(--color-muted); font-family: var(--font-ui); font-size: 11px; font-weight: 600; }
+    .tl-ev { fill: var(--color-fg); }
+    .tl-us { fill: var(--color-accent); }
+    .tl-bank { fill: var(--color-danger); }
+    .tl-txt { fill: var(--color-fg); font-family: var(--font-ui); font-size: 10.5px; }
+    .tl-txt-muted { fill: var(--color-muted); font-family: var(--font-ui); font-size: 10px; }
+    .tl-guide { stroke: var(--color-border); stroke-width: 1; stroke-dasharray: 3 3; }
+  </style>
+</head>
+<body>
+  <main class="paper">
+    <h1>Predicting Sovereign CDS Haircuts</h1>
+    <p class="byline">Scoping note — oil-driven sovereigns, Bahrain as the working case · Treasury / Risk · August 2026 · Draft</p>
+
+    <div class="tldr">
+      <p><strong>The question.</strong> Can we predict, accurately and 1–2 weeks in advance, whether the haircut (loss-given-default) implied for a sovereign like Bahrain will go up or down?</p>
+      <p><strong>The answer.</strong> Not in calm markets — nobody can, and a system promising that would be overfit. What <em>is</em> buildable and defensible: <strong>(1)</strong> detect haircut repricing within a day (most market participants don't extract this number at all); <strong>(2)</strong> in a distress regime, forecast direction one to several weeks ahead with useful (65–75%), not perfect, accuracy; <strong>(3)</strong> pre-compute how the haircut responds to oil and political shocks, so an unpredictable event becomes a same-day playbook instead of a week of committee meetings.</p>
+      <p><strong>The edge is therefore speed and preparation, not clairvoyance</strong> — see the scenario section for where that beats a typical bank's reaction cycle by days to weeks.</p>
+    </div>
+
+    <h2>1. Two different things called "haircut"</h2>
+    <p>Any scoping conversation should first pin down which object we mean, because they are predicted with different tools:</p>
+    <ul>
+      <li><strong>Market-implied recovery / haircut</strong> — what CDS and bond prices assume <em>today</em> about loss-given-default. Note that the standard sovereign CDS pricing convention simply <em>fixes</em> recovery at 25%, so the quoted spread is almost pure default-probability information. The implied haircut is not quoted anywhere; it must be <em>extracted</em> — from the term-structure shape of the CDS curve, from distressed bond price floors, or from quanto (USD-vs-EUR CDS) spreads.</li>
+      <li><strong>Realized haircut</strong> — the actual NPV loss creditors take if a restructuring happens; the thing a CDS auction crystallizes. This is what the academic literature predicts, using fundamentals.</li>
+    </ul>
+    <p>Our system tracks the first daily and uses models of the second as its anchor: markets ultimately converge toward the restructuring outcome that fundamentals make necessary.</p>
+
+    <h2>2. The indicator stack</h2>
+    <p>Indicators sort naturally into tiers by how far ahead they speak — and the further ahead a tier speaks, the noisier it is.</p>
+
+    <div class="table-wrap">
+    <table>
+      <tr><th>Tier</th><th>Indicators</th><th>Typical lead</th><th>Reliability</th></tr>
+      <tr>
+        <td><strong>Market / nowcast</strong></td>
+        <td>Distressed bond price floor; CDS curve shape (inversion); implied recovery extracted from the term structure; quanto CDS spread; BHD 12-month forward points (peg stress)</td>
+        <td>0–2 days (detection, not prediction)</td>
+        <td>High — mechanical daily extraction</td>
+      </tr>
+      <tr>
+        <td><strong>Curve signal</strong></td>
+        <td>Short-end CDS trading above long-end; CDS-leads-bonds price discovery; persistent drift in extracted recovery</td>
+        <td>Days to weeks — <em>only once the credit is already distressed</em></td>
+        <td>Moderate (≈65–75% directional in distress episodes; backtestable on Lebanon / Sri Lanka / Zambia)</td>
+      </tr>
+      <tr>
+        <td><strong>Fundamental siren</strong></td>
+        <td>Fiscal breakeven oil price vs. the Brent futures strip; FX-reserve drawdown rate and import cover; gross financing needs / amortization bunching; debt-to-GDP; share of foreign-law debt</td>
+        <td>Weeks to months</td>
+        <td>Genuine lead but high false-positive rate — sovereigns can sit "unsustainable on paper" for years</td>
+      </tr>
+      <tr>
+        <td><strong>Political / event layer</strong></td>
+        <td>GCC support (renewal, conditionality, withdrawal); OPEC decisions; oil demand shocks</td>
+        <td><strong>None</strong> — timing is not forecastable from market data</td>
+        <td>Handled by pre-computed conditional scenarios, not by lead time</td>
+      </tr>
+    </table>
+    </div>
+
+    <p><strong>Why Bahrain is a special case within the oil group.</strong> Its fiscal breakeven oil price is among the highest in the GCC (well above $100/bbl in recent years) and reserves are thin — standalone fundamentals would price much wider than the market does. The difference is the GCC backstop (the 2018 $10.2bn Saudi/UAE/Kuwait support package). Any model that ignores bailout probability will overpredict both default risk and haircut for Bahrain; and conversely, the largest single driver of a haircut repricing is a <em>political</em> variable that gives no advance signal in market data. Historical analogues without a rich sponsor — Venezuela, Ecuador, Iraq (2006, ≈89% haircut) — show oil exporters take <em>deep</em> haircuts when the oil crash and the default coincide, because ability-to-pay collapses with revenue.</p>
+
+    <div class="widget">
+      <p class="widget-title">Stylized: oil price → solvency gap → which alert tier fires</p>
+      <div class="control">
+        <label for="brent">Brent ($/bbl)</label>
+        <input type="range" id="brent" min="30" max="120" step="1" value="82">
+        <output id="brent-out">$82</output>
+      </div>
+      <div class="control">
+        <label for="bkeven">Fiscal breakeven ($/bbl)</label>
+        <input type="range" id="bkeven" min="80" max="140" step="1" value="115">
+        <output id="bkeven-out">$115</output>
+      </div>
+      <svg id="gap-chart" class="chart" viewBox="0 0 640 280" role="img" aria-label="Implied haircut band vs oil price"></svg>
+      <p class="scenario-note" id="gap-note"></p>
+    </div>
+    <figure style="margin-top:0">
+      <figcaption><strong>Figure 1.</strong> Stylized (illustrative, not calibrated) mapping from the oil-price-vs-breakeven gap to a market-implied haircut band and alert tier. The band is wide on purpose: term-structure extraction is model-sensitive, so implied haircut should always be reported as a range, never a point.</figcaption>
+    </figure>
+
+    <h2>3. Horizons and reliability — the honest version</h2>
+    <div class="table-wrap">
+    <table>
+      <tr><th>Claim</th><th>Can we do it?</th><th>Confidence</th></tr>
+      <tr><td>Detect a haircut repricing within ~1 day</td><td>Yes — daily extraction pipeline</td><td>High</td></tr>
+      <tr><td>Estimate the haircut response to a given oil / political shock ("if Brent gaps down $20, implied haircut widens X points within Y days")</td><td>Yes — conditional elasticities, backtestable on Venezuela / Ecuador / Oman / Bahrain history</td><td>Moderate–good</td></tr>
+      <tr><td>Call direction 1–2 weeks ahead <em>during a distress episode</em></td><td>Yes, imperfectly — curve inversion + fundamentals trend persistence</td><td>Moderate (65–75%, wide error bands)</td></tr>
+      <tr><td>Call direction 1–2 weeks ahead <em>in calm markets</em></td><td><strong>No</strong> — moves are driven by oil and headlines, unpredictable at that horizon; expect ≈52–55% hit rate, i.e. barely better than a coin flip</td><td>—</td></tr>
+      <tr><td>Time political jumps (GCC support news, OPEC shocks)</td><td><strong>No</strong> — not a modeling problem</td><td>—</td></tr>
+    </table>
+    </div>
+    <p>Two structural caveats worth keeping in every presentation of results. First, a CDS spread is roughly <em>probability&nbsp;of&nbsp;default × haircut</em>; separating the two (Pan–Singleton-style term-structure extraction) is model-sensitive — reasonable specifications differ by 10+ recovery points, hence the band. Second, even at the moment a restructuring is <em>announced</em>, predictions of the final negotiated haircut carry roughly ±15–20 points of uncertainty, because the outcome depends on creditor-committee dynamics no market variable captures.</p>
+
+    <div class="callout">
+      <strong>What this system must not promise</strong>
+      Direction calls in calm markets at a 1–2 week horizon, or timing of political events. If a product's value depends on either, that is a red light at scoping stage — anyone who could reliably do it would be trading it, not selling the indicator.
+    </div>
+
+    <h2>4. Scenario playbook — when banks react vs. when we react</h2>
+    <p>The value proposition is easiest to see as timelines. "Typical bank" here means a desk running standard practice: CDS quoted at fixed 25% recovery (so implied haircut is not monitored at all), credit reviewed on a monthly/quarterly committee cycle, ratings-driven mandates, no pre-computed shock playbook. "Us" means the system scoped in §7. Pick a scenario:</p>
+
+    <div class="widget">
+      <p class="widget-title">Reaction timelines by scenario</p>
+      <div class="pill-row" id="scenario-pills" role="group" aria-label="Scenario selector">
+        <button class="pill" data-sc="A" aria-pressed="true">A · Slow slide into distress</button>
+        <button class="pill" data-sc="B" aria-pressed="false">B · Overnight oil crash</button>
+        <button class="pill" data-sc="C" aria-pressed="false">C · GCC support surprise</button>
+        <button class="pill" data-sc="D" aria-pressed="false">D · False alarm</button>
+      </div>
+      <svg id="tl-chart" class="chart" viewBox="0 0 640 300" role="img" aria-label="Scenario timeline"></svg>
+      <div class="legend">
+        <span class="lg-event">Market / event</span>
+        <span class="lg-us">Our action</span>
+        <span class="lg-bank">Typical bank</span>
+      </div>
+      <p class="scenario-note" id="tl-note"></p>
+    </div>
+
+    <h3>Scenario A — slow slide into distress (weeks of lead: prediction works here)</h3>
+    <p>Oil strip settles persistently below Bahrain's fiscal breakeven; reserves drain; a heavy amortization year approaches. This is the one regime where genuine <em>prediction</em> is possible, because deterioration is a process, not an event.</p>
+    <ul>
+      <li><strong>T−120 to T−60 days:</strong> fundamental siren fires (breakeven gap, reserve drawdown). <em>We</em> escalate monitoring and start position review. <em>Banks:</em> nothing — the credit still carries its old rating and the quarterly review hasn't come round.</li>
+      <li><strong>T−45 to T−30:</strong> CDS curve flattens then inverts; extracted implied recovery starts drifting down. <em>We act</em>: hedge, reduce, tighten limits — at still-liquid prices. <em>Banks:</em> a few fast desks move; most wait for a trigger they recognize.</li>
+      <li><strong>T−20:</strong> rating agency puts the sovereign on negative watch. <em>Banks' first broad reaction</em> — ratings-driven mandates force review.</li>
+      <li><strong>T−10 to T0:</strong> spread blowout, restructuring headlines; forced de-risking at the worst prices. <em>We</em> are already positioned.</li>
+    </ul>
+    <p><strong>Net edge: roughly 3–6 weeks</strong>, coming from monitoring a number (implied haircut) most participants never compute, plus acting on curve shape instead of ratings.</p>
+
+    <h3>Scenario B — overnight oil crash (no lead for anyone: preparation wins)</h3>
+    <p>OPEC discipline breaks or a demand shock gaps Brent down $20 overnight. Nobody predicted the day; the difference is entirely in reaction time.</p>
+    <ul>
+      <li><strong>T0, morning:</strong> our pre-computed scenario matrix already contains this shock: expected haircut widening, expected peg-pressure response, limit actions. <em>We re-mark and execute the playbook same day.</em></li>
+      <li><strong>T+1 to T+3:</strong> typical banks re-run models, convene credit committee, debate whether the move is "temporary."</li>
+      <li><strong>T+several weeks:</strong> rating actions arrive, forcing the slowest mandates to react last.</li>
+    </ul>
+    <p><strong>Net edge: same-day vs. multi-day</strong> — bought by preparation, not prediction.</p>
+
+    <h3>Scenario C — GCC support surprise (the Bahrain-specific jump)</h3>
+    <p>Support renewal, new conditionality, or a lapse. The 2018 precedent shows the whole curve reprices within days of an announcement, with essentially no advance warning in market data. Both directions matter: a renewal <em>compresses</em> haircut expectations (unwind hedges, add exposure); a lapse widens them sharply. <em>We</em> respond on day 0–1 from the pre-computed political-scenario branch; <em>banks</em> that never modeled support probability spend the following week re-underwriting the credit from scratch. <strong>Net edge: reaction speed and a ready-made answer to "what does this news mean in points of haircut."</strong></p>
+
+    <h3>Scenario D — false alarm (discipline is part of reliability)</h3>
+    <p>Brent dips for a week and recovers; spot headlines look scary. Our fundamental tier watches the <em>futures strip vs. breakeven</em>, not spot, and the curve never inverts — so the system correctly stays quiet and we avoid overtrading. Some desks knee-jerk to headlines and pay the round-trip. A system judged only on "calls made" would be tempted to fire here; not firing is the right output and should be measured as such (false-positive rate is a first-class KPI).</p>
+
+    <h2>5. Prior art, feasibility, and why the lead time pays</h2>
+    <p>The first questions any reviewer will ask: has anyone done this before, can we realistically build it, and is the lead time — which will be shorter in practice than in stylized timelines — still worth having?</p>
+
+    <h3>Prior art: every component exists; the assembly is the work</h3>
+    <ul>
+      <li><strong>Early-warning systems for sovereign stress</strong> are a decades-old field: the signals approach (Kaminsky–Lizondo–Reinhart, 1998) underpins IMF vulnerability exercises and commercial products such as BlackRock's Sovereign Risk Index. Tiered fundamental sirens are established practice.</li>
+      <li><strong>Implied-recovery extraction is done routinely</strong> — dealer research desks publish implied-recovery estimates for distressed sovereigns, and Pan–Singleton-style extraction is implemented in academic and central-bank work. Most participants simply don't monitor it daily for non-distressed names: the edge is an effort gap, not a technology gap.</li>
+      <li><strong>The strongest existence proof: distressed-debt funds.</strong> Firms such as Gramercy, Greylock and Aurelius run exactly this trade as their core business — form a view on the realized haircut, compare it to market-implied, position against slower money. In Lebanon, Sri Lanka and Zambia they were buying from banks that had become forced sellers late in the slide. The "us vs. typical bank" asymmetry of §4 is not hypothetical; it is the documented business model of an entire fund category.</li>
+      <li><strong>Pre-computed shock playbooks</strong> are standard at hedge funds and better bank risk functions.</li>
+    </ul>
+    <p>Honest positioning: nobody sells an off-the-shelf "Bahrain haircut predictor," but every piece has been done and is being done. The build is an assembly-and-discipline exercise, not research risk.</p>
+
+    <h3>Feasibility: desk-scale, with one Bahrain-specific caveat</h3>
+    <p>The build needs a market data feed (CDS curve, cash bond prices, Brent strip — standard terminal coverage), one quant, and a few months. The genuine constraint is <strong>Bahrain CDS liquidity</strong>: the 5-year point trades, but the full term structure can be sparse — and Pan–Singleton extraction feeds on curve <em>shape</em>. Where the curve is thin, the distressed-bond price floor and Bahrain's fairly full USD bond curve must carry more of the weight; check this early, because it decides which extraction method leads. Validation will also be coarse: only a handful of clean distress episodes exist to backtest on, so expect "the signal worked in 4 of 5 episodes"-level evidence, not tight statistics.</p>
+
+    <h3>Why a shorter-than-stylized lead still pays traders</h3>
+    <p>The economics of distressed sovereign moves are back-loaded and liquidity-punishing, so even a fraction of the stylized lead converts into real money:</p>
+    <ul>
+      <li><strong>Price:</strong> in a slide, most of the damage lands in the final weeks. Exiting or hedging even 5–10 days earlier on an EM sovereign blowout is worth points of price, not basis points.</li>
+      <li><strong>Hedging cost:</strong> protection bought at the curve-inversion stage vs. after the rating action can differ by hundreds of basis points of running spread — a week of lead is directly cheaper insurance.</li>
+      <li><strong>Liquidity is the killer:</strong> as the event nears, bid-offer gaps from tens of bps to points and executable size collapses. Being early matters less for the price you predict than for the price you can actually <em>transact</em>; the late seller often cannot get out in size at all — which is precisely when the distressed funds appear as the only bid.</li>
+      <li><strong>Day-level speed pays on jumps:</strong> executing day 1 vs. day 3 after an oil gap is typically worth points, because the market overshoots and the window closes.</li>
+      <li><strong>Structural exposure:</strong> for a Bahrain-based bank, sovereign exposure is permanent — government bonds, central bank placements, the peg. A system that fires rarely but correctly is still positive-value when the exposure it protects is large and structural; and the same signal feeds limits, collateral planning and funding decisions at zero extra cost.</li>
+    </ul>
+    <div class="callout">
+      <strong>Expectation to set with the sponsor</strong>
+      The system's value is episodic: in calm years it mostly outputs "no signal." That must be agreed upfront — otherwise it gets judged dead weight in year one and cancelled right before it earns its keep.
+    </div>
+
+    <h2>6. Models and algorithms</h2>
+    <p>In order of practicality for a build:</p>
+    <ol>
+      <li><strong>DSA-based "required haircut" (anchor model).</strong> Compute the face/NPV reduction needed to bring debt to a sustainable path (IMF DSA-style thresholds) under oil-price scenarios. Mechanical, transparent, and historically the best single predictor of realized haircuts — negotiated outcomes cluster around what the arithmetic requires.</li>
+      <li><strong>Cross-sectional regression on the historical haircut database.</strong> Cruces &amp; Trebesch (2013; ~180 restructurings since 1970, public), extended by Asonuma &amp; Trebesch (preemptive deals average ≈18–20% haircuts vs. ≈45–50% post-default) and Meyer–Reinhart–Trebesch. Robust drivers: debt/GDP at default (strongest), preemptive-vs-post-default path, GDP per capita and crisis depth, episode duration, governing law and creditor composition, IMF presence. Add oil-exporter dummies and terms-of-trade shocks.</li>
+      <li><strong>Pan &amp; Singleton (2008) term-structure extraction.</strong> Jointly identify default intensity and implied recovery from the <em>shape</em> of the CDS curve (short vs. long end respond differently). The go-to for the daily market-implied number; report as a band and cross-check against the distressed bond price floor whenever the credit trades wide enough for the floor to be informative.</li>
+      <li><strong>Quanto-spread models</strong> (USD vs. EUR CDS on the same name) for the devaluation-conditional-on-default component — directly relevant to a pegged currency.</li>
+      <li><strong>ML on a macro panel</strong> (gradient boosting / random forest). Feasible as a robustness check, but with only ~200 historical restructurings the overfitting risk is serious — never the headline model.</li>
+    </ol>
+
+    <h2>7. Recommended build</h2>
+    <ol>
+      <li><strong>Daily nowcast pipeline</strong> — extract implied recovery band from the CDS curve (Pan–Singleton), bond floor, quanto spread, BHD forwards. Output: one number-with-band per day plus a regime flag (calm / watch / distress).</li>
+      <li><strong>Early-warning tiers</strong> — fundamental siren (months), curve signal (weeks), market trigger (days), each with explicit thresholds and a logged false-positive rate.</li>
+      <li><strong>Scenario matrix</strong> — pre-computed conditional responses: oil gaps of −$10/−$20/−$30, GCC support renewal / conditionality / lapse, peg-stress combinations. Each cell: expected haircut move, horizon, prescribed action.</li>
+      <li><strong>Anchor model</strong> — DSA-required-haircut under the oil strip, refreshed monthly; regression benchmark from the historical database for sanity.</li>
+      <li><strong>Validation</strong> — backtest the curve-signal tier on Lebanon / Sri Lanka / Zambia / Ghana episodes; backtest oil-shock elasticities on Venezuela / Ecuador / Oman / Bahrain 2015–2020; report hit rates <em>and</em> false positives.</li>
+    </ol>
+
+    <h2>8. Data and literature</h2>
+    <ul>
+      <li>Cruces &amp; Trebesch (2013), "Sovereign Defaults: The Price of Haircuts" — public dataset of restructurings and haircuts since 1970.</li>
+      <li>Asonuma &amp; Trebesch — preemptive vs. post-default restructurings.</li>
+      <li>Meyer, Reinhart &amp; Trebesch, "Sovereign Bonds since Waterloo" — long-run recovery prices.</li>
+      <li>Pan &amp; Singleton (2008) — term-structure identification of default intensity and recovery from sovereign CDS.</li>
+      <li>Augustin, Chernov et&nbsp;al. — quanto CDS and devaluation risk.</li>
+      <li>Market data: sovereign CDS curves (Markit/Bloomberg), cash bond prices, BHD forwards, Brent futures strip; IMF Article IV / DSA for Bahrain; fiscal breakeven estimates (IMF REO).</li>
+    </ul>
+
+    <div class="callout">
+      <strong>Figures to verify before external use</strong>
+      Breakeven levels, debt ratios, and the haircut averages quoted here come from literature and data up to early 2026. Refresh Bahrain's current debt/GDP, reserve cover, breakeven estimate, and the GCC package status before this note goes beyond the team.
+    </div>
+
+    <h2>9. Open questions for the next scoping round</h2>
+    <ul>
+      <li>Who consumes the output — risk limits, a trading desk, ALCO reporting? (Determines whether the band or the regime flag is the headline.)</li>
+      <li>Do we have (or can we license) intraday sovereign CDS curve data for the extraction pipeline, or is end-of-day sufficient?</li>
+      <li>How do we score the GCC-support probability — expert prior updated on news, or leave it as pure scenario branches?</li>
+      <li>Extend beyond Bahrain to a GCC panel (Oman is the natural second name: oil-driven, no equivalent backstop — a useful control).</li>
+    </ul>
+
+  </main>
+  <script>
+    // ---------- shared helpers ----------
+    function bindSlider(id, outId, fmt, onChange) {
+      const el = document.getElementById(id), out = document.getElementById(outId);
+      const update = () => { out.textContent = fmt(el.valueAsNumber); onChange(); };
+      el.addEventListener("input", update);
+      update();
+    }
+
+    // ---------- Figure 1: oil gap -> implied haircut band ----------
+    // Stylized illustration only: haircut band widens as Brent falls below breakeven.
+    function haircutBand(brent, breakeven) {
+      const gap = Math.max(0, breakeven - brent);
+      const mid = Math.min(78, 25 + 0.9 * gap);          // stylized midpoint, %
+      const half = 8 + 0.15 * gap;                        // extraction uncertainty grows with stress
+      return { mid, lo: Math.max(5, mid - half), hi: Math.min(90, mid + half), gap };
+    }
+    function tierFor(gap) {
+      if (gap <= 5)  return { name: "CALM — no alert. Daily nowcast only; no directional calls attempted.", cls: "calm" };
+      if (gap <= 20) return { name: "WATCH — fundamental siren on. Lead time: weeks–months, high false-positive rate.", cls: "watch" };
+      if (gap <= 40) return { name: "DISTRESS WATCH — expect curve flattening. Curve-signal tier armed; directional calls become meaningful.", cls: "dw" };
+      return { name: "DISTRESS — curve likely inverted; haircut repricing under way. React same-day; ride the trend, weeks of persistence expected.", cls: "distress" };
+    }
+    function drawGapChart() {
+      const breakeven = document.getElementById("bkeven").valueAsNumber;
+      const brent = document.getElementById("brent").valueAsNumber;
+      const svg = document.getElementById("gap-chart");
+      const W = 640, H = 280, m = { t: 14, r: 14, b: 40, l: 46 };
+      const x0 = 30, x1 = 120, y0 = 0, y1 = 90;
+      const X = v => m.l + ((v - x0) / (x1 - x0)) * (W - m.l - m.r);
+      const Y = v => H - m.b - ((v - y0) / (y1 - y0)) * (H - m.t - m.b);
+      // band polygon across brent range
+      let topPts = [], botPts = [], midPts = [];
+      for (let b = x0; b <= x1; b += 2) {
+        const h = haircutBand(b, breakeven);
+        topPts.push([b, h.hi]); botPts.push([b, h.lo]); midPts.push([b, h.mid]);
+      }
+      const poly = topPts.map(p => `${X(p[0]).toFixed(1)},${Y(p[1]).toFixed(1)}`).join(" ")
+        + " " + botPts.slice().reverse().map(p => `${X(p[0]).toFixed(1)},${Y(p[1]).toFixed(1)}`).join(" ");
+      let out = `<line class="axis" x1="${m.l}" y1="${H - m.b}" x2="${W - m.r}" y2="${H - m.b}"/>`
+              + `<line class="axis" x1="${m.l}" y1="${m.t}" x2="${m.l}" y2="${H - m.b}"/>`;
+      for (let i = 0; i <= 4; i++) {
+        const xv = x0 + (i / 4) * (x1 - x0), yv = y0 + (i / 4) * (y1 - y0);
+        out += `<text class="axis-label" x="${X(xv)}" y="${H - m.b + 16}" text-anchor="middle">$${xv}</text>`;
+        out += `<text class="axis-label" x="${m.l - 6}" y="${Y(yv) + 4}" text-anchor="end">${yv}%</text>`;
+      }
+      out += `<polygon points="${poly}" fill="var(--color-accent-soft)" opacity="0.85"/>`;
+      const d = midPts.map((p, j) => `${j ? "L" : "M"}${X(p[0]).toFixed(1)},${Y(p[1]).toFixed(1)}`).join("");
+      out += `<path class="series" d="${d}"/>`;
+      // breakeven marker
+      if (breakeven >= x0 && breakeven <= x1) {
+        out += `<line class="tl-guide" x1="${X(breakeven)}" y1="${m.t}" x2="${X(breakeven)}" y2="${H - m.b}"/>`;
+        out += `<text class="axis-label" x="${X(breakeven)}" y="${m.t + 10}" text-anchor="middle">breakeven</text>`;
+      }
+      // current brent marker
+      const cur = haircutBand(brent, breakeven);
+      out += `<circle cx="${X(brent)}" cy="${Y(cur.mid)}" r="5" fill="var(--color-danger)"/>`;
+      out += `<text class="axis-label" x="${X(brent)}" y="${Y(cur.mid) - 10}" text-anchor="middle">${cur.lo.toFixed(0)}–${cur.hi.toFixed(0)}%</text>`;
+      out += `<text class="axis-label" x="${(W + m.l) / 2}" y="${H - 4}" text-anchor="middle">Brent ($/bbl) — implied haircut band (%) on the vertical axis</text>`;
+      svg.innerHTML = out;
+      const tier = tierFor(cur.gap);
+      document.getElementById("gap-note").textContent =
+        `Gap to breakeven: $${cur.gap.toFixed(0)}/bbl → stylized implied haircut ${cur.lo.toFixed(0)}–${cur.hi.toFixed(0)}%. Alert tier: ${tier.name}`;
+    }
+    bindSlider("brent", "brent-out", v => `$${v}`, drawGapChart);
+    bindSlider("bkeven", "bkeven-out", v => `$${v}`, drawGapChart);
+
+    // ---------- Scenario timelines ----------
+    // lanes: 0 = market/event, 1 = us, 2 = typical bank
+    const SCENARIOS = {
+      A: {
+        title: "Slow slide: oil strip below breakeven for months",
+        note: "The one regime where prediction works: deterioration is a process. We act at curve inversion (T−30); the broad bank reaction waits for the rating trigger (T−20) and the blowout itself. Net edge ≈ 3–6 weeks.",
+        domain: [-120, 10],
+        events: [
+          { t: -120, lane: 0, label: "strip < breakeven" },
+          { t: -75,  lane: 0, label: "reserves draining" },
+          { t: -35,  lane: 0, label: "curve inverts" },
+          { t: -20,  lane: 0, label: "negative watch" },
+          { t: 0,    lane: 0, label: "blowout / restructuring talk" },
+          { t: -110, lane: 1, label: "siren on: escalate monitoring" },
+          { t: -30,  lane: 1, label: "ACT: hedge / cut / tighten limits" },
+          { t: -18,  lane: 2, label: "ratings-driven review starts" },
+          { t: -3,   lane: 2, label: "forced de-risking at worst prices" },
+        ],
+      },
+      B: {
+        title: "Overnight oil crash: Brent gaps down $20",
+        note: "No one predicted the day. Our edge is entirely preparation: the shock is a row in the pre-computed scenario matrix, so we re-mark and execute same-day; committee cycles take days and ratings weeks.",
+        domain: [-2, 24],
+        events: [
+          { t: 0,  lane: 0, label: "Brent −$20 overnight" },
+          { t: 21, lane: 0, label: "rating actions" },
+          { t: 0,  lane: 1, label: "playbook: re-mark + execute (hours)" },
+          { t: 2,  lane: 2, label: "re-run models, convene committee" },
+          { t: 5,  lane: 2, label: "first de-risking decisions" },
+          { t: 22, lane: 2, label: "slowest mandates react last" },
+        ],
+      },
+      C: {
+        title: "GCC support surprise (renewal, conditionality, or lapse)",
+        note: "Bahrain's biggest haircut driver is political and gives no market-data warning (2018 precedent: days). We answer 'what does this news mean in haircut points' from the political scenario branch on day 0–1; banks re-underwrite from scratch over a week.",
+        domain: [-2, 12],
+        events: [
+          { t: 0, lane: 0, label: "support announcement" },
+          { t: 3, lane: 0, label: "curve fully repriced" },
+          { t: 1, lane: 1, label: "scenario branch: re-mark, adjust hedges" },
+          { t: 4, lane: 2, label: "internal debate on what it means" },
+          { t: 8, lane: 2, label: "credit re-underwritten" },
+        ],
+      },
+      D: {
+        title: "False alarm: one-week oil dip, quickly recovered",
+        note: "Spot falls but the futures strip barely moves and the curve never inverts — the system correctly stays quiet. Not firing is a success and is measured (false-positive rate is a first-class KPI). Headline-driven desks pay the round trip.",
+        domain: [-2, 14],
+        events: [
+          { t: 0,  lane: 0, label: "spot Brent dips" },
+          { t: 7,  lane: 0, label: "spot recovers" },
+          { t: 1,  lane: 1, label: "strip vs breakeven: no signal → no action" },
+          { t: 2,  lane: 2, label: "headline-driven de-risking" },
+          { t: 9,  lane: 2, label: "buy back in — round trip paid" },
+        ],
+      },
+    };
+    const LANES = [
+      { y: 70,  label: "Market / event", dot: "tl-ev" },
+      { y: 150, label: "Us",             dot: "tl-us" },
+      { y: 230, label: "Typical bank",   dot: "tl-bank" },
+    ];
+    function drawTimeline(key) {
+      const sc = SCENARIOS[key];
+      const svg = document.getElementById("tl-chart");
+      const W = 640, H = 300, m = { l: 96, r: 16 };
+      const [t0, t1] = sc.domain;
+      const X = t => m.l + ((t - t0) / (t1 - t0)) * (W - m.l - m.r);
+      let out = `<text class="tl-txt" x="${m.l}" y="24" font-weight="600">${sc.title}</text>`;
+      // lane guides + labels
+      for (const ln of LANES) {
+        out += `<line class="axis" x1="${m.l}" y1="${ln.y}" x2="${W - m.r}" y2="${ln.y}"/>`;
+        out += `<text class="tl-lane-label" x="${m.l - 8}" y="${ln.y + 4}" text-anchor="end">${ln.label}</text>`;
+      }
+      // T0 guide
+      if (t0 < 0 && t1 > 0) {
+        out += `<line class="tl-guide" x1="${X(0)}" y1="46" x2="${X(0)}" y2="${LANES[2].y + 20}"/>`;
+      }
+      // time ticks
+      for (let i = 0; i <= 4; i++) {
+        const tv = Math.round(t0 + (i / 4) * (t1 - t0));
+        out += `<text class="axis-label" x="${X(tv)}" y="${LANES[2].y + 36}" text-anchor="middle">${tv === 0 ? "T0" : (tv > 0 ? "T+" + tv : "T−" + Math.abs(tv))}d</text>`;
+      }
+      // events, alternating label offsets per lane to reduce overlap
+      const laneCount = [0, 0, 0];
+      for (const ev of sc.events) {
+        const ln = LANES[ev.lane];
+        const up = laneCount[ev.lane] % 2 === 0;
+        laneCount[ev.lane]++;
+        const ty = up ? ln.y - 16 : ln.y + 22;
+        out += `<circle class="${ln.dot}" cx="${X(ev.t)}" cy="${ln.y}" r="5"/>`;
+        let anchor = "middle";
+        const xpos = X(ev.t);
+        if (xpos < m.l + 60) anchor = "start";
+        if (xpos > W - m.r - 60) anchor = "end";
+        out += `<text class="tl-txt" x="${xpos}" y="${ty}" text-anchor="${anchor}">${ev.label}</text>`;
+        out += `<text class="tl-txt-muted" x="${xpos}" y="${up ? ty - 12 : ty + 12}" text-anchor="${anchor}">${ev.t === 0 ? "T0" : (ev.t > 0 ? "T+" + ev.t : "T−" + Math.abs(ev.t))}d</text>`;
+      }
+      svg.innerHTML = out;
+      document.getElementById("tl-note").textContent = sc.note;
+    }
+    document.getElementById("scenario-pills").addEventListener("click", (e) => {
+      const btn = e.target.closest(".pill");
+      if (!btn) return;
+      for (const b of document.querySelectorAll("#scenario-pills .pill")) b.setAttribute("aria-pressed", String(b === btn));
+      drawTimeline(btn.dataset.sc);
+    });
+    drawTimeline("A");
+  </script>
+</body>
+</html>

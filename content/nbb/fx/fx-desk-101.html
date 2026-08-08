@@ -1,0 +1,493 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>The FX Desk: The 101</title>
+  <meta name="archive-tags" content="banking, treasury, fx, bahrain">
+  <meta name="archive-summary" content="FX desk crash course built from desk notes: the client conversion journey, bid/ask and the spread, value dates (today, tom, spot T+2), the three products (spot, forward, swap), forward premium vs discount via interest parity, near/far legs, covered-interest arbitrage, and the USD/BHD peg. Interactive throughout.">
+  <meta name="archive-created" content="2026-08-05">
+  <meta name="archive-updated" content="2026-08-05">
+  <meta name="archive-status" content="final">
+  <style>
+    /* ==tokens== (synced from design/tokens.css — do not edit inside the markers) */
+    :root {
+      --color-bg: #faf9f7;
+      --color-surface: #ffffff;
+      --color-fg: #1a1a1e;
+      --color-muted: #6b6b76;
+      --color-border: #e4e2dd;
+      --color-accent: #2f6fed;
+      --color-accent-fg: #ffffff;
+      --color-accent-soft: #e8effd;
+      --color-danger: #c4483c;
+      --color-warn-bg: #fdf6e3;
+      --color-code-bg: #f2f1ee;
+      --color-mark: #fff3bf;
+      --font-body: "Charter", "Georgia", "Cambria", "Times New Roman", serif;
+      --font-ui: system-ui, -apple-system, "Segoe UI", sans-serif;
+      --font-mono: "SFMono-Regular", "Cascadia Code", "Consolas", "Menlo", monospace;
+      --text-xs: 0.75rem;
+      --text-sm: 0.875rem;
+      --text-base: 1.0625rem;
+      --text-lg: 1.25rem;
+      --text-xl: 1.5rem;
+      --text-2xl: 1.875rem;
+      --text-3xl: 2.375rem;
+      --leading-body: 1.65;
+      --leading-tight: 1.25;
+      --measure: 68ch;
+      --space-1: 0.25rem;
+      --space-2: 0.5rem;
+      --space-3: 0.75rem;
+      --space-4: 1rem;
+      --space-5: 1.5rem;
+      --space-6: 2rem;
+      --space-7: 3rem;
+      --space-8: 4rem;
+      --radius-sm: 4px;
+      --radius-md: 8px;
+      --radius-lg: 12px;
+      --shadow-sm: 0 1px 2px rgba(20, 20, 25, 0.06);
+      --shadow-md: 0 2px 8px rgba(20, 20, 25, 0.1);
+    }
+    [data-theme="dark"] {
+      --color-bg: #16161a;
+      --color-surface: #1e1e24;
+      --color-fg: #e8e6e3;
+      --color-muted: #9a98a0;
+      --color-border: #32323a;
+      --color-accent: #6b9bff;
+      --color-accent-fg: #10101c;
+      --color-accent-soft: #23304d;
+      --color-danger: #e0685c;
+      --color-warn-bg: #2e2a1e;
+      --color-code-bg: #24242b;
+      --color-mark: #4d4425;
+      --shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.4);
+      --shadow-md: 0 2px 8px rgba(0, 0, 0, 0.5);
+    }
+    /* ==/tokens== */
+
+    /* When opened standalone (not in the app frame), follow the OS theme. */
+    @media (prefers-color-scheme: dark) {
+      :root:not([data-theme]) {
+        --color-bg: #16161a;
+        --color-surface: #1e1e24;
+        --color-fg: #e8e6e3;
+        --color-muted: #9a98a0;
+        --color-border: #32323a;
+        --color-accent: #6b9bff;
+        --color-accent-fg: #10101c;
+        --color-accent-soft: #23304d;
+        --color-danger: #e0685c;
+        --color-warn-bg: #2e2a1e;
+        --color-code-bg: #24242b;
+        --color-mark: #4d4425;
+      }
+    }
+
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      background: var(--color-bg);
+      color: var(--color-fg);
+      font-family: var(--font-body);
+      font-size: var(--text-base);
+      line-height: var(--leading-body);
+    }
+    .paper {
+      max-width: var(--measure);
+      margin: 0 auto;
+      padding: var(--space-6) var(--space-4) var(--space-8);
+    }
+    h1 { font-size: var(--text-3xl); line-height: var(--leading-tight); margin: 0 0 var(--space-2); }
+    h2 { font-size: var(--text-xl); line-height: var(--leading-tight); margin: var(--space-6) 0 var(--space-3); border-bottom: 1px solid var(--color-border); padding-bottom: var(--space-2); }
+    h3 { font-size: var(--text-lg); margin: var(--space-5) 0 var(--space-2); }
+    .byline { color: var(--color-muted); font-family: var(--font-ui); font-size: var(--text-sm); margin-bottom: var(--space-6); }
+    a { color: var(--color-accent); }
+    code { font-family: var(--font-mono); font-size: 0.88em; background: var(--color-code-bg); padding: 1px 5px; border-radius: var(--radius-sm); }
+    blockquote { margin: var(--space-4) 0; padding: var(--space-2) var(--space-4); border-left: 3px solid var(--color-accent); background: var(--color-surface); color: var(--color-muted); }
+
+    /* interactive widgets */
+    .widget {
+      font-family: var(--font-ui);
+      background: var(--color-surface);
+      border: 1px solid var(--color-border);
+      border-radius: var(--radius-lg);
+      padding: var(--space-4);
+      margin: var(--space-5) 0;
+      box-shadow: var(--shadow-sm);
+    }
+    .widget-title { font-weight: 600; font-size: var(--text-sm); margin: 0 0 var(--space-3); color: var(--color-muted); text-transform: uppercase; letter-spacing: 0.05em; }
+    .control { display: flex; align-items: center; gap: var(--space-3); margin: var(--space-2) 0; font-size: var(--text-sm); }
+    .control label { min-width: 9rem; }
+    .control input[type="range"] { flex: 1; accent-color: var(--color-accent); }
+    .control output { min-width: 4.5rem; text-align: right; font-family: var(--font-mono); font-size: var(--text-sm); }
+    .chart { width: 100%; height: auto; display: block; margin-top: var(--space-3); }
+    .chart .axis { stroke: var(--color-border); stroke-width: 1; }
+    .chart .axis-label { fill: var(--color-muted); font-family: var(--font-ui); font-size: 11px; }
+    .chart .series { fill: none; stroke: var(--color-accent); stroke-width: 2; }
+    .chart .series-2 { fill: none; stroke: var(--color-danger); stroke-width: 2; }
+    .chart .bar { fill: var(--color-accent); }
+    figure { margin: var(--space-5) 0; }
+    figcaption { font-family: var(--font-ui); font-size: var(--text-sm); color: var(--color-muted); margin-top: var(--space-2); }
+    details.derivation { margin: var(--space-4) 0; border: 1px solid var(--color-border); border-radius: var(--radius-md); padding: var(--space-3) var(--space-4); background: var(--color-surface); }
+    details.derivation summary { cursor: pointer; font-family: var(--font-ui); font-weight: 600; font-size: var(--text-sm); }
+
+    /* custom styles (after token markers) */
+    table { border-collapse: collapse; width: 100%; font-family: var(--font-ui); font-size: var(--text-sm); margin: var(--space-4) 0; }
+    th, td { border: 1px solid var(--color-border); padding: var(--space-2) var(--space-3); text-align: left; vertical-align: top; }
+    th { background: var(--color-code-bg); font-weight: 600; }
+    .readout { font-family: var(--font-ui); font-size: var(--text-sm); background: var(--color-accent-soft); border-radius: var(--radius-md); padding: var(--space-3); margin-top: var(--space-3); }
+    .readout strong { font-family: var(--font-mono); }
+    .preset-row { display: flex; gap: var(--space-2); flex-wrap: wrap; margin: var(--space-2) 0; }
+    .preset-row button {
+      font-family: var(--font-ui); font-size: var(--text-sm); cursor: pointer;
+      border: 1px solid var(--color-border); background: var(--color-surface); color: var(--color-fg);
+      padding: var(--space-1) var(--space-3); border-radius: var(--radius-md);
+    }
+    .preset-row button.active { background: var(--color-accent); color: var(--color-accent-fg); border-color: var(--color-accent); }
+    .callout { font-family: var(--font-ui); font-size: var(--text-sm); background: var(--color-warn-bg); border-radius: var(--radius-md); padding: var(--space-3) var(--space-4); margin: var(--space-4) 0; }
+  </style>
+</head>
+<body>
+  <main class="paper">
+    <h1>The FX Desk: The 101</h1>
+    <p class="byline">Spot, forwards, swaps, and how the desk actually earns — expanded from desk notes · Part of the Treasury series: <a href="/doc/nbb/FTP/ftp-reference-guide.html">FTP</a> · <a href="/doc/nbb/money-markets/money-markets-101.html">money markets</a> · 2026</p>
+
+    <h2 id="story">Start with one client, one story</h2>
+    <p>A client in Turkey holds dollars and needs Bahraini dinar. The sequence:</p>
+    <ol>
+      <li>The client instructs a transfer of USD from their Turkish account to their Bahrain account.</li>
+      <li>The bank <strong>confirms the trade</strong>: what is being exchanged, at what rate, and for which <em>value date</em>. If the agreement is "today's rate, money lands tomorrow", then the rate is fixed today even though the cash arrives tomorrow — the confirmation is what makes that binding on both sides.</li>
+      <li>The dollars land, the bank converts at the agreed rate, and BHD is credited.</li>
+    </ol>
+
+    <figure>
+      <svg class="chart" viewBox="0 0 640 190" role="img" aria-label="Client conversion journey from Turkey USD to Bahrain BHD">
+        <rect x="10"  y="45" width="150" height="70" rx="10" style="fill:var(--color-accent-soft); stroke:var(--color-accent)"/>
+        <rect x="245" y="45" width="150" height="70" rx="10" style="fill:var(--color-accent-soft); stroke:var(--color-accent)"/>
+        <rect x="480" y="45" width="150" height="70" rx="10" style="fill:var(--color-accent-soft); stroke:var(--color-accent)"/>
+        <text class="axis-label" x="85"  y="72" text-anchor="middle" style="font-weight:600">Turkey account</text>
+        <text class="axis-label" x="85"  y="90" text-anchor="middle">USD 1,000,000</text>
+        <text class="axis-label" x="320" y="72" text-anchor="middle" style="font-weight:600">Bahrain account</text>
+        <text class="axis-label" x="320" y="90" text-anchor="middle">USD lands (T+1)</text>
+        <text class="axis-label" x="555" y="72" text-anchor="middle" style="font-weight:600">Bahrain account</text>
+        <text class="axis-label" x="555" y="90" text-anchor="middle">BHD 376,000</text>
+        <line x1="160" y1="80" x2="245" y2="80" style="stroke:var(--color-fg);stroke-width:2"/>
+        <line x1="395" y1="80" x2="480" y2="80" style="stroke:var(--color-fg);stroke-width:2"/>
+        <text class="axis-label" x="202" y="70" text-anchor="middle">transfer</text>
+        <text class="axis-label" x="437" y="70" text-anchor="middle">convert</text>
+        <text class="axis-label" x="437" y="135" text-anchor="middle" style="fill:var(--color-danger)">at the rate CONFIRMED on trade day</text>
+        <text class="axis-label" x="202" y="135" text-anchor="middle">1–2 days in transit</text>
+        <text class="axis-label" x="320" y="170" text-anchor="middle" style="font-style:italic">The rate and the cash move on different days. That gap is why value dates exist.</text>
+      </svg>
+      <figcaption><strong>Figure 1.</strong> The client story from the notes. Everything on this desk is a variation of this picture: an exchange of two currencies, a rate fixed at confirmation, and a value date when the cash actually moves.</figcaption>
+    </figure>
+
+    <h2 id="spread">Bid, ask, and where the desk's money comes from</h2>
+    <p>The desk quotes every pair two-sided, e.g. <code>2.553 / 2.554</code>:</p>
+    <ul>
+      <li><strong>Bid = 2.553</strong> — the rate at which the <em>bank buys</em> the base currency from you.</li>
+      <li><strong>Ask = 2.554</strong> — the rate at which the <em>bank sells</em> the base currency to you.</li>
+    </ul>
+    <p>So the customer holding euros who wants BHD <em>sells</em> their euros to the bank — they deal at the <strong>bid</strong>, the lower rate. A different customer who wants euros buys them from the bank at the <strong>ask</strong>. The bank buys low, sells high, and the <strong>0.001 between the two is the spread</strong> — the desk's basic income. One careful note: the bank never needs the rate to <em>move</em> to earn this; it earns by standing in the middle of two-way flow.</p>
+
+    <div class="widget">
+      <p class="widget-title">Widget 1 · The spread engine — two customers, one desk</p>
+      <div class="control">
+        <label for="s-spread">Spread (points)</label>
+        <input type="range" id="s-spread" min="0.0005" max="0.005" step="0.0005" value="0.001">
+        <output id="s-spread-out">0.0010</output>
+      </div>
+      <div class="control">
+        <label for="s-vol">Two-way flow (m/day)</label>
+        <input type="range" id="s-vol" min="1" max="100" step="1" value="20">
+        <output id="s-vol-out">20m</output>
+      </div>
+      <svg id="s-chart" class="chart" viewBox="0 0 640 180" role="img" aria-label="Bid and ask flow through the desk"></svg>
+      <div class="readout" id="s-readout"></div>
+    </div>
+    <figure><figcaption><strong>Figure 2.</strong> Customer A sells EUR at the bid; customer B buys EUR at the ask; the desk keeps the middle. Widen the spread: each trade earns more, but in real markets a wide quote loses the flow to a competitor — the spread is a competitive price, not a free dial.</figcaption></figure>
+
+    <h2 id="products">The three products</h2>
+    <p>Everything the desk trades is one of three things (the notes had it right):</p>
+    <table>
+      <thead><tr><th>Product</th><th>What it is</th><th>Cash moves</th></tr></thead>
+      <tbody>
+        <tr><td><strong>FX spot</strong></td><td>Exchange now, at today's rate</td><td>Value today, tom (T+1), or T+2</td></tr>
+        <tr><td><strong>FX forward</strong></td><td>Rate fixed today, exchange on a future date</td><td>One future date</td></tr>
+        <tr><td><strong>FX swap</strong></td><td>Spot one way + forward back the other — two exchanges bundled</td><td>Near leg now, far leg later</td></tr>
+      </tbody>
+    </table>
+
+    <h3 id="dates">Value dates — "spot" is not one thing</h3>
+    <p>Even a plain spot trade settles on a chosen <em>value date</em>: <strong>value today</strong>, <strong>value tomorrow</strong> (tom), or <strong>T+2</strong> — the standard spot convention. The rate is agreed at confirmation regardless; only the settlement day changes (and the price adjusts by a whisker of interest for each day of difference).</p>
+
+    <div class="widget">
+      <p class="widget-title">Widget 2 · Pick a value date</p>
+      <div class="preset-row" id="vd-presets">
+        <button data-vd="0">Value today</button>
+        <button data-vd="1">Tom (T+1)</button>
+        <button data-vd="2" class="active">Spot (T+2)</button>
+        <button data-vd="30">Forward (T+30)</button>
+      </div>
+      <svg id="vd-chart" class="chart" viewBox="0 0 640 170" role="img" aria-label="Trade date and settlement date timeline"></svg>
+      <div class="readout" id="vd-readout"></div>
+    </div>
+    <figure><figcaption><strong>Figure 3.</strong> The rate is always fixed on trade day (the flag). Only the cash-movement day slides. Once the settlement date is beyond T+2, the trade stops being "spot" and becomes a forward — same mechanics, longer gap, and the rate now includes forward points.</figcaption></figure>
+
+    <h2 id="forwards">Forwards — premium, discount, and why it's arithmetic, not opinion</h2>
+    <p>A forward rate is <em>not</em> the desk's forecast of where the currency is going. It comes from the interest rates of the two currencies, mechanically:</p>
+    <blockquote>Forward = Spot × (1 + r<sub>quote</sub> × t) ÷ (1 + r<sub>base</sub> × t)</blockquote>
+    <p>Intuition: holding the high-interest currency for three months earns you more interest, so the forward price must give that advantage back — otherwise everyone would hold the high-yielder risk-free. When the forward is above spot the base currency trades <strong>at a premium</strong>; below spot, <strong>at a discount</strong>. The difference, quoted in points, is the <strong>forward points</strong>.</p>
+
+    <div class="widget">
+      <p class="widget-title">Widget 3 · Forward points from interest rates</p>
+      <div class="control">
+        <label for="f-base">Base ccy rate (EUR)</label>
+        <input type="range" id="f-base" min="0" max="10" step="0.25" value="2.5">
+        <output id="f-base-out">2.50%</output>
+      </div>
+      <div class="control">
+        <label for="f-quote">Quote ccy rate (USD)</label>
+        <input type="range" id="f-quote" min="0" max="10" step="0.25" value="4.5">
+        <output id="f-quote-out">4.50%</output>
+      </div>
+      <div class="control">
+        <label for="f-tenor">Tenor (months)</label>
+        <input type="range" id="f-tenor" min="1" max="12" step="1" value="3">
+        <output id="f-tenor-out">3m</output>
+      </div>
+      <svg id="f-chart" class="chart" viewBox="0 0 640 220" role="img" aria-label="Spot versus forward rate"></svg>
+      <div class="readout" id="f-readout"></div>
+    </div>
+    <figure><figcaption><strong>Figure 4.</strong> Spot fixed at 1.1000. Set the two interest rates and the forward follows — raise the quote-currency rate above the base's and the base goes to a premium; flip them and it goes to a discount. No opinion about the future anywhere in the formula.</figcaption></figure>
+
+    <h2 id="swaps">FX swaps — near leg, far leg</h2>
+    <p>An FX swap is two exchanges in one ticket: the <strong>near leg</strong> (usually spot) swaps currency A for currency B now; the <strong>far leg</strong> reverses it on a future date at a rate set today — spot plus the forward points. Nobody keeps any currency exposure; what actually happened is that one side <em>borrowed</em> a currency against the other. This is why the <a href="/doc/nbb/money-markets/money-markets-101.html">money markets paper</a> calls FX swaps a funding tool: for many non-US banks it is a primary dollar funding channel.</p>
+
+    <div class="widget">
+      <p class="widget-title">Widget 4 · Anatomy of a swap — both legs</p>
+      <div class="control">
+        <label for="sw-points">Forward points</label>
+        <input type="range" id="sw-points" min="-0.02" max="0.02" step="0.001" value="0.006">
+        <output id="sw-points-out">+0.0060</output>
+      </div>
+      <div class="control">
+        <label for="sw-tenor">Far leg (days)</label>
+        <input type="range" id="sw-tenor" min="7" max="360" step="7" value="90">
+        <output id="sw-tenor-out">90d</output>
+      </div>
+      <svg id="sw-chart" class="chart" viewBox="0 0 640 230" role="img" aria-label="Near and far legs of an FX swap"></svg>
+      <div class="readout" id="sw-readout"></div>
+    </div>
+    <figure><figcaption><strong>Figure 5.</strong> Near leg: hand over EUR 10m, receive USD at spot 1.1000. Far leg: the same amounts flow back at the pre-agreed forward rate. The points are the "interest" on what is economically a collateralised loan of one currency against the other.</figcaption></figure>
+
+    <h2 id="arb">Arbitrage — why the numbers can't disagree for long</h2>
+    <p>The spot rate, the forward rate, and the two currencies' interest rates are locked together by the formula above. If the market's forward drifts away from the arithmetic — because someone is quoting lazily, or flows are one-sided — there is a riskless round-trip: borrow one currency, convert at spot, invest at the other rate, sell the proceeds forward, and end with more than you started, with every rate locked on day one. That is <strong>covered interest arbitrage</strong>. The desk's job is to spot it before everyone else does, because the act of doing the trade closes the gap.</p>
+
+    <div class="widget">
+      <p class="widget-title">Widget 5 · Hunt the arbitrage</p>
+      <div class="control">
+        <label for="a-mis">Market forward mispricing</label>
+        <input type="range" id="a-mis" min="-0.01" max="0.01" step="0.0005" value="0.004">
+        <output id="a-mis-out">+0.0040</output>
+      </div>
+      <div class="readout" id="a-readout"></div>
+    </div>
+    <figure><figcaption><strong>Figure 6.</strong> Fair forward from the arithmetic vs the forward the market is actually quoting. Any nonzero gap converts to a locked-in, riskless profit per €10m round trip — until enough desks do the trade and the quote snaps back. At zero: no free lunch, which is the normal state.</figcaption></figure>
+
+    <details class="derivation">
+      <summary>The arbitrage recipe, step by step (forward quoted too high)</summary>
+      <p>Setup: spot 1.1000, EUR rate 2.5%, USD rate 4.5%, 3 months, fair forward 1.1054 — but the market quotes 1.1094.</p>
+      <p>The forward is rich for EUR, so you want to be a forward <em>seller</em> of EUR:</p>
+      <p>1 · Borrow <strong>$11,000,000</strong> at 4.5% for 3 months — you will owe $11,123,750.<br>
+      2 · Convert at spot 1.1000 → <strong>€10,000,000</strong>. Invest at 2.5% → €10,062,500 at maturity.<br>
+      3 · Today, sell those future euros forward at the rich 1.1094 → locked-in <strong>$11,163,338</strong>.<br>
+      4 · At maturity: collect €10,062,500, deliver into the forward, receive $11,163,338, repay the $11,123,750 loan — keep <strong>$39,588</strong>, with every rate fixed on day one.</p>
+      <p>If the market forward were too LOW instead, run the loop the other way (borrow EUR, invest USD, buy EUR back cheap forward). The direction follows the sign of the mispricing — the widget picks it for you. Either way, one direction locks a profit whenever the quote and the arithmetic disagree.</p>
+    </details>
+
+    <h2 id="bahrain">The Bahrain angle</h2>
+    <p>USD/BHD is pegged at <strong>0.376</strong> and the Central Bank of Bahrain defends it, so dollar–dinar conversion is near-mechanical — the desk's real trading risk lives in the crosses (EUR, GBP, TRY, JPY against either). For the Turkish client in Figure 1, the interesting leg is not USD→BHD; it's whatever TRY exposure existed before the dollars. And because BHD interest rates shadow US rates to hold the peg (see the <a href="/doc/nbb/FTP/ftp-reference-guide.html">FTP guide</a>, section 9), BHD forward points against the dollar stay small and well-behaved — a luxury desks trading unpegged pairs do not have.</p>
+
+    <div class="callout"><strong>Desk vocabulary check</strong> — the terms from the notes, one line each: <em>bid/ask</em>: bank buys at bid, sells at ask. <em>Spread</em>: ask − bid, the desk's basic income. <em>Value date</em>: the day cash actually moves (today / tom / T+2 / forward). <em>Confirmation</em>: the binding statement of trade, rate, and value date. <em>Premium / discount</em>: forward above / below spot, set by interest differentials. <em>Near / far leg</em>: the two exchanges inside a swap. <em>Forward points</em>: the spot-to-forward gap, quoted in points. <em>Covered interest arbitrage</em>: the trade that forces spot, forward, and the two interest rates to agree.</div>
+
+    <h2 id="fit">Where this sits in Treasury</h2>
+    <p>The FX desk is the third desk in the same room as the <a href="/doc/nbb/money-markets/money-markets-101.html">money markets desk</a> and the ALM/<a href="/doc/nbb/FTP/ftp-reference-guide.html">FTP function</a>. The connections run deep: FX swaps are a funding tool (money markets), the forward points are made of interest differentials (the same curves FTP reads), and client FX flow is priced with a spread exactly the way deposits and loans are priced around the FTP rate — the desk stands in the middle and charges for standing there.</p>
+  </main>
+
+  <script>
+    function bindSlider(id, outId, fmt, onChange) {
+      var el = document.getElementById(id), out = document.getElementById(outId);
+      var update = function () { out.textContent = fmt(el.valueAsNumber); onChange(el.valueAsNumber); };
+      el.addEventListener("input", update);
+      update();
+    }
+
+    /* ---------- Widget 1: spread engine ---------- */
+    var s = { spread: 0.001, vol: 20 };
+    var S_MID = 2.5535;
+    function drawS() {
+      var bid = S_MID - s.spread / 2, ask = S_MID + s.spread / 2;
+      var svg = document.getElementById("s-chart");
+      var out =
+        '<rect x="240" y="55" width="160" height="70" rx="10" style="fill:var(--color-accent-soft); stroke:var(--color-accent)"/>' +
+        '<text class="axis-label" x="320" y="83" text-anchor="middle" style="font-weight:600">FX DESK</text>' +
+        '<text class="axis-label" x="320" y="101" text-anchor="middle">' + bid.toFixed(4) + ' / ' + ask.toFixed(4) + '</text>' +
+        '<rect x="15"  y="55" width="150" height="70" rx="10" style="fill:var(--color-bg); stroke:var(--color-border)"/>' +
+        '<text class="axis-label" x="90" y="83" text-anchor="middle" style="font-weight:600">Customer A</text>' +
+        '<text class="axis-label" x="90" y="101" text-anchor="middle">has EUR, wants BHD</text>' +
+        '<rect x="475" y="55" width="150" height="70" rx="10" style="fill:var(--color-bg); stroke:var(--color-border)"/>' +
+        '<text class="axis-label" x="550" y="83" text-anchor="middle" style="font-weight:600">Customer B</text>' +
+        '<text class="axis-label" x="550" y="101" text-anchor="middle">has BHD, wants EUR</text>' +
+        '<line x1="165" y1="90" x2="240" y2="90" style="stroke:var(--color-danger);stroke-width:2"/>' +
+        '<text class="axis-label" x="202" y="80" text-anchor="middle" style="fill:var(--color-danger)">sells EUR</text>' +
+        '<text class="axis-label" x="202" y="112" text-anchor="middle">at BID ' + bid.toFixed(4) + '</text>' +
+        '<line x1="400" y1="90" x2="475" y2="90" style="stroke:var(--color-accent);stroke-width:2"/>' +
+        '<text class="axis-label" x="437" y="80" text-anchor="middle" style="fill:var(--color-accent)">buys EUR</text>' +
+        '<text class="axis-label" x="437" y="112" text-anchor="middle">at ASK ' + ask.toFixed(4) + '</text>' +
+        '<text class="axis-label" x="320" y="160" text-anchor="middle" style="font-style:italic">the desk holds nothing and keeps the middle</text>';
+      svg.innerHTML = out;
+      var daily = s.vol * 1e6 * s.spread / S_MID;
+      var annual = daily * 250;
+      var fmtM = function (v) { return v >= 1e6 ? (v / 1e6).toFixed(2) + "m" : (v / 1e3).toFixed(0) + "k"; };
+      document.getElementById("s-readout").innerHTML =
+        "Spread <strong>" + s.spread.toFixed(4) + "</strong> on <strong>" + s.vol + "m</strong> of matched two-way flow ≈ <strong>BHD " + fmtM(daily) + "</strong>/day, <strong>BHD " + fmtM(annual) + "</strong>/year — earned without taking a view on the rate at all.";
+    }
+    bindSlider("s-spread", "s-spread-out", function (v) { return v.toFixed(4); }, function (v) { s.spread = v; drawS(); });
+    bindSlider("s-vol", "s-vol-out", function (v) { return v + "m"; }, function (v) { s.vol = v; drawS(); });
+
+    /* ---------- Widget 2: value dates ---------- */
+    function drawVD(days) {
+      var svg = document.getElementById("vd-chart");
+      var W = 640, y = 90, xTrade = 60, xEnd = 600;
+      var span = 32;
+      var xFor = function (d) { return xTrade + (Math.min(d, span) / span) * (xEnd - xTrade); };
+      var out = '<line class="axis" x1="' + xTrade + '" y1="' + y + '" x2="' + xEnd + '" y2="' + y + '"/>';
+      [0, 1, 2].forEach(function (d) {
+        out += '<line class="axis" x1="' + xFor(d) + '" y1="' + (y - 5) + '" x2="' + xFor(d) + '" y2="' + (y + 5) + '"/>' +
+               '<text class="axis-label" x="' + xFor(d) + '" y="' + (y + 22) + '" text-anchor="middle">T' + (d ? "+" + d : "") + '</text>';
+      });
+      out += '<text class="axis-label" x="' + xEnd + '" y="' + (y + 22) + '" text-anchor="end">T+30…</text>';
+      out += '<polygon points="' + xTrade + ',' + (y - 42) + ' ' + xTrade + ',' + (y - 12) + ' ' + (xTrade + 16) + ',' + (y - 34) + '" style="fill:var(--color-danger)"/>' +
+             '<line x1="' + xTrade + '" y1="' + (y - 12) + '" x2="' + xTrade + '" y2="' + y + '" style="stroke:var(--color-danger)"/>' +
+             '<text class="axis-label" x="' + (xTrade + 20) + '" y="' + (y - 46) + '">trade day: rate CONFIRMED</text>';
+      var xs = xFor(days);
+      out += '<circle cx="' + xs + '" cy="' + y + '" r="9" style="fill:var(--color-accent)"/>' +
+             '<text class="axis-label" x="' + xs + '" y="' + (y + 44) + '" text-anchor="middle" style="font-weight:600">cash moves here</text>';
+      svg.innerHTML = out;
+      var names = { 0: ["Value today", "Same-day settlement — used for urgent payments; the rate embeds a tiny adjustment for the days of interest given up."],
+                    1: ["Tom (T+1)", "The notes' example: rate agreed today, money lands tomorrow. The confirmation makes today's rate binding for tomorrow's cash."],
+                    2: ["Spot (T+2)", "The default convention — 'spot' with no qualifier means this. Two days exist for payment instructions to clear both banking systems."],
+                    30: ["Forward (T+30)", "Beyond T+2 this is a forward: same confirmation, but the rate now includes forward points from the interest differential (next section)."] };
+      var n = names[days];
+      document.getElementById("vd-readout").innerHTML = "<strong>" + n[0] + "</strong> · " + n[1];
+    }
+    document.getElementById("vd-presets").addEventListener("click", function (e) {
+      var vd = e.target.getAttribute("data-vd");
+      if (vd === null) return;
+      this.querySelectorAll("button").forEach(function (b) { b.classList.toggle("active", b.getAttribute("data-vd") === vd); });
+      drawVD(+vd);
+    });
+    drawVD(2);
+
+    /* ---------- Widget 3: forward points ---------- */
+    var f = { base: 2.5, quote: 4.5, tenor: 3 };
+    var F_SPOT = 1.1;
+    function drawF() {
+      var t = f.tenor / 12;
+      var fwd = F_SPOT * (1 + f.quote / 100 * t) / (1 + f.base / 100 * t);
+      var pts = fwd - F_SPOT;
+      var svg = document.getElementById("f-chart");
+      var W = 640, H = 220, m = { t: 20, b: 40, l: 60, r: 20 };
+      var y0 = 1.06, y1 = 1.16;
+      var Y = function (v) { return H - m.b - ((v - y0) / (y1 - y0)) * (H - m.t - m.b); };
+      var out = '<line class="axis" x1="' + m.l + '" y1="' + m.t + '" x2="' + m.l + '" y2="' + (H - m.b) + '"/>';
+      for (var i = 0; i <= 4; i++) {
+        var yv = y0 + (i / 4) * (y1 - y0);
+        out += '<text class="axis-label" x="' + (m.l - 8) + '" y="' + (Y(yv) + 4) + '" text-anchor="end">' + yv.toFixed(2) + '</text>' +
+               '<line class="axis" x1="' + m.l + '" y1="' + Y(yv) + '" x2="' + (W - m.r) + '" y2="' + Y(yv) + '" style="opacity:0.4"/>';
+      }
+      out += '<line x1="' + (m.l + 40) + '" y1="' + Y(F_SPOT) + '" x2="' + (m.l + 240) + '" y2="' + Y(F_SPOT) + '" style="stroke:var(--color-accent);stroke-width:3"/>' +
+             '<text class="axis-label" x="' + (m.l + 140) + '" y="' + (Y(F_SPOT) - 8) + '" text-anchor="middle">SPOT ' + F_SPOT.toFixed(4) + '</text>';
+      out += '<line x1="' + (m.l + 300) + '" y1="' + Y(fwd) + '" x2="' + (m.l + 500) + '" y2="' + Y(fwd) + '" style="stroke:var(--color-danger);stroke-width:3"/>' +
+             '<text class="axis-label" x="' + (m.l + 400) + '" y="' + (Y(fwd) - 8) + '" text-anchor="middle">FORWARD ' + fwd.toFixed(4) + '</text>';
+      out += '<line x1="' + (m.l + 270) + '" y1="' + Y(F_SPOT) + '" x2="' + (m.l + 270) + '" y2="' + Y(fwd) + '" style="stroke:var(--color-muted);stroke-dasharray:4 3"/>' +
+             '<text class="axis-label" x="' + (m.l + 278) + '" y="' + ((Y(F_SPOT) + Y(fwd)) / 2 + 4) + '">' + (pts >= 0 ? "+" : "") + (pts * 10000).toFixed(0) + ' pts</text>';
+      svg.innerHTML = out;
+      var state = pts > 0.0001 ? "at a PREMIUM — the base currency (EUR) earns less interest, so its forward price is higher in compensation"
+        : (pts < -0.0001 ? "at a DISCOUNT — the base currency earns more interest, so its forward price gives that advantage back" : "flat — equal rates, forward equals spot");
+      document.getElementById("f-readout").innerHTML =
+        "Forward = 1.1000 × (1 + " + (f.quote / 100).toFixed(3) + "×" + t.toFixed(2) + ") ÷ (1 + " + (f.base / 100).toFixed(3) + "×" + t.toFixed(2) + ") = <strong>" + fwd.toFixed(4) + "</strong>. EUR is trading " + state + ".";
+    }
+    bindSlider("f-base", "f-base-out", function (v) { return v.toFixed(2) + "%"; }, function (v) { f.base = v; drawF(); });
+    bindSlider("f-quote", "f-quote-out", function (v) { return v.toFixed(2) + "%"; }, function (v) { f.quote = v; drawF(); });
+    bindSlider("f-tenor", "f-tenor-out", function (v) { return v + "m"; }, function (v) { f.tenor = v; drawF(); });
+
+    /* ---------- Widget 4: swap legs ---------- */
+    var sw = { points: 0.006, tenor: 90 };
+    function drawSW() {
+      var spot = 1.1, far = spot + sw.points, eur = 10;
+      var usdNear = eur * spot, usdFar = eur * far;
+      var svg = document.getElementById("sw-chart");
+      var out =
+        '<text class="axis-label" x="12" y="28" style="font-weight:600">NEAR LEG — today (spot ' + spot.toFixed(4) + ')</text>' +
+        '<rect x="12"  y="40" width="130" height="52" rx="8" style="fill:var(--color-accent-soft); stroke:var(--color-accent)"/>' +
+        '<rect x="498" y="40" width="130" height="52" rx="8" style="fill:var(--color-accent-soft); stroke:var(--color-accent)"/>' +
+        '<text class="axis-label" x="77"  y="70" text-anchor="middle" style="font-weight:600">OUR BANK</text>' +
+        '<text class="axis-label" x="563" y="70" text-anchor="middle" style="font-weight:600">COUNTERPARTY</text>' +
+        '<line x1="142" y1="55" x2="498" y2="55" style="stroke:var(--color-danger);stroke-width:2"/>' +
+        '<text class="axis-label" x="320" y="48" text-anchor="middle">EUR ' + eur.toFixed(0) + 'm →</text>' +
+        '<line x1="498" y1="80" x2="142" y2="80" style="stroke:var(--color-accent);stroke-width:2"/>' +
+        '<text class="axis-label" x="320" y="98" text-anchor="middle">← USD ' + usdNear.toFixed(1) + 'm</text>' +
+        '<text class="axis-label" x="12" y="140" style="font-weight:600">FAR LEG — day ' + sw.tenor + ' (forward ' + far.toFixed(4) + ' = spot ' + (sw.points >= 0 ? "+" : "−") + ' ' + Math.abs(sw.points * 10000).toFixed(0) + ' pts)</text>' +
+        '<rect x="12"  y="152" width="130" height="52" rx="8" style="fill:var(--color-accent-soft); stroke:var(--color-accent)"/>' +
+        '<rect x="498" y="152" width="130" height="52" rx="8" style="fill:var(--color-accent-soft); stroke:var(--color-accent)"/>' +
+        '<text class="axis-label" x="77"  y="182" text-anchor="middle" style="font-weight:600">OUR BANK</text>' +
+        '<text class="axis-label" x="563" y="182" text-anchor="middle" style="font-weight:600">COUNTERPARTY</text>' +
+        '<line x1="498" y1="167" x2="142" y2="167" style="stroke:var(--color-danger);stroke-width:2"/>' +
+        '<text class="axis-label" x="320" y="160" text-anchor="middle">← EUR ' + eur.toFixed(0) + 'm comes home</text>' +
+        '<line x1="142" y1="192" x2="498" y2="192" style="stroke:var(--color-accent);stroke-width:2"/>' +
+        '<text class="axis-label" x="320" y="210" text-anchor="middle">USD ' + usdFar.toFixed(2) + 'm goes back →</text>';
+      svg.innerHTML = out;
+      var costPct = (usdFar - usdNear) / usdNear * 100 * (360 / sw.tenor);
+      document.getElementById("sw-readout").innerHTML =
+        "We held USD " + usdNear.toFixed(1) + "m for " + sw.tenor + " days and returned USD " + usdFar.toFixed(2) + "m — the points are the interest: ≈ <strong>" + costPct.toFixed(2) + "%</strong> annualised" + (sw.points >= 0 ? " paid" : " EARNED (negative points: we borrowed the high-yield currency)") + ". Economically: a collateralised USD loan, EUR as collateral. No net FX exposure at any point.";
+    }
+    bindSlider("sw-points", "sw-points-out", function (v) { return (v >= 0 ? "+" : "") + v.toFixed(4); }, function (v) { sw.points = v; drawSW(); });
+    bindSlider("sw-tenor", "sw-tenor-out", function (v) { return v + "d"; }, function (v) { sw.tenor = v; drawSW(); });
+
+    /* ---------- Widget 5: arbitrage ---------- */
+    function drawA(mis) {
+      var spot = 1.1, rb = 0.025, rq = 0.045, t = 0.25, notional = 10e6;
+      var fair = spot * (1 + rq * t) / (1 + rb * t);
+      var mkt = fair + mis;
+      var profit;
+      if (Math.abs(mis) < 1e-9) profit = 0;
+      else if (mis > 0) {
+        // market forward too high (USD per EUR): borrow USD, buy EUR spot, invest EUR, sell EUR forward at rich rate
+        var usd = notional * spot;                 // borrow this many USD
+        var eurInvested = notional * (1 + rb * t); // EUR grows
+        var usdBack = eurInvested * mkt;           // sell EUR forward, rich
+        profit = usdBack - usd * (1 + rq * t);     // repay USD loan
+      } else {
+        // market forward too low: borrow EUR, buy USD spot, invest USD, buy EUR forward cheap
+        var usd2 = notional * spot * (1 + rq * t);
+        var eurBack = usd2 / mkt;
+        profit = (eurBack - notional * (1 + rb * t)) * mkt; // in USD terms
+      }
+      document.getElementById("a-readout").innerHTML =
+        "Fair forward: <strong>" + fair.toFixed(4) + "</strong> · market forward: <strong>" + mkt.toFixed(4) + "</strong> · " +
+        (Math.abs(mis) < 1e-9
+          ? "gap: <strong>0</strong> — covered interest parity holds, no free lunch. This is the normal state, enforced by everyone watching for the alternative."
+          : "riskless profit on a €10m round trip: <strong>$" + Math.abs(profit).toLocaleString("en-US", { maximumFractionDigits: 0 }) + "</strong> — " +
+            (mis > 0 ? "borrow USD, buy EUR spot, invest EUR, sell it forward at the rich rate" : "borrow EUR, buy USD spot, invest USD, buy EUR back forward at the cheap rate") +
+            ". Every rate is locked on day one; the only risk is being slow.");
+    }
+    bindSlider("a-mis", "a-mis-out", function (v) { return (v >= 0 ? "+" : "") + v.toFixed(4); }, drawA);
+  </script>
+</body>
+</html>

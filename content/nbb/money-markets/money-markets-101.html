@@ -1,0 +1,561 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Money Markets: The 101</title>
+  <meta name="archive-tags" content="banking, treasury, money-market, liquidity">
+  <meta name="archive-summary" content="Crash course on money markets: what they are, why every bank is in them daily, the instrument toolkit (unsecured, repo, central bank facilities, T-bills, FX swaps), the eight ways banks make money, and the constraints (LCR, NSFR, leverage, rollover risk) that turn trades into a business. Interactive: cash squaring, the policy corridor, repo mechanics, curve riding, and more.">
+  <meta name="archive-created" content="2026-08-05">
+  <meta name="archive-updated" content="2026-08-05">
+  <meta name="archive-status" content="final">
+  <style>
+    /* ==tokens== (synced from design/tokens.css — do not edit inside the markers) */
+    :root {
+      --color-bg: #faf9f7;
+      --color-surface: #ffffff;
+      --color-fg: #1a1a1e;
+      --color-muted: #6b6b76;
+      --color-border: #e4e2dd;
+      --color-accent: #2f6fed;
+      --color-accent-fg: #ffffff;
+      --color-accent-soft: #e8effd;
+      --color-danger: #c4483c;
+      --color-warn-bg: #fdf6e3;
+      --color-code-bg: #f2f1ee;
+      --color-mark: #fff3bf;
+      --font-body: "Charter", "Georgia", "Cambria", "Times New Roman", serif;
+      --font-ui: system-ui, -apple-system, "Segoe UI", sans-serif;
+      --font-mono: "SFMono-Regular", "Cascadia Code", "Consolas", "Menlo", monospace;
+      --text-xs: 0.75rem;
+      --text-sm: 0.875rem;
+      --text-base: 1.0625rem;
+      --text-lg: 1.25rem;
+      --text-xl: 1.5rem;
+      --text-2xl: 1.875rem;
+      --text-3xl: 2.375rem;
+      --leading-body: 1.65;
+      --leading-tight: 1.25;
+      --measure: 68ch;
+      --space-1: 0.25rem;
+      --space-2: 0.5rem;
+      --space-3: 0.75rem;
+      --space-4: 1rem;
+      --space-5: 1.5rem;
+      --space-6: 2rem;
+      --space-7: 3rem;
+      --space-8: 4rem;
+      --radius-sm: 4px;
+      --radius-md: 8px;
+      --radius-lg: 12px;
+      --shadow-sm: 0 1px 2px rgba(20, 20, 25, 0.06);
+      --shadow-md: 0 2px 8px rgba(20, 20, 25, 0.1);
+    }
+    [data-theme="dark"] {
+      --color-bg: #16161a;
+      --color-surface: #1e1e24;
+      --color-fg: #e8e6e3;
+      --color-muted: #9a98a0;
+      --color-border: #32323a;
+      --color-accent: #6b9bff;
+      --color-accent-fg: #10101c;
+      --color-accent-soft: #23304d;
+      --color-danger: #e0685c;
+      --color-warn-bg: #2e2a1e;
+      --color-code-bg: #24242b;
+      --color-mark: #4d4425;
+      --shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.4);
+      --shadow-md: 0 2px 8px rgba(0, 0, 0, 0.5);
+    }
+    /* ==/tokens== */
+
+    /* When opened standalone (not in the app frame), follow the OS theme. */
+    @media (prefers-color-scheme: dark) {
+      :root:not([data-theme]) {
+        --color-bg: #16161a;
+        --color-surface: #1e1e24;
+        --color-fg: #e8e6e3;
+        --color-muted: #9a98a0;
+        --color-border: #32323a;
+        --color-accent: #6b9bff;
+        --color-accent-fg: #10101c;
+        --color-accent-soft: #23304d;
+        --color-danger: #e0685c;
+        --color-warn-bg: #2e2a1e;
+        --color-code-bg: #24242b;
+        --color-mark: #4d4425;
+      }
+    }
+
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      background: var(--color-bg);
+      color: var(--color-fg);
+      font-family: var(--font-body);
+      font-size: var(--text-base);
+      line-height: var(--leading-body);
+    }
+    .paper {
+      max-width: var(--measure);
+      margin: 0 auto;
+      padding: var(--space-6) var(--space-4) var(--space-8);
+    }
+    h1 { font-size: var(--text-3xl); line-height: var(--leading-tight); margin: 0 0 var(--space-2); }
+    h2 { font-size: var(--text-xl); line-height: var(--leading-tight); margin: var(--space-6) 0 var(--space-3); border-bottom: 1px solid var(--color-border); padding-bottom: var(--space-2); }
+    h3 { font-size: var(--text-lg); margin: var(--space-5) 0 var(--space-2); }
+    .byline { color: var(--color-muted); font-family: var(--font-ui); font-size: var(--text-sm); margin-bottom: var(--space-6); }
+    a { color: var(--color-accent); }
+    code { font-family: var(--font-mono); font-size: 0.88em; background: var(--color-code-bg); padding: 1px 5px; border-radius: var(--radius-sm); }
+    pre { background: var(--color-code-bg); padding: var(--space-4); border-radius: var(--radius-md); overflow-x: auto; }
+    pre code { background: none; padding: 0; font-size: var(--text-sm); }
+    blockquote { margin: var(--space-4) 0; padding: var(--space-2) var(--space-4); border-left: 3px solid var(--color-accent); background: var(--color-surface); color: var(--color-muted); }
+
+    /* interactive widgets */
+    .widget {
+      font-family: var(--font-ui);
+      background: var(--color-surface);
+      border: 1px solid var(--color-border);
+      border-radius: var(--radius-lg);
+      padding: var(--space-4);
+      margin: var(--space-5) 0;
+      box-shadow: var(--shadow-sm);
+    }
+    .widget-title { font-weight: 600; font-size: var(--text-sm); margin: 0 0 var(--space-3); color: var(--color-muted); text-transform: uppercase; letter-spacing: 0.05em; }
+    .control { display: flex; align-items: center; gap: var(--space-3); margin: var(--space-2) 0; font-size: var(--text-sm); }
+    .control label { min-width: 9rem; }
+    .control input[type="range"] { flex: 1; accent-color: var(--color-accent); }
+    .control output { min-width: 4rem; text-align: right; font-family: var(--font-mono); font-size: var(--text-sm); }
+    .chart { width: 100%; height: auto; display: block; margin-top: var(--space-3); }
+    .chart .axis { stroke: var(--color-border); stroke-width: 1; }
+    .chart .axis-label { fill: var(--color-muted); font-family: var(--font-ui); font-size: 11px; }
+    .chart .series { fill: none; stroke: var(--color-accent); stroke-width: 2; }
+    .chart .series-2 { fill: none; stroke: var(--color-danger); stroke-width: 2; }
+    .chart .bar { fill: var(--color-accent); }
+    figure { margin: var(--space-5) 0; }
+    figcaption { font-family: var(--font-ui); font-size: var(--text-sm); color: var(--color-muted); margin-top: var(--space-2); }
+    details.derivation { margin: var(--space-4) 0; border: 1px solid var(--color-border); border-radius: var(--radius-md); padding: var(--space-3) var(--space-4); background: var(--color-surface); }
+    details.derivation summary { cursor: pointer; font-family: var(--font-ui); font-weight: 600; font-size: var(--text-sm); }
+
+    /* custom styles (after token markers) */
+    table { border-collapse: collapse; width: 100%; font-family: var(--font-ui); font-size: var(--text-sm); margin: var(--space-4) 0; }
+    th, td { border: 1px solid var(--color-border); padding: var(--space-2) var(--space-3); text-align: left; vertical-align: top; }
+    th { background: var(--color-code-bg); font-weight: 600; }
+    .readout { font-family: var(--font-ui); font-size: var(--text-sm); background: var(--color-accent-soft); border-radius: var(--radius-md); padding: var(--space-3); margin-top: var(--space-3); }
+    .readout strong { font-family: var(--font-mono); }
+    .preset-row { display: flex; gap: var(--space-2); flex-wrap: wrap; margin: var(--space-2) 0; }
+    .preset-row button {
+      font-family: var(--font-ui); font-size: var(--text-sm); cursor: pointer;
+      border: 1px solid var(--color-border); background: var(--color-surface); color: var(--color-fg);
+      padding: var(--space-1) var(--space-3); border-radius: var(--radius-md);
+    }
+    .preset-row button.active { background: var(--color-accent); color: var(--color-accent-fg); border-color: var(--color-accent); }
+  </style>
+</head>
+<body>
+  <main class="paper">
+    <h1>Money Markets: The 101</h1>
+    <p class="byline">How the short end works, how banks make money in it, and what stops them · Companion to the <a href="/doc/nbb/FTP/ftp-reference-guide.html">FTP series</a> · 2026</p>
+
+    <h2 id="what">What it actually is</h2>
+    <p>The money market is where <strong>short-term cash</strong> gets borrowed and lent — anything from overnight out to about a year. That's the defining line. Beyond a year you're in the capital markets (bonds); inside a year you're in the money market.</p>
+    <p>It's wholesale, not retail. The participants are banks, central banks, money market funds, large corporates, sovereign wealth funds, and government treasuries. Minimum ticket sizes run in the millions. No branches, no customers — just institutions moving large amounts of cash for short periods.</p>
+    <p>The core purpose is boring and essential: <strong>every bank ends each day either short of cash or long of it</strong>, and neither is acceptable. Deposits came in, loans went out, payments settled, and the numbers never balance exactly. The money market is where banks square up — the plumbing that keeps the system liquid overnight.</p>
+
+    <div class="widget">
+      <p class="widget-title">Widget 1 · Square the day — a week on the cash desk</p>
+      <div class="preset-row"><button id="w1-btn">Simulate another week</button></div>
+      <svg id="w1-chart" class="chart" viewBox="0 0 640 260" role="img" aria-label="Daily cash positions over one week"></svg>
+      <div class="readout" id="w1-readout"></div>
+    </div>
+    <figure><figcaption><strong>Figure 1.</strong> Five business days of end-of-day positions for one bank. Red bars (short) must be borrowed by close; blue bars (long) must be lent or parked. The position is never zero, and the desk never gets a day off — that is the whole reason this market exists.</figcaption></figure>
+
+    <h2 id="why">Why a bank is in it at all</h2>
+    <p>Four reasons:</p>
+    <p><strong>Daily cash management.</strong> You must end the day with your central bank reserve account in acceptable shape. If you're short, you borrow. If you're long, you lend or park it. This happens every single day, and someone's job is exactly this.</p>
+    <p><strong>Bridging the funding gap.</strong> Loans are long, deposits are shorter, and the difference has to be funded from somewhere. Short-term wholesale money fills the gap — carefully, because this is precisely the maturity-transformation risk the <a href="/doc/nbb/FTP/ftp-reference-guide.html">FTP series</a> keeps warning about.</p>
+    <p><strong>Running the liquidity buffer.</strong> Regulation requires a stock of high-quality liquid assets. Money markets are where you buy, sell and finance that portfolio.</p>
+    <p><strong>Serving clients.</strong> Corporates with idle cash need somewhere to put it. Banks take that money in and pay a rate — a funding source and a client service at once.</p>
+
+    <h2 id="instruments">The instruments</h2>
+
+    <figure>
+      <svg class="chart" viewBox="0 0 640 330" role="img" aria-label="Map of money market instruments">
+        <rect x="8"   y="26" width="200" height="130" rx="8" style="fill:var(--color-danger); opacity:0.14"/>
+        <rect x="220" y="26" width="200" height="130" rx="8" style="fill:var(--color-accent); opacity:0.14"/>
+        <rect x="432" y="26" width="200" height="130" rx="8" style="fill:var(--color-muted); opacity:0.14"/>
+        <rect x="8"   y="176" width="200" height="130" rx="8" style="fill:var(--color-accent); opacity:0.08"/>
+        <rect x="220" y="176" width="200" height="130" rx="8" style="fill:var(--color-accent); opacity:0.08"/>
+        <rect x="432" y="176" width="200" height="130" rx="8" style="fill:var(--color-accent); opacity:0.08"/>
+        <text class="axis-label" x="108" y="48"  text-anchor="middle" style="font-weight:600">UNSECURED — on your name</text>
+        <text class="axis-label" x="108" y="72"  text-anchor="middle">Interbank deposits</text>
+        <text class="axis-label" x="108" y="90"  text-anchor="middle">Certificates of deposit (CDs)</text>
+        <text class="axis-label" x="108" y="108" text-anchor="middle">Commercial paper (CP)</text>
+        <text class="axis-label" x="108" y="140" text-anchor="middle" style="font-style:italic">tight limits post-2008</text>
+        <text class="axis-label" x="320" y="48"  text-anchor="middle" style="font-weight:600">SECURED — on collateral</text>
+        <text class="axis-label" x="320" y="72"  text-anchor="middle">Repo</text>
+        <text class="axis-label" x="320" y="90"  text-anchor="middle">Reverse repo</text>
+        <text class="axis-label" x="320" y="140" text-anchor="middle" style="font-style:italic">the workhorse — cheaper, larger</text>
+        <text class="axis-label" x="532" y="48"  text-anchor="middle" style="font-weight:600">CENTRAL BANK</text>
+        <text class="axis-label" x="532" y="72"  text-anchor="middle">Deposit facility (floor)</text>
+        <text class="axis-label" x="532" y="90"  text-anchor="middle">Lending facility (ceiling)</text>
+        <text class="axis-label" x="532" y="108" text-anchor="middle">Open market operations</text>
+        <text class="axis-label" x="532" y="140" text-anchor="middle" style="font-style:italic">the corridor</text>
+        <text class="axis-label" x="108" y="198" text-anchor="middle" style="font-weight:600">GOVT PAPER</text>
+        <text class="axis-label" x="108" y="222" text-anchor="middle">Treasury bills</text>
+        <text class="axis-label" x="108" y="256" text-anchor="middle" style="font-style:italic">backbone of the buffer</text>
+        <text class="axis-label" x="320" y="198" text-anchor="middle" style="font-weight:600">FX SWAPS</text>
+        <text class="axis-label" x="320" y="222" text-anchor="middle">EUR now ⇄ USD now,</text>
+        <text class="axis-label" x="320" y="240" text-anchor="middle">reverse at maturity</text>
+        <text class="axis-label" x="320" y="274" text-anchor="middle" style="font-style:italic">a primary USD channel for non-US banks</text>
+        <text class="axis-label" x="532" y="198" text-anchor="middle" style="font-weight:600">DERIVATIVES</text>
+        <text class="axis-label" x="532" y="222" text-anchor="middle">OIS · FRAs · short swaps</text>
+        <text class="axis-label" x="532" y="256" text-anchor="middle" style="font-style:italic">hedge the rate risk, no cash moves</text>
+      </svg>
+      <figcaption><strong>Figure 2.</strong> The toolkit at a glance. Left to right on the top row: trust in a name, trust in collateral, trust in the central bank.</figcaption>
+    </figure>
+
+    <h3>Unsecured — lending on the borrower's name alone</h3>
+    <ul>
+      <li><em>Interbank deposits</em> — Bank A lends Bank B cash for a set period. No collateral. Pure credit exposure, so limits are tight and post-2008 this market is a fraction of its former size.</li>
+      <li><em>Certificates of deposit (CDs)</em> — a tradeable receipt for a deposit. The lender can sell it on before maturity, which makes it more attractive than a locked deposit and so slightly cheaper for the bank.</li>
+      <li><em>Commercial paper (CP)</em> — short-term unsecured IOUs issued by banks and large corporates, usually 1–90 days.</li>
+    </ul>
+
+    <h3>Secured — lending against collateral</h3>
+    <ul>
+      <li><em>Repo (repurchase agreement)</em> — the workhorse of the modern money market. You sell a security (usually government bonds) and agree to buy it back tomorrow at a slightly higher price. Economically it's a collateralised loan; the price difference is the interest. Because the lender holds collateral, repo is cheaper and far larger than unsecured lending.</li>
+      <li><em>Reverse repo</em> — the same trade from the other side. You lend cash and take collateral.</li>
+    </ul>
+    <p>Repo is why the money market survived 2008 in a way unsecured lending didn't: when nobody trusts anyone's name, they'll still trust their government bonds.</p>
+
+    <div class="widget">
+      <p class="widget-title">Widget 2 · Repo mechanics — the two legs</p>
+      <div class="control">
+        <label for="w2-haircut">Haircut</label>
+        <input type="range" id="w2-haircut" min="0" max="10" step="0.5" value="2">
+        <output id="w2-haircut-out">2.0%</output>
+      </div>
+      <div class="control">
+        <label for="w2-rate">Repo rate</label>
+        <input type="range" id="w2-rate" min="2" max="7" step="0.1" value="4.5">
+        <output id="w2-rate-out">4.50%</output>
+      </div>
+      <div class="control">
+        <label for="w2-term">Term (days)</label>
+        <input type="range" id="w2-term" min="1" max="30" step="1" value="1">
+        <output id="w2-term-out">1d</output>
+      </div>
+      <svg id="w2-chart" class="chart" viewBox="0 0 640 210" role="img" aria-label="Repo leg diagram"></svg>
+      <div class="readout" id="w2-readout"></div>
+    </div>
+    <figure><figcaption><strong>Figure 3.</strong> BHD 100m of government bonds financing a cash loan. The haircut is the lender's protection — widen it and watch the cash raised shrink: that is exactly what happens to everyone at once in a stress, which is how "collateral you counted on becomes collateral nobody wants".</figcaption></figure>
+
+    <h3>Central bank facilities</h3>
+    <ul>
+      <li><em>Deposit facility</em> — park excess reserves at the central bank, earn the policy rate. Risk-free.</li>
+      <li><em>Lending facility</em> — borrow from the central bank against collateral, at a penalty rate.</li>
+      <li><em>Open market operations</em> — the central bank's scheduled repo operations, injecting or draining cash from the system.</li>
+    </ul>
+    <p>These two facilities form a <strong>corridor</strong>: no bank should lend below the deposit rate (why accept less than risk-free?) and none should borrow above the lending rate (why pay more than the central bank charges?). Market rates live between them. This is how monetary policy actually transmits into the real economy.</p>
+
+    <div class="widget">
+      <p class="widget-title">Widget 3 · The corridor — where the overnight rate lives</p>
+      <div class="control">
+        <label for="w3-policy">Policy (deposit) rate</label>
+        <input type="range" id="w3-policy" min="1" max="6" step="0.25" value="4">
+        <output id="w3-policy-out">4.00%</output>
+      </div>
+      <div class="control">
+        <label for="w3-liq">System liquidity</label>
+        <input type="range" id="w3-liq" min="0" max="1" step="0.05" value="0.5">
+        <output id="w3-liq-out">balanced</output>
+      </div>
+      <svg id="w3-chart" class="chart" viewBox="0 0 640 190" role="img" aria-label="Policy corridor with market rate marker"></svg>
+      <div class="readout" id="w3-readout"></div>
+    </div>
+    <figure><figcaption><strong>Figure 4.</strong> Floor = deposit facility, ceiling = lending facility (floor + 1%). Drain liquidity and the market rate climbs toward the ceiling; flood the system and it sinks onto the floor — the post-QE world. Move the policy rate and the whole corridor — and the market rate inside it — moves with it: transmission.</figcaption></figure>
+
+    <h3>Short-dated government paper</h3>
+    <ul>
+      <li><em>Treasury bills</em> — government debt under a year. The safest asset in the currency, and the backbone of most liquidity buffers.</li>
+    </ul>
+
+    <h3>FX swaps as a funding tool</h3>
+    <p>Underrated and important. If you need dollars but have euros, you can swap euros for dollars now and reverse it later. It's economically a secured dollar loan collateralised with euros. For many non-US banks this is a <em>primary</em> dollar funding channel, not an afterthought.</p>
+
+    <h3>Derivatives for hedging</h3>
+    <p>OIS, FRAs, short-dated swaps — used to hedge the rate risk on all of the above without moving cash around.</p>
+
+    <h2 id="tenors">Tenors</h2>
+    <p>The short end has its own vocabulary: <strong>O/N</strong> (overnight, tonight to tomorrow) · <strong>T/N</strong> (tom-next) · <strong>S/N</strong> (spot-next) · then 1 week, 1 month, 3 months, 6 months, 12 months.</p>
+    <p>Overnight is where the volume is. Three months is the pricing benchmark most things reference.</p>
+
+    <h2 id="money">How banks actually make money here</h2>
+    <p><strong>1. Bid–offer spread.</strong> The basic one. Take money in at one rate, lend it out at a slightly higher one. Thin margins, enormous volumes. A few basis points on billions is real money.</p>
+
+    <div class="widget">
+      <p class="widget-title">Widget 4 · Thin margins × enormous volumes</p>
+      <div class="control">
+        <label for="w4-spread">Bid–offer spread</label>
+        <input type="range" id="w4-spread" min="1" max="10" step="0.5" value="3">
+        <output id="w4-spread-out">3.0 bp</output>
+      </div>
+      <div class="control">
+        <label for="w4-vol">Daily book (BHD bn)</label>
+        <input type="range" id="w4-vol" min="0.5" max="10" step="0.5" value="3">
+        <output id="w4-vol-out">3.0bn</output>
+      </div>
+      <div class="readout" id="w4-readout"></div>
+    </div>
+
+    <p><strong>2. Riding the short curve.</strong> The curve usually slopes up even within a year — 3-month money pays more than overnight. Borrow overnight, lend 3-month, capture the difference, roll the overnight funding 90 times. Profitable and dangerous, and it's the maturity-transformation trap in miniature. Fine in size and with limits; fatal when it becomes the business model.</p>
+
+    <div class="widget">
+      <p class="widget-title">Widget 5 · Riding the curve — and getting caught</p>
+      <div class="control">
+        <label for="w5-slope">Short-curve slope</label>
+        <input type="range" id="w5-slope" min="0" max="1.5" step="0.05" value="0.6">
+        <output id="w5-slope-out">+0.60%</output>
+      </div>
+      <div class="preset-row" id="w5-presets">
+        <button data-mode="calm" class="active">Calm market</button>
+        <button data-mode="stress">Funding stress hits (O/N +300bp)</button>
+      </div>
+      <svg id="w5-chart" class="chart" viewBox="0 0 640 280" role="img" aria-label="Short-end curve with borrow and lend points"></svg>
+      <div class="readout" id="w5-readout"></div>
+    </div>
+    <figure><figcaption><strong>Figure 5.</strong> Borrow at the overnight point (red dot), lend at 3 months (blue dot), pocket the gap — then roll the overnight leg every single day. Hit the stress button: your 3-month asset is locked, your funding just repriced, and the carry inverts overnight. This exact trade, oversized, is how banks die.</figcaption></figure>
+
+    <p><strong>3. Secured/unsecured arbitrage.</strong> If you can borrow cheaply in repo (because you hold good collateral) and lend unsecured at a higher rate, you capture the credit spread. You're being paid for taking counterparty risk you're comfortable with.</p>
+    <p><strong>4. Cross-currency basis.</strong> Sometimes it's genuinely cheaper to raise dollars by borrowing euros and FX-swapping than by borrowing dollars directly. That gap — the cross-currency basis — moves around and can be harvested. It widens dramatically in stress, which is both the opportunity and the warning.</p>
+    <p><strong>5. Collateral transformation.</strong> A client holds assets that don't qualify as good collateral; you lend them government bonds against those assets and charge a fee. You're monetising your collateral quality. Profitable, and one of the more risk-laden activities here — the 2008 lesson is that collateral quality is correlated with everything else going wrong.</p>
+    <p><strong>6. Buffer carry.</strong> Your liquidity buffer earns something. If T-bills yield more than your funding cost for that tenor, the buffer carries positively. Often it doesn't — buffers frequently cost money, which is the negative carry priced into the term liquidity premium.</p>
+    <p><strong>7. Client facilitation.</strong> A corporate parks $200m with you overnight. You pay them slightly less than you can earn placing it. Reliable, low-risk, and it deepens the client relationship.</p>
+    <p><strong>8. Policy arbitrage.</strong> When market rates drift below the central bank's deposit rate, you can borrow in the market and park at the central bank for a spread. Free money while it lasts — and it usually doesn't last long, because everyone does it and the gap closes.</p>
+
+    <h2 id="considerations">The considerations — what constrains all of this</h2>
+    <p>This is the part that separates a 101 from an actual understanding. Every trade above is profitable in isolation; the constraints are what make it a real business.</p>
+    <p><strong>Liquidity regulation (LCR).</strong> The Liquidity Coverage Ratio assumes short-term wholesale funding runs away in a crisis, so it forces you to hold liquid assets against it. Which means cheap 1-week money isn't as cheap as it looks — it carries a regulatory buffer cost. This deliberately kills a lot of otherwise attractive short-funding trades. That's the point: it was written to stop 2008 happening again.</p>
+
+    <div class="widget">
+      <p class="widget-title">Widget 6 · The LCR trap — quoted rate vs true cost</p>
+      <div class="control">
+        <label for="w6-tenor">Funding tenor</label>
+        <input type="range" id="w6-tenor" min="0.25" max="12" step="0.25" value="0.25">
+        <output id="w6-tenor-out">1 week</output>
+      </div>
+      <svg id="w6-chart" class="chart" viewBox="0 0 640 200" role="img" aria-label="Quoted rate versus all-in cost with buffer drag"></svg>
+      <div class="readout" id="w6-readout"></div>
+    </div>
+    <figure><figcaption><strong>Figure 6.</strong> Short wholesale money quotes cheap (left bar) but funding inside the LCR's 30-day window forces you to hold HQLA against it, and the buffer's negative carry lands on top (right bar). Slide the tenor past one month and watch the drag melt away — the regulation is deliberately steering you longer.</figcaption></figure>
+
+    <p><strong>Structural funding (NSFR).</strong> The Net Stable Funding Ratio requires long assets to be backed by stable funding. It directly limits how much you can fund long lending with money market cash.</p>
+    <p><strong>Counterparty credit limits.</strong> Unsecured lending is a credit decision. Every counterparty has a limit; every trade consumes some of it. A profitable trade you have no line for is not a trade.</p>
+    <p><strong>Leverage ratio.</strong> Repo inflates your balance sheet enormously — huge gross positions for tiny margins. Since the leverage ratio measures gross exposure regardless of risk, repo can be balance-sheet-expensive even when it's nearly riskless. This is why repo books shrink at quarter-end when balance sheets get reported.</p>
+    <p><strong>Intraday liquidity.</strong> Separate from overnight. You need cash <em>during</em> the day to settle payments as they arrive, and the timing can be brutal even if you end the day flat.</p>
+    <p><strong>Collateral quality and haircuts.</strong> Not all collateral is equal. Lenders apply haircuts — lend $95m against $100m of bonds — and haircuts widen exactly when you most need the funding. Collateral you counted on can become collateral nobody wants.</p>
+    <p><strong>Rollover risk.</strong> The one that ties everything back. Every short-term borrowing must be repaid or renewed. It renews smoothly a thousand times and then one day it doesn't. That's the same risk the term liquidity premium prices — this is where it actually lives.</p>
+    <p><strong>Concentration.</strong> Ten counterparties for 80% of your funding is fragile even if each individually looks solid, because they'll all reassess you at the same moment for the same reason.</p>
+    <p><strong>Quarter and year-end.</strong> Reporting dates distort everything. Balance sheets get compressed, rates spike, liquidity thins. Predictable and still disruptive.</p>
+
+    <h2 id="ftp">How this connects to FTP</h2>
+    <p>The money market desk usually sits inside Treasury, right next to the FTP function — and they're two halves of the same job.</p>
+    <p>FTP sets the internal price of funding. The money market desk goes out and <strong>actually raises it</strong>. When the desk funds more cheaply than the FTP curve implied, that gap is legitimate execution gain for ALM. When it funds more expensively — a stressed market, a bad week — that's a real loss, absorbed by Treasury rather than dumped on the business lines.</p>
+    <p>And the short end of your FTP curve is built directly from money market prices. What the desk pays for 3-month money <em>is</em> the 3-month base rate plus your 3-month liquidity premium, observed live. See <a href="/doc/nbb/FTP/ftp-calculation-components.html">Anatomy of an FTP Calculation</a> for how those two components are read off the curves.</p>
+
+    <h2 id="summary">One paragraph to hold it all</h2>
+    <blockquote>The money market is the banking system's daily cash-clearing mechanism, where institutions square short-term surpluses and deficits against each other and the central bank. Banks earn thin spreads on huge volumes, plus whatever they can capture from the shape of the short curve, the gap between secured and unsecured, and cross-currency dislocations. What limits them is not the availability of profitable trades but regulation, counterparty limits, balance-sheet cost, and the fact that short-term funding is the single most reliable way a bank has ever destroyed itself.</blockquote>
+  </main>
+
+  <script>
+    function bindSlider(id, outId, fmt, onChange) {
+      var el = document.getElementById(id), out = document.getElementById(outId);
+      var update = function () { out.textContent = fmt(el.valueAsNumber); onChange(el.valueAsNumber); };
+      el.addEventListener("input", update);
+      update();
+    }
+
+    /* ---------- Widget 1: square the day ---------- */
+    var W1_DAYS = ["Mon", "Tue", "Wed", "Thu", "Fri"];
+    function drawW1() {
+      var pos = W1_DAYS.map(function () { return Math.round((Math.random() * 300 - 150)); });
+      var svg = document.getElementById("w1-chart");
+      var W = 640, H = 260, m = { t: 16, r: 12, b: 36, l: 50 };
+      var maxV = 160, zero = m.t + (H - m.t - m.b) / 2;
+      var scale = (H - m.t - m.b) / 2 / maxV;
+      var bw = (W - m.l - m.r) / 5;
+      var out = '<line class="axis" x1="' + m.l + '" y1="' + zero + '" x2="' + (W - m.r) + '" y2="' + zero + '"/>';
+      [-150, -75, 0, 75, 150].forEach(function (v) {
+        out += '<text class="axis-label" x="' + (m.l - 6) + '" y="' + (zero - v * scale + 4) + '" text-anchor="end">' + v + 'm</text>';
+      });
+      var borrow = 0, lend = 0;
+      pos.forEach(function (v, i) {
+        var h = Math.abs(v) * scale;
+        var y = v >= 0 ? zero - h : zero;
+        var color = v >= 0 ? "var(--color-accent)" : "var(--color-danger)";
+        if (v >= 0) lend += v; else borrow += -v;
+        out += '<rect x="' + (m.l + i * bw + bw * 0.2).toFixed(1) + '" y="' + y.toFixed(1) + '" width="' + (bw * 0.6).toFixed(1) + '" height="' + Math.max(h, 1).toFixed(1) + '" rx="3" style="fill:' + color + '"/>';
+        out += '<text class="axis-label" x="' + (m.l + (i + 0.5) * bw).toFixed(1) + '" y="' + (v >= 0 ? y - 6 : y + h + 14).toFixed(1) + '" text-anchor="middle">' + (v > 0 ? "+" : "") + v + '</text>';
+        out += '<text class="axis-label" x="' + (m.l + (i + 0.5) * bw).toFixed(1) + '" y="' + (H - m.b + 18) + '" text-anchor="middle">' + W1_DAYS[i] + '</text>';
+      });
+      svg.innerHTML = out;
+      document.getElementById("w1-readout").innerHTML =
+        "This week the desk had to <strong style='color:var(--color-danger)'>borrow " + borrow + "m</strong> across the short days and <strong style='color:var(--color-accent)'>place " + lend + "m</strong> across the long ones — none of it optional, all of it by close of business. (BHD millions, illustrative.)";
+    }
+    document.getElementById("w1-btn").addEventListener("click", drawW1);
+    drawW1();
+
+    /* ---------- Widget 2: repo ---------- */
+    var w2 = { haircut: 2, rate: 4.5, term: 1 };
+    function drawW2() {
+      var collateral = 100;
+      var cash = collateral * (1 - w2.haircut / 100);
+      var interest = cash * (w2.rate / 100) * (w2.term / 360);
+      var repurchase = cash + interest;
+      var svg = document.getElementById("w2-chart");
+      var out =
+        '<rect x="20"  y="30" width="170" height="60" rx="8" style="fill:var(--color-accent-soft); stroke:var(--color-accent)"/>' +
+        '<rect x="450" y="30" width="170" height="60" rx="8" style="fill:var(--color-accent-soft); stroke:var(--color-accent)"/>' +
+        '<text class="axis-label" x="105" y="55" text-anchor="middle" style="font-weight:600">BORROWER</text>' +
+        '<text class="axis-label" x="105" y="72" text-anchor="middle">holds 100m govt bonds</text>' +
+        '<text class="axis-label" x="535" y="55" text-anchor="middle" style="font-weight:600">CASH LENDER</text>' +
+        '<text class="axis-label" x="535" y="72" text-anchor="middle">takes the bonds</text>' +
+        '<line x1="200" y1="45" x2="440" y2="45" style="stroke:var(--color-accent);stroke-width:2" marker-end="url(#arr1)"/>' +
+        '<line x1="440" y1="75" x2="200" y2="75" style="stroke:var(--color-danger);stroke-width:2"/>' +
+        '<text class="axis-label" x="320" y="38"  text-anchor="middle">LEG 1 today: bonds →</text>' +
+        '<text class="axis-label" x="320" y="93"  text-anchor="middle">← cash ' + cash.toFixed(1) + 'm (after ' + w2.haircut.toFixed(1) + '% haircut)</text>' +
+        '<line x1="200" y1="145" x2="440" y2="145" style="stroke:var(--color-danger);stroke-width:2"/>' +
+        '<line x1="440" y1="175" x2="200" y2="175" style="stroke:var(--color-accent);stroke-width:2"/>' +
+        '<text class="axis-label" x="320" y="138" text-anchor="middle">LEG 2, day ' + w2.term + ': repurchase price ' + repurchase.toFixed(2) + 'm →</text>' +
+        '<text class="axis-label" x="320" y="193" text-anchor="middle">← bonds come home</text>';
+      svg.innerHTML = out;
+      document.getElementById("w2-readout").innerHTML =
+        "Cash raised: <strong>" + cash.toFixed(1) + "m</strong> · interest for " + w2.term + " day" + (w2.term > 1 ? "s" : "") + ": <strong>" +
+        (interest * 1000).toFixed(0) + "k</strong> (the price difference between the two legs) · lender's protection: <strong>" + (collateral - cash).toFixed(1) + "m</strong> of excess collateral. Economically: a collateralised loan.";
+    }
+    bindSlider("w2-haircut", "w2-haircut-out", function (v) { return v.toFixed(1) + "%"; }, function (v) { w2.haircut = v; drawW2(); });
+    bindSlider("w2-rate", "w2-rate-out", function (v) { return v.toFixed(2) + "%"; }, function (v) { w2.rate = v; drawW2(); });
+    bindSlider("w2-term", "w2-term-out", function (v) { return v + "d"; }, function (v) { w2.term = v; drawW2(); });
+
+    /* ---------- Widget 3: corridor ---------- */
+    var w3 = { policy: 4, liq: 0.5 };
+    function liqLabel(v) { return v < 0.25 ? "scarce" : (v > 0.75 ? "abundant" : "balanced"); }
+    function drawW3() {
+      var floor = w3.policy, ceil = w3.policy + 1;
+      var market = floor + (ceil - floor) * Math.pow(1 - w3.liq, 1.6);
+      var svg = document.getElementById("w3-chart");
+      var W = 640, m = { l: 60, r: 20 };
+      var yFor = function (r) { return 150 - ((r - (floor - 0.5)) / 2) * 110; };
+      var out =
+        '<rect x="' + m.l + '" y="' + yFor(ceil) + '" width="' + (W - m.l - m.r) + '" height="' + (yFor(floor) - yFor(ceil)) + '" style="fill:var(--color-accent-soft)"/>' +
+        '<line x1="' + m.l + '" y1="' + yFor(floor) + '" x2="' + (W - m.r) + '" y2="' + yFor(floor) + '" style="stroke:var(--color-accent);stroke-width:2"/>' +
+        '<line x1="' + m.l + '" y1="' + yFor(ceil) + '" x2="' + (W - m.r) + '" y2="' + yFor(ceil) + '" style="stroke:var(--color-danger);stroke-width:2"/>' +
+        '<text class="axis-label" x="' + (W - m.r) + '" y="' + (yFor(floor) + 16) + '" text-anchor="end">deposit facility (floor) ' + floor.toFixed(2) + '%</text>' +
+        '<text class="axis-label" x="' + (W - m.r) + '" y="' + (yFor(ceil) - 8) + '" text-anchor="end">lending facility (ceiling) ' + ceil.toFixed(2) + '%</text>' +
+        '<line x1="' + m.l + '" y1="' + yFor(market) + '" x2="' + (W - m.r) + '" y2="' + yFor(market) + '" style="stroke:var(--color-fg);stroke-width:2;stroke-dasharray:6 4"/>' +
+        '<text class="axis-label" x="' + (m.l + 6) + '" y="' + (yFor(market) - 7) + '" style="font-weight:600">market O/N rate ' + market.toFixed(2) + '%</text>';
+      svg.innerHTML = out;
+      document.getElementById("w3-readout").innerHTML =
+        "Liquidity is <strong>" + liqLabel(w3.liq) + "</strong>. " +
+        (w3.liq > 0.75 ? "Cash is everywhere, so nobody pays up for it — the market rate sits on the floor (the post-QE regime; the floor IS the policy rate)."
+          : w3.liq < 0.25 ? "Cash is scarce; banks bid the rate up toward the ceiling, and the central bank's lending facility becomes the marginal source."
+          : "The rate floats mid-corridor — banks clear among themselves, using the facilities only as backstops.");
+    }
+    bindSlider("w3-policy", "w3-policy-out", function (v) { return v.toFixed(2) + "%"; }, function (v) { w3.policy = v; drawW3(); });
+    bindSlider("w3-liq", "w3-liq-out", liqLabel, function (v) { w3.liq = v; drawW3(); });
+
+    /* ---------- Widget 4: bid-offer ---------- */
+    var w4 = { spread: 3, vol: 3 };
+    function drawW4() {
+      var daily = w4.vol * 1e9 * (w4.spread / 10000) / 360;
+      var annual = daily * 360;
+      var fmt = function (v) {
+        return v >= 1e6 ? "BHD " + (v / 1e6).toFixed(1) + "m" : "BHD " + (v / 1e3).toFixed(0) + "k";
+      };
+      document.getElementById("w4-readout").innerHTML =
+        "A <strong>" + w4.spread.toFixed(1) + " bp</strong> spread on a <strong>" + w4.vol.toFixed(1) + "bn</strong> book earns ≈ <strong>" + fmt(daily) + "</strong> per day — <strong>" + fmt(annual) + "</strong> a year, for matching two phone calls. Thin margins, enormous volumes.";
+    }
+    bindSlider("w4-spread", "w4-spread-out", function (v) { return v.toFixed(1) + " bp"; }, function (v) { w4.spread = v; drawW4(); });
+    bindSlider("w4-vol", "w4-vol-out", function (v) { return v.toFixed(1) + "bn"; }, function (v) { w4.vol = v; drawW4(); });
+
+    /* ---------- Widget 5: riding the curve ---------- */
+    var w5 = { slope: 0.6, mode: "calm" };
+    function drawW5() {
+      var base = 4.0, shock = w5.mode === "stress" ? 3.0 : 0;
+      var curve = function (m) { return base + w5.slope * (1 - Math.exp(-m / 3)); };
+      var onRate = base + shock;
+      var m3 = curve(3);
+      var W = 640, H = 280, mm = { t: 12, r: 12, b: 28, l: 44 };
+      var x0 = 0, x1 = 12, y0 = 3, y1 = 8;
+      var X = function (v) { return mm.l + ((v - x0) / (x1 - x0)) * (W - mm.l - mm.r); };
+      var Y = function (v) { return H - mm.b - ((v - y0) / (y1 - y0)) * (H - mm.t - mm.b); };
+      var out = '<line class="axis" x1="' + mm.l + '" y1="' + (H - mm.b) + '" x2="' + (W - mm.r) + '" y2="' + (H - mm.b) + '"/>' +
+                '<line class="axis" x1="' + mm.l + '" y1="' + mm.t + '" x2="' + mm.l + '" y2="' + (H - mm.b) + '"/>';
+      for (var i = 0; i <= 4; i++) {
+        var xv = (i / 4) * 12, yv = y0 + (i / 4) * (y1 - y0);
+        out += '<text class="axis-label" x="' + X(xv) + '" y="' + (H - mm.b + 16) + '" text-anchor="middle">' + xv.toFixed(0) + 'm</text>';
+        out += '<text class="axis-label" x="' + (mm.l - 6) + '" y="' + (Y(yv) + 4) + '" text-anchor="end">' + yv.toFixed(1) + '</text>';
+      }
+      var d = "";
+      for (var t = 0.05; t <= 12; t += 0.2) d += (d ? "L" : "M") + X(t).toFixed(1) + "," + Y(curve(t)).toFixed(1);
+      out += '<path class="series" d="' + d + '"/>';
+      out += '<circle cx="' + X(0.05) + '" cy="' + Y(onRate) + '" r="7" style="fill:var(--color-danger)"/>' +
+             '<text class="axis-label" x="' + (X(0.05) + 12) + '" y="' + (Y(onRate) + 4) + '">borrow O/N ' + onRate.toFixed(2) + '%</text>';
+      out += '<circle cx="' + X(3) + '" cy="' + Y(m3) + '" r="7" style="fill:var(--color-accent)"/>' +
+             '<text class="axis-label" x="' + (X(3) + 12) + '" y="' + (Y(m3) - 8) + '">lend 3m ' + m3.toFixed(2) + '%</text>';
+      document.getElementById("w5-chart").innerHTML = out;
+      var carry = (m3 - onRate) * 100;
+      document.getElementById("w5-readout").innerHTML = w5.mode === "calm"
+        ? "Carry: <strong>+" + carry.toFixed(0) + " bp</strong> for as long as the overnight leg keeps rolling at " + onRate.toFixed(2) + "%. Ninety rolls to go."
+        : "Carry: <strong style='color:var(--color-danger)'>" + carry.toFixed(0) + " bp</strong>. The 3-month asset is locked at " + m3.toFixed(2) + "% but tonight's funding costs " + onRate.toFixed(2) + "% — and you MUST roll it or default. This is rollover risk arriving on schedule: unannounced.";
+    }
+    bindSlider("w5-slope", "w5-slope-out", function (v) { return "+" + v.toFixed(2) + "%"; }, function (v) { w5.slope = v; drawW5(); });
+    document.getElementById("w5-presets").addEventListener("click", function (e) {
+      var mode = e.target.getAttribute("data-mode");
+      if (!mode) return;
+      w5.mode = mode;
+      this.querySelectorAll("button").forEach(function (b) { b.classList.toggle("active", b.getAttribute("data-mode") === mode); });
+      drawW5();
+    });
+
+    /* ---------- Widget 6: LCR true cost ---------- */
+    function tenorLabel(v) {
+      if (v < 1) return (v * 4).toFixed(0) + " week" + (v * 4 > 1 ? "s" : "");
+      return v.toFixed(2).replace(/\.00$/, "").replace(/\.50$/, ".5") + " month" + (v > 1 ? "s" : "");
+    }
+    function drawW6(tenor) {
+      var quoted = 4.0 + 0.6 * (1 - Math.exp(-tenor / 3));
+      var drag = tenor < 1 ? 0.55 : 0.55 * Math.exp(-(tenor - 1) / 1.5);
+      var total = quoted + drag;
+      var svg = document.getElementById("w6-chart");
+      var W = 640, H = 200, m = { t: 26, b: 40, l: 44, r: 12 };
+      var maxV = 5.6, plotH = H - m.t - m.b;
+      var Y = function (v) { return H - m.b - (v / maxV) * plotH; };
+      var bars = [
+        { label: "quoted market rate", v: quoted, drag: 0 },
+        { label: "true cost (rate + buffer drag)", v: quoted, drag: drag }
+      ];
+      var bw = (W - m.l - m.r) / 2;
+      var out = '<line class="axis" x1="' + m.l + '" y1="' + (H - m.b) + '" x2="' + (W - m.r) + '" y2="' + (H - m.b) + '"/>';
+      bars.forEach(function (b, i) {
+        var x = m.l + i * bw + bw * 0.25, wdt = bw * 0.5;
+        var h1 = (b.v / maxV) * plotH;
+        out += '<rect x="' + x + '" y="' + Y(b.v) + '" width="' + wdt + '" height="' + h1 + '" rx="3" style="fill:var(--color-accent)"/>';
+        if (b.drag > 0.005) {
+          var h2 = (b.drag / maxV) * plotH;
+          out += '<rect x="' + x + '" y="' + (Y(b.v) - h2) + '" width="' + wdt + '" height="' + h2 + '" rx="3" style="fill:var(--color-danger)"/>';
+        }
+        out += '<text class="axis-label" x="' + (x + wdt / 2) + '" y="' + (Y(b.v + b.drag) - 8) + '" text-anchor="middle">' + (b.v + b.drag).toFixed(2) + '%</text>';
+        out += '<text class="axis-label" x="' + (x + wdt / 2) + '" y="' + (H - m.b + 18) + '" text-anchor="middle">' + b.label + '</text>';
+      });
+      svg.innerHTML = out;
+      document.getElementById("w6-readout").innerHTML =
+        "Tenor <strong>" + tenorLabel(tenor) + "</strong>: quoted <strong>" + quoted.toFixed(2) + "%</strong> + LCR buffer drag <strong>" + (drag * 100).toFixed(0) + " bp</strong> = all-in <strong>" + total.toFixed(2) + "%</strong>. " +
+        (tenor < 1 ? "Inside the 30-day LCR window the regulation assumes this money runs in a crisis — you hold HQLA against nearly all of it, and the buffer's negative carry is part of the real price."
+                   : "Outside the 30-day window the run-off assumption fades and the cheap-looking rate becomes genuinely cheap(er).");
+    }
+    bindSlider("w6-tenor", "w6-tenor-out", tenorLabel, drawW6);
+  </script>
+</body>
+</html>

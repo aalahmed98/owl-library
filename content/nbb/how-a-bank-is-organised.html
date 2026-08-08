@@ -1,0 +1,344 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>How a Bank Is Organised — Front, Middle, Back</title>
+  <meta name="archive-tags" content="banking, bahrain, organization">
+  <meta name="archive-summary" content="The standard department structure of a mid-size Gulf commercial bank (NBB-type): front, middle and back office plus corporate functions and governance committees — as an explorable map with an FTP-touchpoint highlighter and the three-lines-of-defence model.">
+  <meta name="archive-created" content="2026-08-05">
+  <meta name="archive-updated" content="2026-08-05">
+  <meta name="archive-status" content="final">
+  <style>
+    /* ==tokens== (synced from design/tokens.css — do not edit inside the markers) */
+    :root {
+      --color-bg: #faf9f7;
+      --color-surface: #ffffff;
+      --color-fg: #1a1a1e;
+      --color-muted: #6b6b76;
+      --color-border: #e4e2dd;
+      --color-accent: #2f6fed;
+      --color-accent-fg: #ffffff;
+      --color-accent-soft: #e8effd;
+      --color-danger: #c4483c;
+      --color-warn-bg: #fdf6e3;
+      --color-code-bg: #f2f1ee;
+      --color-mark: #fff3bf;
+      --font-body: "Charter", "Georgia", "Cambria", "Times New Roman", serif;
+      --font-ui: system-ui, -apple-system, "Segoe UI", sans-serif;
+      --font-mono: "SFMono-Regular", "Cascadia Code", "Consolas", "Menlo", monospace;
+      --text-xs: 0.75rem;
+      --text-sm: 0.875rem;
+      --text-base: 1.0625rem;
+      --text-lg: 1.25rem;
+      --text-xl: 1.5rem;
+      --text-2xl: 1.875rem;
+      --text-3xl: 2.375rem;
+      --leading-body: 1.65;
+      --leading-tight: 1.25;
+      --measure: 68ch;
+      --space-1: 0.25rem;
+      --space-2: 0.5rem;
+      --space-3: 0.75rem;
+      --space-4: 1rem;
+      --space-5: 1.5rem;
+      --space-6: 2rem;
+      --space-7: 3rem;
+      --space-8: 4rem;
+      --radius-sm: 4px;
+      --radius-md: 8px;
+      --radius-lg: 12px;
+      --shadow-sm: 0 1px 2px rgba(20, 20, 25, 0.06);
+      --shadow-md: 0 2px 8px rgba(20, 20, 25, 0.1);
+    }
+    [data-theme="dark"] {
+      --color-bg: #16161a;
+      --color-surface: #1e1e24;
+      --color-fg: #e8e6e3;
+      --color-muted: #9a98a0;
+      --color-border: #32323a;
+      --color-accent: #6b9bff;
+      --color-accent-fg: #10101c;
+      --color-accent-soft: #23304d;
+      --color-danger: #e0685c;
+      --color-warn-bg: #2e2a1e;
+      --color-code-bg: #24242b;
+      --color-mark: #4d4425;
+      --shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.4);
+      --shadow-md: 0 2px 8px rgba(0, 0, 0, 0.5);
+    }
+    /* ==/tokens== */
+
+    /* When opened standalone (not in the app frame), follow the OS theme. */
+    @media (prefers-color-scheme: dark) {
+      :root:not([data-theme]) {
+        --color-bg: #16161a;
+        --color-surface: #1e1e24;
+        --color-fg: #e8e6e3;
+        --color-muted: #9a98a0;
+        --color-border: #32323a;
+        --color-accent: #6b9bff;
+        --color-accent-fg: #10101c;
+        --color-accent-soft: #23304d;
+        --color-danger: #e0685c;
+        --color-warn-bg: #2e2a1e;
+        --color-code-bg: #24242b;
+        --color-mark: #4d4425;
+      }
+    }
+
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      background: var(--color-bg);
+      color: var(--color-fg);
+      font-family: var(--font-body);
+      font-size: var(--text-base);
+      line-height: var(--leading-body);
+    }
+    .paper {
+      max-width: var(--measure);
+      margin: 0 auto;
+      padding: var(--space-6) var(--space-4) var(--space-8);
+    }
+    h1 { font-size: var(--text-3xl); line-height: var(--leading-tight); margin: 0 0 var(--space-2); }
+    h2 { font-size: var(--text-xl); line-height: var(--leading-tight); margin: var(--space-6) 0 var(--space-3); border-bottom: 1px solid var(--color-border); padding-bottom: var(--space-2); }
+    h3 { font-size: var(--text-lg); margin: var(--space-5) 0 var(--space-2); }
+    .byline { color: var(--color-muted); font-family: var(--font-ui); font-size: var(--text-sm); margin-bottom: var(--space-6); }
+    a { color: var(--color-accent); }
+    code { font-family: var(--font-mono); font-size: 0.88em; background: var(--color-code-bg); padding: 1px 5px; border-radius: var(--radius-sm); }
+    blockquote { margin: var(--space-4) 0; padding: var(--space-2) var(--space-4); border-left: 3px solid var(--color-accent); background: var(--color-surface); color: var(--color-muted); }
+
+    /* interactive widgets */
+    .widget {
+      font-family: var(--font-ui);
+      background: var(--color-surface);
+      border: 1px solid var(--color-border);
+      border-radius: var(--radius-lg);
+      padding: var(--space-4);
+      margin: var(--space-5) 0;
+      box-shadow: var(--shadow-sm);
+    }
+    .widget-title { font-weight: 600; font-size: var(--text-sm); margin: 0 0 var(--space-3); color: var(--color-muted); text-transform: uppercase; letter-spacing: 0.05em; }
+    .chart { width: 100%; height: auto; display: block; margin-top: var(--space-3); }
+    .chart .axis { stroke: var(--color-border); stroke-width: 1; }
+    .chart .axis-label { fill: var(--color-muted); font-family: var(--font-ui); font-size: 11px; }
+    figure { margin: var(--space-5) 0; }
+    figcaption { font-family: var(--font-ui); font-size: var(--text-sm); color: var(--color-muted); margin-top: var(--space-2); }
+
+    /* custom styles (after token markers) */
+    table { border-collapse: collapse; width: 100%; font-family: var(--font-ui); font-size: var(--text-sm); margin: var(--space-4) 0; }
+    th, td { border: 1px solid var(--color-border); padding: var(--space-2) var(--space-3); text-align: left; vertical-align: top; }
+    th { background: var(--color-code-bg); font-weight: 600; }
+    .readout { font-family: var(--font-ui); font-size: var(--text-sm); background: var(--color-accent-soft); border-radius: var(--radius-md); padding: var(--space-3); margin-top: var(--space-3); min-height: 4.5em; }
+    .preset-row { display: flex; gap: var(--space-2); flex-wrap: wrap; margin: var(--space-2) 0; }
+    .preset-row button {
+      font-family: var(--font-ui); font-size: var(--text-sm); cursor: pointer;
+      border: 1px solid var(--color-border); background: var(--color-surface); color: var(--color-fg);
+      padding: var(--space-1) var(--space-3); border-radius: var(--radius-md);
+    }
+    .preset-row button.active { background: var(--color-accent); color: var(--color-accent-fg); border-color: var(--color-accent); }
+    .dept-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(146px, 1fr)); gap: var(--space-2); margin-top: var(--space-3); }
+    .dept {
+      font-family: var(--font-ui); font-size: var(--text-xs); font-weight: 600; cursor: pointer; text-align: center;
+      border: 1px solid var(--color-border); border-left-width: 4px; border-radius: var(--radius-md);
+      background: var(--color-bg); color: var(--color-fg);
+      padding: var(--space-2); line-height: 1.3;
+    }
+    .dept.g-front  { border-left-color: var(--color-accent); }
+    .dept.g-middle { border-left-color: var(--color-danger); }
+    .dept.g-back   { border-left-color: var(--color-muted); }
+    .dept.g-corp   { border-left-color: var(--color-border); }
+    .dept.selected { background: var(--color-accent); color: var(--color-accent-fg); border-color: var(--color-accent); }
+    .dept.ftp-glow { box-shadow: 0 0 0 2px var(--color-mark) inset; }
+    .dept .grp { display: block; font-weight: 400; color: var(--color-muted); font-size: 0.85em; margin-top: 2px; }
+    .dept.selected .grp { color: var(--color-accent-fg); opacity: 0.8; }
+    .legend { display: flex; gap: var(--space-4); flex-wrap: wrap; font-family: var(--font-ui); font-size: var(--text-xs); color: var(--color-muted); margin-top: var(--space-3); }
+    .legend span { display: inline-flex; align-items: center; gap: 5px; }
+    .legend i { width: 10px; height: 10px; border-radius: 2px; display: inline-block; }
+  </style>
+</head>
+<body>
+  <main class="paper">
+    <h1>How a Bank Is Organised</h1>
+    <p class="byline">Front, middle and back office — the standard structure of a mid-size Gulf commercial bank · Companion to the <a href="/doc/nbb/FTP/ftp-reference-guide.html">FTP</a> and <a href="/doc/nbb/money-markets/money-markets-101.html">money markets</a> papers · 2026</p>
+
+    <p>One caveat up front: banks rarely publish department-level structure — they publish <em>segments</em> (typically Retail, Corporate/Business Banking, and Investment &amp; Treasury), which is a coarser cut. What follows is the standard structure for a bank of NBB's size and type: a mid-size Gulf commercial bank with retail, corporate, treasury and an Islamic arm. The names will differ slightly from any bank's internal labels, but the functions will all be there.</p>
+    <p>The grouping that actually explains how a bank works is <strong>front / middle / back office</strong>: who makes the money, who checks the risk, and who processes the result.</p>
+
+    <h2>The map</h2>
+    <p>Click any department for its one-liner. The <em>FTP touchpoints</em> button highlights every unit that touches the FTP machinery you've covered in the other papers.</p>
+
+    <div class="widget">
+      <p class="widget-title">Widget 1 · Department explorer</p>
+      <div class="preset-row" id="grp-filter">
+        <button data-g="all" class="active">All</button>
+        <button data-g="front">Front office</button>
+        <button data-g="middle">Middle office</button>
+        <button data-g="back">Back office</button>
+        <button data-g="corp">Corporate</button>
+        <button data-g="ftp" id="ftp-btn">★ FTP touchpoints</button>
+      </div>
+      <div class="dept-grid" id="dept-grid"></div>
+      <div class="legend">
+        <span><i style="background:var(--color-accent)"></i>front — makes revenue</span>
+        <span><i style="background:var(--color-danger)"></i>middle — controls risk</span>
+        <span><i style="background:var(--color-muted)"></i>back — processes it all</span>
+        <span><i style="background:var(--color-border)"></i>corporate — runs the firm</span>
+      </div>
+      <div class="readout" id="dept-readout"></div>
+    </div>
+    <figure><figcaption><strong>Figure 1.</strong> The whole bank on one screen. Revenue is made in a minority of the boxes; everything else exists to control, process, or support it — which is the right proportion, not an inefficiency.</figcaption></figure>
+
+    <h2>Front office — faces customers, generates revenue</h2>
+    <p>Retail gathers the cheap stable deposits that quietly fund everything else; Corporate writes the big loans; Treasury &amp; Investments — the unit the whole <a href="/doc/nbb/FTP/ftp-reference-guide.html">FTP series</a> is about — manages the balance sheet between them and is often the second-largest profit source. Private banking, FI, trade finance, investment banking and the Islamic arm (at NBB, largely the majority-owned Bahrain Islamic Bank subsidiary) round out the revenue side.</p>
+
+    <h2>Middle office — control and oversight, independent of the front</h2>
+    <p>Risk (credit, market, liquidity/ALM, operational) challenges the deal-makers; Compliance keeps the bank inside CBB and international rules (AML/CFT is heavily resourced in Gulf banks because of correspondent-banking pressure); Credit Administration handles the mechanics after approval; Internal Audit deliberately reports to the Board, not the CEO, so it can criticise management; Finance owns the books — and the performance reports where FTP results actually land.</p>
+
+    <h2>Back office — execution and processing</h2>
+    <p>Operations settles payments and trades — rarely visible, catastrophic when it breaks. IT runs the core system and is increasingly the biggest capital spend; Information Security is kept deliberately separate from IT; Digital sits between IT and the business and gets reshuffled constantly.</p>
+
+    <h2>Corporate functions</h2>
+    <p>HR (which in Bahrain also owns regulatory <em>Bahrainisation</em> employment quotas), Strategy, Marketing, Investor Relations (NBB is listed on Bahrain Bourse), Procurement, and an increasingly standalone Sustainability/ESG function.</p>
+
+    <h2>Governance — committees, not departments</h2>
+    <p>Cross-departmental decisions get made in committees:</p>
+    <table>
+      <thead><tr><th>Level</th><th>Committees</th><th>Why it matters here</th></tr></thead>
+      <tbody>
+        <tr><td>Board</td><td>Audit · Risk · Nomination &amp; Remuneration · Executive/Board Credit</td><td>Where Internal Audit and risk appetite report</td></tr>
+        <tr><td>Management</td><td><strong>ALCO</strong> · Management Credit · Operational Risk · IT Steering</td><td>ALCO owns FTP policy, behavioural assumptions, and the rate card — the governance layer of everything in the FTP papers</td></tr>
+      </tbody>
+    </table>
+
+    <h2>The mental model worth keeping: three lines of defence</h2>
+    <p>The framework regulators actually use:</p>
+
+    <figure>
+      <svg class="chart" viewBox="0 0 640 250" role="img" aria-label="Three lines of defence diagram">
+        <rect x="10"  y="30" width="195" height="130" rx="10" style="fill:var(--color-accent); opacity:0.85"/>
+        <rect x="222" y="30" width="195" height="130" rx="10" style="fill:var(--color-danger); opacity:0.8"/>
+        <rect x="434" y="30" width="196" height="130" rx="10" style="fill:var(--color-muted); opacity:0.8"/>
+        <text class="axis-label" x="107" y="56"  text-anchor="middle" style="fill:#fff;font-weight:600">1st LINE</text>
+        <text class="axis-label" x="107" y="78"  text-anchor="middle" style="fill:#fff">Business units</text>
+        <text class="axis-label" x="107" y="96"  text-anchor="middle" style="fill:#fff">own their risk,</text>
+        <text class="axis-label" x="107" y="112" text-anchor="middle" style="fill:#fff">because they create it</text>
+        <text class="axis-label" x="319" y="56"  text-anchor="middle" style="fill:#fff;font-weight:600">2nd LINE</text>
+        <text class="axis-label" x="319" y="78"  text-anchor="middle" style="fill:#fff">Risk &amp; Compliance</text>
+        <text class="axis-label" x="319" y="96"  text-anchor="middle" style="fill:#fff">independent oversight,</text>
+        <text class="axis-label" x="319" y="112" text-anchor="middle" style="fill:#fff">challenging the first line</text>
+        <text class="axis-label" x="532" y="56"  text-anchor="middle" style="fill:#fff;font-weight:600">3rd LINE</text>
+        <text class="axis-label" x="532" y="78"  text-anchor="middle" style="fill:#fff">Internal Audit</text>
+        <text class="axis-label" x="532" y="96"  text-anchor="middle" style="fill:#fff">checks that the first two</text>
+        <text class="axis-label" x="532" y="112" text-anchor="middle" style="fill:#fff">are doing their jobs</text>
+        <line x1="205" y1="95" x2="222" y2="95" style="stroke:var(--color-fg);stroke-width:2"/>
+        <line x1="417" y1="95" x2="434" y2="95" style="stroke:var(--color-fg);stroke-width:2"/>
+        <rect x="10" y="185" width="620" height="45" rx="10" style="fill:var(--color-accent-soft); stroke:var(--color-border)"/>
+        <text class="axis-label" x="320" y="212" text-anchor="middle">Operations · IT · Finance · HR — support all three lines</text>
+      </svg>
+      <figcaption><strong>Figure 2.</strong> Three lines of defence. Audit reports to the Board Audit Committee, not the CEO — deliberately outside the chain it audits.</figcaption>
+    </figure>
+
+    <h2>Sources</h2>
+    <p style="font-family:var(--font-ui); font-size:var(--text-sm); color:var(--color-muted)">
+      <a href="https://nbbonline.com/wp-content/uploads/2026/03/Annual-Financial-and-Sustainability-Report-2025-3.pdf">NBB Annual Financial and Sustainability Report 2025</a> (could not be retrieved at time of writing — listed for reference) ·
+      <a href="https://en.wikipedia.org/wiki/National_Bank_of_Bahrain">National Bank of Bahrain — Wikipedia</a> ·
+      <a href="https://gulfbase.com/profile-summary-national-bank-of-bahrain-nbb-117">NBB profile — GulfBase</a>.
+      Structure shown is the standard template for a bank of this type, not NBB's published org chart.
+    </p>
+  </main>
+
+  <script>
+    var DEPTS = [
+      { g: "front", name: "Retail Banking", ftp: true,
+        d: "Branches, cards, mortgages, personal loans — and the bank's main source of cheap, stable deposits, which makes it strategically bigger than its own profit line. FTP: every deposit it gathers earns an internal FTP credit." },
+      { g: "front", name: "Private Banking / Wealth", ftp: false,
+        d: "High-net-worth clients: investment products, portfolio management, bespoke lending. Small headcount, high margin, deep relationships." },
+      { g: "front", name: "Corporate / Business Banking", ftp: true,
+        d: "Lending from SMEs to large corporates — working capital, term loans, project finance; in Bahrain, significant government exposure. FTP: every loan is charged the internal cost of funds." },
+      { g: "front", name: "Financial Institutions (FI)", ftp: false,
+        d: "Relationships with other banks, insurers and funds: correspondent banking, interbank lines, syndications." },
+      { g: "front", name: "Trade Finance", ftp: false,
+        d: "Letters of credit, guarantees, documentary collections. Its own specialists — UCP 600 documentation is a discipline in itself." },
+      { g: "front", name: "Treasury & Investments", ftp: true,
+        d: "Money markets, FX, fixed income, and ALM. Sets the FTP curve, raises the actual funding, and holds the residual mismatch — the unit the FTP and money-markets papers are about. Often the second-largest profit source." },
+      { g: "front", name: "Investment Banking / Advisory", ftp: false,
+        d: "Capital raising, M&A advisory, structured finance where present — smaller in Bahrain than in hubs like Dubai." },
+      { g: "front", name: "Islamic Banking", ftp: false,
+        d: "Sharia-compliant products (Murabaha, Ijara, Wakala, Sukuk) under a Sharia Supervisory Board. At NBB: largely the majority-owned Bahrain Islamic Bank subsidiary." },
+      { g: "middle", name: "Risk Management", ftp: true,
+        d: "Four splits: Credit Risk (approves lending, sets limits), Market Risk (VaR, trading limits), Liquidity/ALM Risk (owns LCR/NSFR and oversees the mismatch FTP prices), Operational Risk (process, systems, people)." },
+      { g: "middle", name: "Credit Administration", ftp: false,
+        d: "The mechanics after approval: documentation, collateral registration, disbursement, covenant tracking." },
+      { g: "middle", name: "Compliance", ftp: false,
+        d: "CBB Rulebook adherence, AML/CFT (heavily resourced due to correspondent-banking pressure), sanctions screening, FATCA/CRS." },
+      { g: "middle", name: "Internal Audit", ftp: false,
+        d: "Independent assurance reporting to the Board Audit Committee, not the CEO — deliberately outside the management chain so it can criticise it." },
+      { g: "middle", name: "Legal", ftp: false,
+        d: "Contracts, documentation, litigation, regulatory interpretation, recoveries." },
+      { g: "middle", name: "Finance / Financial Control", ftp: true,
+        d: "The books: IFRS reporting, regulatory returns, budgeting. Also owns performance measurement — where FTP results are actually reported to the business lines." },
+      { g: "middle", name: "Sharia Compliance / Audit", ftp: false,
+        d: "Verifies Islamic products and transactions meet Sharia requirements; reports to the Sharia Supervisory Board." },
+      { g: "back", name: "Operations", ftp: false,
+        d: "Payments, settlements, clearing, reconciliations, treasury settlement, card ops. Rarely visible, catastrophic when it breaks." },
+      { g: "back", name: "Information Technology", ftp: false,
+        d: "Core banking system, digital channels, infrastructure. Increasingly the largest capital spend in the bank." },
+      { g: "back", name: "Information Security", ftp: false,
+        d: "Deliberately distinct from IT: intrusion and data-loss protection, and a growing CBB focus area." },
+      { g: "back", name: "Digital Banking", ftp: false,
+        d: "Mobile app, online banking, digital onboarding, automation. Sits between IT and the business; org charts constantly reshuffle it." },
+      { g: "corp", name: "Human Resources", ftp: false,
+        d: "Recruitment, compensation, training — and in Bahrain, the regulatory Bahrainisation employment quotas that genuinely shape hiring." },
+      { g: "corp", name: "Strategy & Corp Development", ftp: false,
+        d: "Long-range planning, M&A, competitive analysis, new markets." },
+      { g: "corp", name: "Marketing & Communications", ftp: false,
+        d: "Brand, campaigns, PR, media." },
+      { g: "corp", name: "Investor Relations", ftp: false,
+        d: "NBB is listed on Bahrain Bourse — IR manages shareholders, analysts, and earnings disclosure." },
+      { g: "corp", name: "Procurement & Administration", ftp: false,
+        d: "Vendors, contracts, premises, facilities." },
+      { g: "corp", name: "Sustainability / ESG", ftp: false,
+        d: "Increasingly a standalone reporting line — NBB publishes a combined Annual Financial and Sustainability Report." },
+      { g: "corp", name: "ALCO (committee)", ftp: true,
+        d: "Not a department — the Asset & Liability Committee. Owns FTP policy, the rate card, behavioural assumptions, and strategic tilts. The governance seat of everything in the FTP papers." }
+    ];
+    var GRP_LABEL = { front: "front office", middle: "middle office", back: "back office", corp: "corporate / governance" };
+
+    var grid = document.getElementById("dept-grid");
+    var readout = document.getElementById("dept-readout");
+    var state = { filter: "all", ftpGlow: false, selected: "Treasury & Investments" };
+
+    function render() {
+      grid.innerHTML = "";
+      DEPTS.forEach(function (dep) {
+        if (state.filter !== "all" && state.filter !== "ftp" && dep.g !== state.filter) return;
+        if (state.filter === "ftp" && !dep.ftp) return;
+        var b = document.createElement("button");
+        b.className = "dept g-" + dep.g +
+          (state.selected === dep.name ? " selected" : "") +
+          (state.ftpGlow && dep.ftp && state.selected !== dep.name ? " ftp-glow" : "");
+        b.innerHTML = (dep.ftp ? "★ " : "") + dep.name + '<span class="grp">' + GRP_LABEL[dep.g] + "</span>";
+        b.addEventListener("click", function () { state.selected = dep.name; render(); });
+        grid.appendChild(b);
+      });
+      var sel = null;
+      DEPTS.forEach(function (dep) { if (dep.name === state.selected) sel = dep; });
+      readout.innerHTML = sel
+        ? "<strong>" + sel.name + "</strong> · " + GRP_LABEL[sel.g] + (sel.ftp ? " · ★ FTP touchpoint" : "") + "<br>" + sel.d
+        : "Click a department.";
+    }
+
+    document.getElementById("grp-filter").addEventListener("click", function (e) {
+      var g = e.target.getAttribute("data-g");
+      if (!g) return;
+      state.filter = g;
+      state.ftpGlow = (g === "ftp");
+      this.querySelectorAll("button").forEach(function (b) { b.classList.toggle("active", b.getAttribute("data-g") === g); });
+      render();
+    });
+    render();
+  </script>
+</body>
+</html>

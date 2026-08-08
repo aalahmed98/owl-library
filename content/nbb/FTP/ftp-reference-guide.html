@@ -1,0 +1,611 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Funds Transfer Pricing — Reference Guide</title>
+  <meta name="archive-tags" content="banking, ftp, treasury, alm, bahrain">
+  <meta name="archive-summary" content="Interactive reference guide to FTP: the three rate components, tenor buckets and behavioural maturity, blended FTP, ALM economics, deposit beta, governance, breakage cost, and stress testing — with NBB/Bahrain context, live widgets, quick-reference formulas, and glossary.">
+  <meta name="archive-created" content="2026-08-05">
+  <meta name="archive-updated" content="2026-08-05">
+  <meta name="archive-status" content="final">
+  <meta name="archive-source" content="FTP_Reference_Guide_1.docx (ingested from local file)">
+  <style>
+    /* ==tokens== (synced from design/tokens.css — do not edit inside the markers) */
+    :root {
+      --color-bg: #faf9f7;
+      --color-surface: #ffffff;
+      --color-fg: #1a1a1e;
+      --color-muted: #6b6b76;
+      --color-border: #e4e2dd;
+      --color-accent: #2f6fed;
+      --color-accent-fg: #ffffff;
+      --color-accent-soft: #e8effd;
+      --color-danger: #c4483c;
+      --color-warn-bg: #fdf6e3;
+      --color-code-bg: #f2f1ee;
+      --color-mark: #fff3bf;
+      --font-body: "Charter", "Georgia", "Cambria", "Times New Roman", serif;
+      --font-ui: system-ui, -apple-system, "Segoe UI", sans-serif;
+      --font-mono: "SFMono-Regular", "Cascadia Code", "Consolas", "Menlo", monospace;
+      --text-xs: 0.75rem;
+      --text-sm: 0.875rem;
+      --text-base: 1.0625rem;
+      --text-lg: 1.25rem;
+      --text-xl: 1.5rem;
+      --text-2xl: 1.875rem;
+      --text-3xl: 2.375rem;
+      --leading-body: 1.65;
+      --leading-tight: 1.25;
+      --measure: 68ch;
+      --space-1: 0.25rem;
+      --space-2: 0.5rem;
+      --space-3: 0.75rem;
+      --space-4: 1rem;
+      --space-5: 1.5rem;
+      --space-6: 2rem;
+      --space-7: 3rem;
+      --space-8: 4rem;
+      --radius-sm: 4px;
+      --radius-md: 8px;
+      --radius-lg: 12px;
+      --shadow-sm: 0 1px 2px rgba(20, 20, 25, 0.06);
+      --shadow-md: 0 2px 8px rgba(20, 20, 25, 0.1);
+    }
+    [data-theme="dark"] {
+      --color-bg: #16161a;
+      --color-surface: #1e1e24;
+      --color-fg: #e8e6e3;
+      --color-muted: #9a98a0;
+      --color-border: #32323a;
+      --color-accent: #6b9bff;
+      --color-accent-fg: #10101c;
+      --color-accent-soft: #23304d;
+      --color-danger: #e0685c;
+      --color-warn-bg: #2e2a1e;
+      --color-code-bg: #24242b;
+      --color-mark: #4d4425;
+      --shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.4);
+      --shadow-md: 0 2px 8px rgba(0, 0, 0, 0.5);
+    }
+    /* ==/tokens== */
+
+    /* When opened standalone (not in the app frame), follow the OS theme. */
+    @media (prefers-color-scheme: dark) {
+      :root:not([data-theme]) {
+        --color-bg: #16161a;
+        --color-surface: #1e1e24;
+        --color-fg: #e8e6e3;
+        --color-muted: #9a98a0;
+        --color-border: #32323a;
+        --color-accent: #6b9bff;
+        --color-accent-fg: #10101c;
+        --color-accent-soft: #23304d;
+        --color-danger: #e0685c;
+        --color-warn-bg: #2e2a1e;
+        --color-code-bg: #24242b;
+        --color-mark: #4d4425;
+      }
+    }
+
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      background: var(--color-bg);
+      color: var(--color-fg);
+      font-family: var(--font-body);
+      font-size: var(--text-base);
+      line-height: var(--leading-body);
+    }
+    .paper {
+      max-width: var(--measure);
+      margin: 0 auto;
+      padding: var(--space-6) var(--space-4) var(--space-8);
+    }
+    h1 { font-size: var(--text-3xl); line-height: var(--leading-tight); margin: 0 0 var(--space-2); }
+    h2 { font-size: var(--text-xl); line-height: var(--leading-tight); margin: var(--space-6) 0 var(--space-3); border-bottom: 1px solid var(--color-border); padding-bottom: var(--space-2); }
+    h3 { font-size: var(--text-lg); margin: var(--space-5) 0 var(--space-2); }
+    .byline { color: var(--color-muted); font-family: var(--font-ui); font-size: var(--text-sm); margin-bottom: var(--space-6); }
+    a { color: var(--color-accent); }
+    code { font-family: var(--font-mono); font-size: 0.88em; background: var(--color-code-bg); padding: 1px 5px; border-radius: var(--radius-sm); }
+    pre { background: var(--color-code-bg); padding: var(--space-4); border-radius: var(--radius-md); overflow-x: auto; }
+    pre code { background: none; padding: 0; font-size: var(--text-sm); }
+    blockquote { margin: var(--space-4) 0; padding: var(--space-2) var(--space-4); border-left: 3px solid var(--color-accent); background: var(--color-surface); color: var(--color-muted); }
+
+    /* interactive widgets */
+    .widget {
+      font-family: var(--font-ui);
+      background: var(--color-surface);
+      border: 1px solid var(--color-border);
+      border-radius: var(--radius-lg);
+      padding: var(--space-4);
+      margin: var(--space-5) 0;
+      box-shadow: var(--shadow-sm);
+    }
+    .widget-title { font-weight: 600; font-size: var(--text-sm); margin: 0 0 var(--space-3); color: var(--color-muted); text-transform: uppercase; letter-spacing: 0.05em; }
+    .control { display: flex; align-items: center; gap: var(--space-3); margin: var(--space-2) 0; font-size: var(--text-sm); }
+    .control label { min-width: 9rem; }
+    .control input[type="range"] { flex: 1; accent-color: var(--color-accent); }
+    .control output { min-width: 4rem; text-align: right; font-family: var(--font-mono); font-size: var(--text-sm); }
+    .chart { width: 100%; height: auto; display: block; margin-top: var(--space-3); }
+    .chart .axis { stroke: var(--color-border); stroke-width: 1; }
+    .chart .axis-label { fill: var(--color-muted); font-family: var(--font-ui); font-size: 11px; }
+    .chart .series { fill: none; stroke: var(--color-accent); stroke-width: 2; }
+    .chart .series-2 { fill: none; stroke: var(--color-danger); stroke-width: 2; }
+    .chart .bar { fill: var(--color-accent); }
+    figure { margin: var(--space-5) 0; }
+    figcaption { font-family: var(--font-ui); font-size: var(--text-sm); color: var(--color-muted); margin-top: var(--space-2); }
+    details.derivation { margin: var(--space-4) 0; border: 1px solid var(--color-border); border-radius: var(--radius-md); padding: var(--space-3) var(--space-4); background: var(--color-surface); }
+    details.derivation summary { cursor: pointer; font-family: var(--font-ui); font-weight: 600; font-size: var(--text-sm); }
+
+    /* custom styles (after token markers) */
+    table { border-collapse: collapse; width: 100%; font-family: var(--font-ui); font-size: var(--text-sm); margin: var(--space-4) 0; }
+    th, td { border: 1px solid var(--color-border); padding: var(--space-2) var(--space-3); text-align: left; vertical-align: top; }
+    th { background: var(--color-code-bg); font-weight: 600; }
+    .readout { font-family: var(--font-ui); font-size: var(--text-sm); background: var(--color-accent-soft); border-radius: var(--radius-md); padding: var(--space-3); margin-top: var(--space-3); }
+    .readout strong { font-family: var(--font-mono); }
+    .preset-row { display: flex; gap: var(--space-2); flex-wrap: wrap; margin: var(--space-2) 0; }
+    .preset-row button {
+      font-family: var(--font-ui); font-size: var(--text-sm); cursor: pointer;
+      border: 1px solid var(--color-border); background: var(--color-surface); color: var(--color-fg);
+      padding: var(--space-1) var(--space-3); border-radius: var(--radius-md);
+    }
+    .preset-row button.active { background: var(--color-accent); color: var(--color-accent-fg); border-color: var(--color-accent); }
+    .stack-legend { display: flex; gap: var(--space-4); flex-wrap: wrap; font-size: var(--text-xs); color: var(--color-muted); margin-top: var(--space-2); }
+    .stack-legend span::before { content: ""; display: inline-block; width: 10px; height: 10px; border-radius: 2px; margin-right: 5px; vertical-align: baseline; }
+    .lg-base::before { background: var(--color-accent); }
+    .lg-prem::before { background: var(--color-danger); }
+    .lg-addon::before { background: var(--color-muted); }
+  </style>
+</head>
+<body>
+  <main class="paper">
+    <h1>Funds Transfer Pricing</h1>
+    <p class="byline">A reference guide — components, buckets, pricing mechanics, and governance · National Bank of Bahrain context · Interactive edition</p>
+
+    <h2 id="s1">1. What FTP Is, and Why It Exists</h2>
+    <p>Funds Transfer Pricing (FTP) is the internal mechanism a bank uses to price money as it moves between business units. Every loan a bank writes is charged an internal cost of funds; every deposit it gathers is credited an internal rate. The gap between what a customer pays or receives and that internal FTP rate is the margin a business unit actually earns.</p>
+    <p>Without FTP, a bank cannot fairly compare a mortgage against a current account, or a lending branch against a deposit-gathering branch, because the two carry completely different interest-rate and liquidity risk. FTP strips that risk out of the comparison by charging and crediting it centrally, through Treasury/ALM, so what's left in each business unit's number is only what that unit actually controls — pricing, credit selection, and customer relationship.</p>
+
+    <h2 id="s2">2. The Three Components of an FTP Rate</h2>
+    <p>Every FTP rate is built by stacking three things:</p>
+    <ul>
+      <li><strong>Base rate</strong> — the market yield curve (swap/OIS) read at the deal's matched tenor. This is the pure price of money, with no bank-specific risk attached.</li>
+      <li><strong>Term liquidity premium</strong> — the bank's own funding spread above the base rate at that tenor. This is bank-specific: a stronger bank pays less, a weaker one pays more, and this is the component that moves most violently in a crisis.</li>
+      <li><strong>Add-ons</strong> — smaller charges for contingent liquidity (undrawn commitments), basis/cross-currency mismatch, and optionality (e.g. a borrower's right to prepay).</li>
+    </ul>
+    <blockquote>Base rate + liquidity premium + add-ons = the FTP rate charged on an asset or credited on a liability.</blockquote>
+
+    <div class="widget">
+      <p class="widget-title">Widget 1 · Build an FTP rate</p>
+      <div class="control">
+        <label for="w1-base">Base rate</label>
+        <input type="range" id="w1-base" min="0" max="8" step="0.05" value="4.2">
+        <output id="w1-base-out">4.20%</output>
+      </div>
+      <div class="control">
+        <label for="w1-prem">Liquidity premium</label>
+        <input type="range" id="w1-prem" min="0" max="3" step="0.05" value="0.8">
+        <output id="w1-prem-out">0.80%</output>
+      </div>
+      <div class="control">
+        <label for="w1-addon">Add-ons</label>
+        <input type="range" id="w1-addon" min="0" max="1" step="0.05" value="0.2">
+        <output id="w1-addon-out">0.20%</output>
+      </div>
+      <svg id="w1-chart" class="chart" viewBox="0 0 640 90" role="img" aria-label="Stacked FTP rate components"></svg>
+      <div class="stack-legend"><span class="lg-base">Base rate</span><span class="lg-prem">Liquidity premium</span><span class="lg-addon">Add-ons</span></div>
+      <div class="readout" id="w1-readout"></div>
+    </div>
+    <figure><figcaption><strong>Figure 1.</strong> The three components stack into one FTP rate. Widen the liquidity premium to see a funding-stress scenario: the base curve hasn't moved, but every loan in the bank just got more expensive to fund.</figcaption></figure>
+
+    <h2 id="s3">3. Buckets and Maturities</h2>
+    <p>A bank maintains a ladder of tenor "buckets" — overnight, 1 month, 1 year, 5 years, 10 years, and so on — each with its own point on the curve. Every balance on the balance sheet is assigned to a bucket, which determines the rate it's charged or credited.</p>
+    <h3>Contractual maturity</h3>
+    <p>A fixed-term deposit or a bullet loan has a maturity written into the contract, so bucketing is mechanical: a 3-year deposit goes straight into the 3-year bucket. No modelling is required.</p>
+    <h3>Behavioural maturity</h3>
+    <p>Non-maturity balances — current accounts, savings accounts — have no contractual end date. The bank studies how the balance has actually behaved over time and splits it into tranches: a stable "core" portion (treated as long-tenor, sticky funding), a "volatile" portion, and a "surge" portion (short-tenor, treated as if it could leave any day). This is sometimes formalised as a <em>replicating portfolio</em> — a mix of tenor buckets that would have reproduced the balance's real historical behaviour.</p>
+
+    <figure>
+      <svg class="chart" viewBox="0 0 640 200" role="img" aria-label="Core, volatile, and surge tranches of a deposit balance">
+        <rect x="60" y="130" width="520" height="50" rx="4" style="fill:var(--color-accent)"/>
+        <rect x="60" y="80" width="520" height="46" rx="4" style="fill:var(--color-danger); opacity:0.75"/>
+        <rect x="60" y="30" width="520" height="46" rx="4" style="fill:var(--color-muted); opacity:0.6"/>
+        <text class="axis-label" x="70" y="60" style="fill:#fff">SURGE (~15%) — could leave any day → overnight / 1-month buckets</text>
+        <text class="axis-label" x="70" y="108" style="fill:#fff">VOLATILE (~25%) — swings with salaries, seasons → short buckets</text>
+        <text class="axis-label" x="70" y="160" style="fill:#fff">CORE (~60%) — never left in years of history → long-tenor buckets</text>
+        <text class="axis-label" x="60" y="196">One current-account balance, split by observed behaviour (illustrative proportions)</text>
+      </svg>
+      <figcaption><strong>Figure 2.</strong> Behavioural tranching of a non-maturity deposit: one balance, three tenor treatments.</figcaption>
+    </figure>
+
+    <h3>Repricing maturity vs final maturity</h3>
+    <p>These can differ. A 5-year loan at a fixed rate has both final and repricing maturity at 5 years. A 5-year loan at a floating rate that resets every 3 months has a final maturity of 5 years but a repricing maturity of 3 months — and it is bucketed (and priced) at the 3-month point, not the 5-year point, because that is the horizon over which its price actually resets. It then rolls into that same short bucket again at every reset date, for the life of the loan.</p>
+
+    <h2 id="s4">4. Blended FTP — How a Single Rate Gets Calculated</h2>
+    <p>A loan that repays principal gradually (an amortising loan) is not one bucket — it is many. Each year's principal repayment is a slice of cash returning at a specific point in time, and each slice is priced at that bucket's own point on the curve. The loan's overall FTP charge is the principal-weighted average across every bucket its cash flow touches:</p>
+    <blockquote>Blended FTP = Σ (cash flow in year t × curve rate at year t) ÷ Σ (total cash flow)</blockquote>
+    <p>This matters because a bullet loan (all principal back at maturity) sits 100% in the final bucket and is priced at the full headline rate for that tenor, while an otherwise-identical amortising loan is pulled toward the cheaper short-tenor buckets its early cash flow lands in. On a normal, upward-sloping curve, the amortising loan will always carry a lower blended FTP charge than the bullet loan of the same stated tenor. Charging an amortising loan the full headline rate — a common shortcut — systematically overcharges it and understates the true margin the business unit earned.</p>
+    <p>The same principal-weighted logic applies to non-maturity deposits, except the weights come from the behavioural core/volatile/surge split rather than from a real repayment schedule.</p>
+
+    <div class="widget">
+      <p class="widget-title">Widget 2 · Bullet vs amortising — same tenor, different FTP</p>
+      <div class="control">
+        <label for="w2-tenor">Loan tenor (years)</label>
+        <input type="range" id="w2-tenor" min="2" max="10" step="1" value="5">
+        <output id="w2-tenor-out">5y</output>
+      </div>
+      <div class="control">
+        <label for="w2-slope">Curve steepness</label>
+        <input type="range" id="w2-slope" min="-2" max="3" step="0.1" value="1.5">
+        <output id="w2-slope-out">+1.5%</output>
+      </div>
+      <svg id="w2-chart" class="chart" viewBox="0 0 640 280" role="img" aria-label="Curve with per-year amortising slices"></svg>
+      <div class="readout" id="w2-readout"></div>
+    </div>
+    <figure><figcaption><strong>Figure 3.</strong> The blue line is the FTP curve; the dots are the amortising loan's equal annual principal slices, each priced at its own bucket. Drag steepness negative to invert the curve — the amortising loan then prices <em>above</em> the bullet, the mirror image of the normal case.</figcaption></figure>
+
+    <details class="derivation">
+      <summary>Worked example: 5-year amortising loan, equal principal</summary>
+      <p>Principal 100, repaid 20 per year over 5 years. Suppose the curve reads 3.0% (1y), 3.6% (2y), 4.0% (3y), 4.3% (4y), 4.5% (5y).</p>
+      <p>Blended FTP = (20×3.0 + 20×3.6 + 20×4.0 + 20×4.3 + 20×4.5) ÷ 100 = <strong>3.88%</strong> — versus the 5-year headline rate of <strong>4.50%</strong> a bullet loan would pay. Charging this loan 4.50% overstates its funding cost by 62&nbsp;bp.</p>
+    </details>
+
+    <h2 id="s5">5. Who Gets Charged, Who Gets Credited — ALM Economics</h2>
+    <p>FTP splits a bank's net interest income three ways, and the three always sum to the whole:</p>
+    <ul>
+      <li><strong>Lending margin</strong> = customer loan rate − FTP charge</li>
+      <li><strong>Deposit margin</strong> = FTP credit − customer deposit rate</li>
+      <li><strong>ALM margin</strong> = FTP charged on assets − FTP credited on liabilities</li>
+    </ul>
+    <p>ALM's margin is compensation for running maturity transformation — borrowing short (via deposits and short funding) and lending long. On a normal upward-sloping curve this produces a positive spread; on a flat or inverted curve it can go to zero or negative.</p>
+    <p>A well-run FTP framework aims for ALM's structural profit to sit near zero over the full interest-rate cycle. If ALM consistently posts large, steady profit quarter after quarter, that is not evidence of skill — it is usually a sign that the mismatch itself has become a standing, undisclosed bet on the curve staying upward-sloping, which reverses hard exactly when the curve flattens or inverts. FTP does not create profit; it only allocates it between business units and Treasury.</p>
+
+    <h2 id="s6">6. Deposit Beta — Current Accounts vs Term Deposits</h2>
+    <p>Deposit beta measures how much of a market rate move gets passed on to the customer's rate. Term deposits have high beta (roughly 90%) — their cost tracks the market closely, both on new issuance and, eventually, as the back book of maturing deposits rolls into new rates. Current accounts have low beta (roughly 15%) — the customer rate barely moves even when market rates rise sharply.</p>
+    <p>This creates an asymmetry worth remembering: rising rates compress term deposit margins (cost catches up to the FTP credit) but expand current account margins quickly (the FTP credit paid on that continuously-rolling pool rises with the curve while the customer rate stays flat). It is also why banks compete hard for transactional, non-maturity balances rather than simply chasing deposit volume of any kind.</p>
+    <p>On any single existing fixed-term deposit, both sides are frozen at origination — the customer's rate and the FTP credit assigned to it don't move again until maturity. A term-deposit-funded book therefore only catches up to a new rate environment gradually, as each deposit matures and rolls into a new rate — a process that can take years.</p>
+
+    <div class="widget">
+      <p class="widget-title">Widget 3 · Deposit beta — who feels a rate hike?</p>
+      <div class="control">
+        <label for="w3-move">Market rates rise by</label>
+        <input type="range" id="w3-move" min="0" max="3" step="0.25" value="2">
+        <output id="w3-move-out">+2.00%</output>
+      </div>
+      <svg id="w3-chart" class="chart" viewBox="0 0 640 240" role="img" aria-label="Pass-through and margin effect by deposit type"></svg>
+      <div class="readout" id="w3-readout"></div>
+    </div>
+    <figure><figcaption><strong>Figure 4.</strong> The same market move, passed through at beta ≈ 90% (term deposits) vs ≈ 15% (current accounts). The gap between the FTP credit (which rises with the curve) and the customer rate is the deposit desk's margin — watch which product's margin expands.</figcaption></figure>
+
+    <h2 id="s7">7. Core / Volatile / Surge — Behavioural Tranching and Governance</h2>
+    <p>Because the core/volatile/surge split is a modelled assumption rather than an observable fact, it is also the single largest lever in the entire FTP framework — moving it has far more P&amp;L impact than any argument over the rate card. That size creates a structural incentive problem: business units benefit from a higher core assumption (bigger FTP credit, better-looking margin) and nobody inside the bank has a natural incentive to argue the number down.</p>
+    <p>Regulators address this with hard limits — under Basel's IRRBB framework, there is a cap on the average behavioural life a bank may assign to non-maturity deposits, roughly five years for retail transactional balances and shorter for wholesale and non-transactional ones. Internally, changes to the core assumption should not be made unilaterally or reactively; they go through model governance and ALCO sign-off, with a documented root-cause analysis of why the change is warranted, before taking effect.</p>
+    <p>Concentration is the sharpest version of this risk. A book of many small, independent retail balances tends to be genuinely stable, because unrelated customer decisions largely cancel out day to day. A book concentrated in a handful of large depositors carries much less of that averaging benefit — the same news event can move all of them together. This was the core failure at Silicon Valley Bank in 2023: concentrated, large, correlated deposits assumed to be far stickier than they were, funding long-duration assets. It is also a locally relevant risk in the GCC, where government and large-corporate deposits make up an outsized share of bank funding and a granular retail-style behavioural model will tend to overstate how core that concentrated money really is.</p>
+
+    <h2 id="s8">8. The Market Curve</h2>
+    <p>The curve used for FTP — usually the swap or OIS curve — is not calculated from a formula; it is read directly off the market. Real instruments trade at every tenor, each with an observable rate, and plotting those rates together produces the curve.</p>
+    <p>A curve normally slopes upward, since lenders want more compensation for tying money up longer. It can invert — short rates above long rates — when the market expects future rate cuts, which is exactly the shape seen after aggressive hiking cycles. Curve shape matters enormously for FTP: an inverted curve can push a floating-rate loan's price above its own customer rate, and it changes which side of the maturity-transformation trade (borrow short, lend long) is actually profitable.</p>
+
+    <div class="widget">
+      <p class="widget-title">Widget 4 · Curve shapes and what they do to ALM</p>
+      <div class="preset-row" id="w4-presets">
+        <button data-shape="normal" class="active">Normal (upward)</button>
+        <button data-shape="flat">Flat</button>
+        <button data-shape="inverted">Inverted</button>
+      </div>
+      <svg id="w4-chart" class="chart" viewBox="0 0 640 280" role="img" aria-label="Yield curve shape"></svg>
+      <div class="readout" id="w4-readout"></div>
+    </div>
+    <figure><figcaption><strong>Figure 5.</strong> Three curve regimes. The readout shows the maturity-transformation spread ALM earns borrowing at the 3-month point and lending at the 5-year point of the displayed curve.</figcaption></figure>
+
+    <h2 id="s9">9. Fixed vs Floating Rate — and the US/GCC Difference</h2>
+    <p>A fixed rate is locked at inception and never changes for the life of the deal. A floating rate resets periodically to a reference benchmark plus a spread, so its cost tracks the market throughout its life.</p>
+    <p>The benchmark itself differs by market. In the US, floating rates reference SOFR, an overnight rate built from real, observed transactions, which replaced LIBOR specifically because LIBOR was based on banks estimating their own borrowing cost. In the GCC, floating rates reference local interbank offered rates — BHIBOR in Bahrain, SAIBOR in Saudi Arabia, EIBOR in the UAE — which work more like LIBOR did, a panel of banks submitting estimated borrowing costs rather than a rate built purely from executed trades.</p>
+    <p>Because the Bahraini dinar (and most GCC currencies) is pegged to the US dollar, the Central Bank of Bahrain has to keep local rates in line with US rates to defend that peg. In practice, BHIBOR tracks the Fed's moves closely, with a local liquidity spread on top — a floating-rate loan booked in Bahrain is largely a local pass-through of US monetary policy, not an independent rate.</p>
+
+    <h2 id="s10">10. Why FTP Does Not Price Credit Risk</h2>
+    <p>FTP prices interest-rate risk and liquidity risk only. Credit risk — the risk a specific borrower fails to repay — is priced separately, through expected-loss provisioning and a capital charge for unexpected loss, and is owned by the business unit that underwrites the loan.</p>
+    <p>The reason for the split is accountability. Rate and liquidity risk are the same for every borrower and can be centrally hedged and pooled by Treasury; credit risk is specific to the borrower and depends entirely on underwriting quality, which Treasury has no visibility into. Folding expected loss into the FTP rate would blur who is responsible when a loan goes bad — mispriced funding or weak underwriting — and would make it impossible to compare a loan's profitability on a genuinely risk-adjusted basis.</p>
+
+    <h2 id="s11">11. The FTP "Seesaw" — One Lever, Two Sides</h2>
+    <p>FTP acts as a single pivot point that sets the economics on both sides of the balance sheet at once, and moving it does not create value — it only shifts advantage from one side to the other.</p>
+    <p>Raise the FTP rate at a given tenor and deposits at that tenor become more attractive to gather (the bank can credit depositors more while still protecting margin), while loans at that tenor become less attractive to originate (the cost of funds rises, so either the customer rate rises or the lending margin shrinks). Lower the FTP rate and the effect flips: loans become cheap to write, deposits become less rewarding to collect.</p>
+    <p>This is why the FTP rate is not set to make either side happy — it has to track the genuine market cost of funds. An FTP rate held artificially low to flatter the lending business, or artificially high to flatter the deposit-gathering business, does not change the bank's real economics; it just transfers margin from one business unit to the other while mispricing the underlying risk for both.</p>
+
+    <div class="widget">
+      <p class="widget-title">Widget 5 · The seesaw — slide FTP between the two desks</p>
+      <div class="control">
+        <label for="w5-ftp">FTP rate</label>
+        <input type="range" id="w5-ftp" min="2" max="7" step="0.1" value="4.5">
+        <output id="w5-ftp-out">4.50%</output>
+      </div>
+      <svg id="w5-chart" class="chart" viewBox="0 0 640 220" role="img" aria-label="Margin split between deposit desk and lending desk"></svg>
+      <div class="readout" id="w5-readout"></div>
+    </div>
+    <figure><figcaption><strong>Figure 6.</strong> Customer deposit rate fixed at 2.00%, customer loan rate fixed at 7.00%. The FTP slider only decides how the fixed 5.00% customer spread is shared between the deposit desk and the lending desk — the total never changes.</figcaption></figure>
+
+    <h2 id="s12">12. Breakage Cost</h2>
+    <p>Breakage cost is what it costs the bank when a customer exits a fixed-term deal early — withdrawing a term deposit before maturity, or prepaying a fixed-rate loan — and it is calculated directly off the FTP curve.</p>
+    <p>The mechanism: compare the deal's original, locked-in FTP rate against the current FTP rate for its remaining tenor. For an early-withdrawn term deposit, the bank must replace that funding at today's rate for the remaining period; if rates have risen since origination, replacement funding costs more than the deposit was credited, and that gap is passed to the customer as a breakage penalty. For a prepaid fixed loan, the bank loses the future income on a loan that was earning an FTP-based margin locked in at origination; if rates have fallen since then, the bank must relend the returned principal at a lower rate than the original loan carried, and the breakage fee compensates for that reinvestment loss.</p>
+    <p>In short: breakage cost is the price of unwinding an FTP match before its scheduled maturity, sized by how far the curve has moved since the deal was struck.</p>
+
+    <div class="widget">
+      <p class="widget-title">Widget 6 · Breakage cost calculator (BHD 100,000 notional)</p>
+      <div class="control">
+        <label for="w6-orig">FTP at origination</label>
+        <input type="range" id="w6-orig" min="1" max="8" step="0.1" value="3.0">
+        <output id="w6-orig-out">3.00%</output>
+      </div>
+      <div class="control">
+        <label for="w6-curr">FTP today (rem. tenor)</label>
+        <input type="range" id="w6-curr" min="1" max="8" step="0.1" value="5.0">
+        <output id="w6-curr-out">5.00%</output>
+      </div>
+      <div class="control">
+        <label for="w6-rem">Remaining tenor</label>
+        <input type="range" id="w6-rem" min="0.5" max="5" step="0.5" value="2">
+        <output id="w6-rem-out">2.0y</output>
+      </div>
+      <div class="readout" id="w6-readout"></div>
+    </div>
+    <figure><figcaption><strong>Figure 7.</strong> The same curve move creates a breakage charge on one product and none on the other: rates up hurts an early-withdrawn deposit; rates down hurts a prepaid fixed loan.</figcaption></figure>
+
+    <h2 id="s13">13. Stress Testing FTP</h2>
+    <p>Stress testing FTP means shocking the framework from several angles at once and checking whether it still tells the truth under pressure: parallel shifts, steepening, flattening or inversion of the base curve; a sharp widening of the liquidity premium; and, critically, a breakdown of the behavioural assumptions themselves (What if "core" deposits turn out far less sticky? What if prepayments stop entirely?).</p>
+    <p>A stress test is judged successful not by whether the numbers look fine under stress, but by whether it accurately reveals where the framework breaks and by how much. Pass/fail is measured against pre-set limits: does ALM's projected P&amp;L stay within board-approved risk limits; does the liquidity position stay above LCR/NSFR minimums; does the IRRBB economic-value or income sensitivity stay within limits; does the test surface a concentration or cliff-edge nobody had noticed. A test that comes back saying "everything's fine" is often a failed test — it usually means the scenario wasn't severe enough.</p>
+    <p>When a stress test does breach a limit, the levers available, roughly fastest to slowest, are: repricing new business on the rate card; recalibrating the behavioural assumptions (usually the biggest lever); increasing the high-quality liquid asset buffer; and tightening ALCO-set limits on concentration and bucket exposure going forward.</p>
+
+    <h2 id="s14">14. Quick Reference</h2>
+    <h3>Key formulas</h3>
+    <table>
+      <thead><tr><th>Concept</th><th>Formula / rule</th></tr></thead>
+      <tbody>
+        <tr><td>FTP rate</td><td>Base rate + Term liquidity premium + Add-ons</td></tr>
+        <tr><td>Lending margin</td><td>Customer loan rate − FTP charge</td></tr>
+        <tr><td>Deposit margin</td><td>FTP credit − Customer deposit rate</td></tr>
+        <tr><td>ALM margin</td><td>FTP charged on assets − FTP credited on liabilities</td></tr>
+        <tr><td>Blended FTP</td><td>Σ(cash flow in year t × curve rate at t) ÷ Σ(total cash flow)</td></tr>
+        <tr><td>Average life</td><td>Σ(cash flow in year t × t) ÷ Σ(total cash flow)</td></tr>
+      </tbody>
+    </table>
+    <h3>US vs GCC benchmark reference</h3>
+    <table>
+      <thead><tr><th></th><th>United States</th><th>Bahrain / GCC</th></tr></thead>
+      <tbody>
+        <tr><td>Floating-rate benchmark</td><td>SOFR</td><td>BHIBOR / SAIBOR / EIBOR</td></tr>
+        <tr><td>Basis</td><td>Real overnight transactions</td><td>Panel-submitted estimates</td></tr>
+        <tr><td>Independence from Fed policy</td><td>Is the policy itself</td><td>Tracks the Fed via the USD peg</td></tr>
+      </tbody>
+    </table>
+
+    <h2 id="s15">15. Glossary</h2>
+    <table>
+      <thead><tr><th>Term</th><th>Meaning</th></tr></thead>
+      <tbody>
+        <tr><td>ALCO</td><td>Asset &amp; Liability Committee — governs FTP assumptions, rate card, and limits</td></tr>
+        <tr><td>ALM / Treasury</td><td>The desk that charges assets and credits liabilities, holding the residual mismatch</td></tr>
+        <tr><td>Bucket</td><td>A tenor slot on the FTP curve (e.g. 3-month, 1-year, 5-year) with its own rate</td></tr>
+        <tr><td>Bullet loan</td><td>A loan that repays 100% of principal at maturity, nothing earlier</td></tr>
+        <tr><td>Core / volatile / surge</td><td>Behavioural tranches splitting a non-maturity deposit book by assumed stability</td></tr>
+        <tr><td>Deposit beta</td><td>The share of a market rate move passed on to a deposit's customer rate</td></tr>
+        <tr><td>EIBOR / SAIBOR / BHIBOR</td><td>Interbank offered rate benchmarks in the UAE / Saudi Arabia / Bahrain</td></tr>
+        <tr><td>IRRBB</td><td>Interest Rate Risk in the Banking Book — the regulatory framework capping behavioural assumptions</td></tr>
+        <tr><td>LCR / NSFR</td><td>Liquidity Coverage Ratio / Net Stable Funding Ratio — Basel III liquidity requirements</td></tr>
+        <tr><td>Replicating portfolio</td><td>A mix of tenor buckets constructed to reproduce a deposit book's real historical behaviour</td></tr>
+        <tr><td>SOFR</td><td>Secured Overnight Financing Rate — the US floating-rate benchmark, transaction-based</td></tr>
+      </tbody>
+    </table>
+  </main>
+
+  <script>
+    function bindSlider(id, outId, fmt, onChange) {
+      var el = document.getElementById(id), out = document.getElementById(outId);
+      var update = function () { out.textContent = fmt(el.valueAsNumber); onChange(el.valueAsNumber); };
+      el.addEventListener("input", update);
+      update();
+    }
+
+    function lineChart(svgId, seriesList, opts) {
+      opts = opts || {};
+      var svg = document.getElementById(svgId);
+      var W = 640, H = 280, m = { t: 12, r: 12, b: 28, l: 44 };
+      var pts = [];
+      seriesList.forEach(function (s) { pts = pts.concat(s.points); });
+      var xs = pts.map(function (p) { return p[0]; }), ys = pts.map(function (p) { return p[1]; });
+      var x0 = opts.xMin != null ? opts.xMin : Math.min.apply(null, xs);
+      var x1 = opts.xMax != null ? opts.xMax : Math.max.apply(null, xs);
+      var y0 = opts.yMin != null ? opts.yMin : Math.min.apply(null, ys);
+      var y1 = opts.yMax != null ? opts.yMax : Math.max.apply(null, ys);
+      var X = function (v) { return m.l + ((v - x0) / ((x1 - x0) || 1)) * (W - m.l - m.r); };
+      var Y = function (v) { return H - m.b - ((v - y0) / ((y1 - y0) || 1)) * (H - m.t - m.b); };
+      var tickFmt = function (v) { return +v.toFixed(2); };
+      var out = '<line class="axis" x1="' + m.l + '" y1="' + (H - m.b) + '" x2="' + (W - m.r) + '" y2="' + (H - m.b) + '"/>' +
+                '<line class="axis" x1="' + m.l + '" y1="' + m.t + '" x2="' + m.l + '" y2="' + (H - m.b) + '"/>';
+      for (var i = 0; i <= 4; i++) {
+        var xv = x0 + (i / 4) * (x1 - x0), yv = y0 + (i / 4) * (y1 - y0);
+        out += '<text class="axis-label" x="' + X(xv) + '" y="' + (H - m.b + 16) + '" text-anchor="middle">' + tickFmt(xv) + '</text>';
+        out += '<text class="axis-label" x="' + (m.l - 6) + '" y="' + (Y(yv) + 4) + '" text-anchor="end">' + tickFmt(yv) + '</text>';
+      }
+      seriesList.forEach(function (s, si) {
+        var d = s.points.map(function (p, j) { return (j ? "L" : "M") + X(p[0]).toFixed(1) + "," + Y(p[1]).toFixed(1); }).join("");
+        out += '<path class="' + (si === 0 ? "series" : "series-2") + '" d="' + d + '"/>';
+      });
+      if (opts.dots) {
+        opts.dots.forEach(function (p) {
+          out += '<circle cx="' + X(p[0]).toFixed(1) + '" cy="' + Y(p[1]).toFixed(1) + '" r="5" style="fill:var(--color-danger)"/>';
+        });
+      }
+      if (opts.xLabel) out += '<text class="axis-label" x="' + ((W + m.l) / 2) + '" y="' + (H - 4) + '" text-anchor="middle">' + opts.xLabel + '</text>';
+      svg.innerHTML = out;
+    }
+
+    /* ---------- Widget 1: FTP rate stack ---------- */
+    var w1 = { base: 4.2, prem: 0.8, addon: 0.2 };
+    function drawW1() {
+      var total = w1.base + w1.prem + w1.addon;
+      var svg = document.getElementById("w1-chart");
+      var W = 640, x = 10, y = 18, h = 40, maxRate = 12;
+      var scale = (W - 90) / maxRate;
+      var segs = [
+        { v: w1.base,  color: "var(--color-accent)" },
+        { v: w1.prem,  color: "var(--color-danger)" },
+        { v: w1.addon, color: "var(--color-muted)" }
+      ];
+      var out = "";
+      segs.forEach(function (s) {
+        var w = s.v * scale;
+        if (w > 0.5) out += '<rect x="' + x.toFixed(1) + '" y="' + y + '" width="' + w.toFixed(1) + '" height="' + h + '" rx="3" style="fill:' + s.color + '"/>';
+        if (w > 34) out += '<text class="axis-label" x="' + (x + w / 2).toFixed(1) + '" y="' + (y + h / 2 + 4) + '" text-anchor="middle" style="fill:#fff">' + s.v.toFixed(2) + '%</text>';
+        x += w;
+      });
+      out += '<text class="axis-label" x="' + (x + 8).toFixed(1) + '" y="' + (y + h / 2 + 4) + '" style="font-weight:600">= ' + total.toFixed(2) + '%</text>';
+      out += '<text class="axis-label" x="10" y="' + (y + h + 20) + '">0%</text><text class="axis-label" x="' + (10 + maxRate * scale) + '" y="' + (y + h + 20) + '" text-anchor="end">12%</text>';
+      svg.innerHTML = out;
+      var note = w1.prem >= 1.5
+        ? "A liquidity premium this wide is crisis territory — this is the component that blew out in 2008 and March 2020, repricing every new loan in the bank overnight."
+        : "In calm markets the premium is a modest spread over the swap/OIS curve; the base rate does most of the work.";
+      document.getElementById("w1-readout").innerHTML =
+        "FTP rate = " + w1.base.toFixed(2) + "% + " + w1.prem.toFixed(2) + "% + " + w1.addon.toFixed(2) +
+        "% = <strong>" + total.toFixed(2) + "%</strong><br>" + note;
+    }
+    bindSlider("w1-base", "w1-base-out", function (v) { return v.toFixed(2) + "%"; }, function (v) { w1.base = v; drawW1(); });
+    bindSlider("w1-prem", "w1-prem-out", function (v) { return v.toFixed(2) + "%"; }, function (v) { w1.prem = v; drawW1(); });
+    bindSlider("w1-addon", "w1-addon-out", function (v) { return v.toFixed(2) + "%"; }, function (v) { w1.addon = v; drawW1(); });
+
+    /* ---------- Widget 2: bullet vs amortising ---------- */
+    var w2 = { tenor: 5, slope: 1.5 };
+    function w2Curve(t) { return 4 + w2.slope * (1 - Math.exp(-t / 4)); }
+    function drawW2() {
+      var pts = [], t;
+      for (t = 0.25; t <= 10; t += 0.25) pts.push([t, w2Curve(t)]);
+      var slices = [], sum = 0;
+      for (t = 1; t <= w2.tenor; t++) { var r = w2Curve(t); slices.push([t, r]); sum += r; }
+      var blended = sum / w2.tenor;
+      var bullet = w2Curve(w2.tenor);
+      lineChart("w2-chart", [{ points: pts }], { yMin: 1, yMax: 8, xMin: 0, xMax: 10, xLabel: "tenor (years)", dots: slices });
+      var diff = (bullet - blended) * 100;
+      var cmp = diff > 1 ? "cheaper" : (diff < -1 ? "more expensive" : "about the same");
+      document.getElementById("w2-readout").innerHTML =
+        "Bullet loan (" + w2.tenor + "y headline): <strong>" + bullet.toFixed(2) + "%</strong> · " +
+        "Amortising blended FTP: <strong>" + blended.toFixed(2) + "%</strong> · " +
+        "difference: <strong>" + Math.abs(diff).toFixed(0) + " bp</strong> — the amortising loan funds " + cmp +
+        (diff < -1 ? " (inverted curve: early slices price at the expensive short end)." : diff > 1 ? " (its early slices land in cheaper short buckets)." : ".");
+    }
+    bindSlider("w2-tenor", "w2-tenor-out", function (v) { return v + "y"; }, function (v) { w2.tenor = v; drawW2(); });
+    bindSlider("w2-slope", "w2-slope-out", function (v) { return (v >= 0 ? "+" : "") + v.toFixed(1) + "%"; }, function (v) { w2.slope = v; drawW2(); });
+
+    /* ---------- Widget 3: deposit beta ---------- */
+    function drawW3(move) {
+      var termPass = 0.9 * move, caPass = 0.15 * move;
+      var svg = document.getElementById("w3-chart");
+      var W = 640, H = 240, m = { t: 16, b: 46, l: 44, r: 12 };
+      var maxV = 3.2, plotH = H - m.t - m.b;
+      var Y = function (v) { return H - m.b - (v / maxV) * plotH; };
+      var groups = [
+        { label: "Market move", vals: [move], colors: ["var(--color-muted)"] },
+        { label: "Term deposit (β≈0.90)", vals: [termPass], colors: ["var(--color-danger)"] },
+        { label: "Current account (β≈0.15)", vals: [caPass], colors: ["var(--color-accent)"] }
+      ];
+      var gw = (W - m.l - m.r) / groups.length;
+      var out = '<line class="axis" x1="' + m.l + '" y1="' + (H - m.b) + '" x2="' + (W - m.r) + '" y2="' + (H - m.b) + '"/>';
+      for (var i = 0; i <= 4; i++) {
+        var yv = (i / 4) * maxV;
+        out += '<text class="axis-label" x="' + (m.l - 6) + '" y="' + (Y(yv) + 4) + '" text-anchor="end">' + yv.toFixed(1) + '%</text>';
+      }
+      groups.forEach(function (g, gi) {
+        var bx = m.l + gi * gw + gw * 0.28, bw = gw * 0.44;
+        var h = Math.max(0, (g.vals[0] / maxV) * plotH);
+        out += '<rect x="' + bx.toFixed(1) + '" y="' + (H - m.b - h).toFixed(1) + '" width="' + bw.toFixed(1) + '" height="' + h.toFixed(1) + '" rx="3" style="fill:' + g.colors[0] + '"/>';
+        out += '<text class="axis-label" x="' + (bx + bw / 2).toFixed(1) + '" y="' + (H - m.b - h - 6).toFixed(1) + '" text-anchor="middle">+' + g.vals[0].toFixed(2) + '%</text>';
+        out += '<text class="axis-label" x="' + (m.l + (gi + 0.5) * gw).toFixed(1) + '" y="' + (H - m.b + 18) + '" text-anchor="middle">' + g.label + '</text>';
+      });
+      out += '<text class="axis-label" x="' + ((W + m.l) / 2) + '" y="' + (H - 6) + '" text-anchor="middle">customer-rate increase passed through</text>';
+      svg.innerHTML = out;
+      var caMarginGain = move - caPass, termMarginGain = move - termPass;
+      document.getElementById("w3-readout").innerHTML =
+        "FTP credit on rolling balances rises roughly with the market: +" + move.toFixed(2) + "%. " +
+        "Current-account margin expands by ≈ <strong>+" + caMarginGain.toFixed(2) + "%</strong>; " +
+        "term-deposit margin expands by only ≈ <strong>+" + termMarginGain.toFixed(2) + "%</strong> — and on the existing back book both sides stay frozen until each deposit matures and rolls.";
+    }
+    bindSlider("w3-move", "w3-move-out", function (v) { return "+" + v.toFixed(2) + "%"; }, drawW3);
+
+    /* ---------- Widget 4: curve shapes ---------- */
+    var w4Shapes = {
+      normal:   { f: function (t) { return 2.5 + 2.5 * (1 - Math.exp(-t / 3)); }, note: "Upward-sloping: maturity transformation (borrow short, lend long) earns a positive spread — the classic regime." },
+      flat:     { f: function (t) { return 4.0 + 0.05 * (1 - Math.exp(-t / 3)); }, note: "Flat: term premia have vanished. ALM's structural spread goes to ≈ zero; the bank lives on customer margins alone." },
+      inverted: { f: function (t) { return 5.5 - 2.0 * (1 - Math.exp(-t / 3)); }, note: "Inverted: short money costs MORE than long lending yields — maturity transformation loses money, and a floating-rate loan can price above its own customer rate. Seen after aggressive hiking cycles." }
+    };
+    function drawW4(shape) {
+      var s = w4Shapes[shape], pts = [];
+      for (var t = 0.25; t <= 10; t += 0.25) pts.push([t, s.f(t)]);
+      lineChart("w4-chart", [{ points: pts }], { yMin: 1, yMax: 7, xMin: 0, xMax: 10, xLabel: "tenor (years)" });
+      var spread = (s.f(5) - s.f(0.25)) * 100;
+      document.getElementById("w4-readout").innerHTML =
+        s.note + "<br>Borrow at 3m (" + s.f(0.25).toFixed(2) + "%), lend at 5y (" + s.f(5).toFixed(2) + "%) → ALM spread: <strong>" +
+        (spread >= 0 ? "+" : "") + spread.toFixed(0) + " bp</strong>.";
+      var btns = document.querySelectorAll("#w4-presets button");
+      btns.forEach(function (b) { b.classList.toggle("active", b.getAttribute("data-shape") === shape); });
+    }
+    document.getElementById("w4-presets").addEventListener("click", function (e) {
+      var shape = e.target.getAttribute("data-shape");
+      if (shape) drawW4(shape);
+    });
+    drawW4("normal");
+
+    /* ---------- Widget 5: seesaw ---------- */
+    var W5_DEP = 2.0, W5_LOAN = 7.0;
+    function drawW5(ftp) {
+      var depMargin = ftp - W5_DEP, lendMargin = W5_LOAN - ftp;
+      var svg = document.getElementById("w5-chart");
+      var W = 640, m = { l: 44, r: 12 };
+      var xFor = function (rate) { return m.l + ((rate - 1) / 7) * (W - m.l - m.r); };
+      var axisY = 150;
+      var out = '<line class="axis" x1="' + m.l + '" y1="' + axisY + '" x2="' + (W - m.r) + '" y2="' + axisY + '"/>';
+      for (var r = 1; r <= 8; r++) {
+        out += '<line class="axis" x1="' + xFor(r) + '" y1="' + (axisY - 4) + '" x2="' + xFor(r) + '" y2="' + (axisY + 4) + '"/>' +
+               '<text class="axis-label" x="' + xFor(r) + '" y="' + (axisY + 20) + '" text-anchor="middle">' + r + '%</text>';
+      }
+      var xd = xFor(W5_DEP), xl = xFor(W5_LOAN), xf = xFor(ftp);
+      out += '<rect x="' + xd.toFixed(1) + '" y="70" width="' + (xf - xd).toFixed(1) + '" height="26" rx="3" style="fill:var(--color-accent)"/>';
+      out += '<rect x="' + xf.toFixed(1) + '" y="70" width="' + (xl - xf).toFixed(1) + '" height="26" rx="3" style="fill:var(--color-danger)"/>';
+      if (xf - xd > 60) out += '<text class="axis-label" x="' + ((xd + xf) / 2).toFixed(1) + '" y="87" text-anchor="middle" style="fill:#fff">deposit desk +' + depMargin.toFixed(2) + '%</text>';
+      if (xl - xf > 60) out += '<text class="axis-label" x="' + ((xf + xl) / 2).toFixed(1) + '" y="87" text-anchor="middle" style="fill:#fff">lending desk +' + lendMargin.toFixed(2) + '%</text>';
+      out += '<line x1="' + xd + '" y1="40" x2="' + xd + '" y2="' + axisY + '" style="stroke:var(--color-muted);stroke-dasharray:4 3"/>' +
+             '<text class="axis-label" x="' + xd + '" y="34" text-anchor="middle">deposit rate 2.00%</text>';
+      out += '<line x1="' + xl + '" y1="40" x2="' + xl + '" y2="' + axisY + '" style="stroke:var(--color-muted);stroke-dasharray:4 3"/>' +
+             '<text class="axis-label" x="' + xl + '" y="34" text-anchor="middle">loan rate 7.00%</text>';
+      out += '<polygon points="' + xf + ',' + (axisY + 26) + ' ' + (xf - 7) + ',' + (axisY + 40) + ' ' + (xf + 7) + ',' + (axisY + 40) + '" style="fill:var(--color-fg)"/>' +
+             '<text class="axis-label" x="' + xf + '" y="' + (axisY + 56) + '" text-anchor="middle" style="font-weight:600">FTP ' + ftp.toFixed(2) + '%</text>';
+      svg.innerHTML = out;
+      var tilt;
+      if (ftp < 3.5) tilt = "Tilted toward LENDING: cheap internal funding makes loans attractive to write, but gathering deposits barely pays. Use when the bank is drowning in liquidity it can't deploy.";
+      else if (ftp > 5.5) tilt = "Tilted toward DEPOSITS: gathering funding is richly rewarded, lending is squeezed. Use when the bank needs liquidity — but only with ALCO approval, temporarily.";
+      else tilt = "Near the market cost of funds: both desks earn a fair margin for what they control. This is the neutral, default position.";
+      document.getElementById("w5-readout").innerHTML =
+        "Deposit margin <strong>" + depMargin.toFixed(2) + "%</strong> + lending margin <strong>" + lendMargin.toFixed(2) +
+        "%</strong> = <strong>5.00%</strong> always. " + tilt;
+    }
+    bindSlider("w5-ftp", "w5-ftp-out", function (v) { return v.toFixed(2) + "%"; }, drawW5);
+
+    /* ---------- Widget 6: breakage ---------- */
+    var w6 = { orig: 3.0, curr: 5.0, rem: 2.0 }, W6_NOTIONAL = 100000;
+    function drawW6() {
+      var move = w6.curr - w6.orig;
+      var depBreak = Math.max(0, move) / 100 * w6.rem * W6_NOTIONAL;
+      var loanBreak = Math.max(0, -move) / 100 * w6.rem * W6_NOTIONAL;
+      var fmt = function (v) { return "BHD " + v.toLocaleString("en-US", { maximumFractionDigits: 0 }); };
+      var dir = move > 0 ? "risen" : (move < 0 ? "fallen" : "not moved");
+      document.getElementById("w6-readout").innerHTML =
+        "Curve has <strong>" + dir + " " + Math.abs(move).toFixed(1) + "%</strong> since origination, " + w6.rem.toFixed(1) + "y remaining.<br>" +
+        "Early-withdrawn term deposit → breakage ≈ <strong>" + fmt(depBreak) + "</strong>" +
+        (depBreak ? " (replacement funding now costs more than the deposit was credited)." : " (replacement funding is no more expensive — no charge).") + "<br>" +
+        "Prepaid fixed-rate loan → breakage ≈ <strong>" + fmt(loanBreak) + "</strong>" +
+        (loanBreak ? " (returned principal can only be relent at today's lower rate)." : " (principal can be relent at the same or better rate — no charge).");
+    }
+    bindSlider("w6-orig", "w6-orig-out", function (v) { return v.toFixed(2) + "%"; }, function (v) { w6.orig = v; drawW6(); });
+    bindSlider("w6-curr", "w6-curr-out", function (v) { return v.toFixed(2) + "%"; }, function (v) { w6.curr = v; drawW6(); });
+    bindSlider("w6-rem", "w6-rem-out", function (v) { return v.toFixed(1) + "y"; }, function (v) { w6.rem = v; drawW6(); });
+  </script>
+</body>
+</html>
