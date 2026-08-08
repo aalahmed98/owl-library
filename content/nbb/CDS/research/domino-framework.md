@@ -1138,6 +1138,71 @@ compression state is ACTIVE now — the 2026-06/07 desk items, including the
 open 2026-07-03 watch→distress escalation, carry the badge. The market is
 currently trading Bahrain on price.
 
+## Confluence specs P2-C4 / P2-C5 (registered 2026-08-08, BEFORE any evaluation)
+
+Owner objective: stack the conditioners; find what puts desk items above 50%
+verified. Display-layer only, zero suppression (the P2-C zero-tradeoff price
+carries over); desk composition untouched.
+
+### P2-C4 — residual-attribution conditioner
+
+**Mechanism:** a desk item that fires into a move that is mostly
+BAHRAIN-SPECIFIC (residual-driven) is the mechanism working; one that fires
+into a mostly-global move is beta noise wearing a Bahrain costume — the
+2022-09-02 flag (a 96%-global episode) is the motivating exemplar, and the
+results below must state whether this conditioner would have left it
+unmarked.
+
+**Measure (frozen):** at date t, over the trailing **20 common observations**
+of the stored residual + fitted series (20 = the system's standing trend
+window, slope_20d's constant — reused, not invented):
+`share = Δresidual_20 / Δproxy_20`, where `Δproxy_20 = Δresidual_20 +
+Δfitted_20`. **State "Bahrain-driven"** = `|Δproxy_20| ≥ 10bp` (de-minimis
+floor: one step of the house 10bp grid — below it there is no move worth
+attributing) AND `share ≥ 0.5` (the definitional majority midpoint, like
+Guidotti's 1.0 — chosen definitionally, not solved). Sign-agnostic by
+construction: a majority-Bahrain tightening marks recovery items too.
+Walk-forward: trailing data only. Items before the residual exists or with
+sub-floor moves are "unknown" (reported separately; for P2-C5 below,
+unknown counts as INACTIVE — the conservative direction, committed now).
+
+**Evaluation (one run):** the P2-P1 gradable desk items; confirmed
+(Bahrain-driven) vs unconfirmed hit rates; seeded 10k bootstrap 90% CI on
+the difference; era-split. **Adopted as a display badge iff the pooled
+difference CI excludes 0.**
+
+### P2-C5 — confluence stratification
+
+**Population:** the same P2-P1 gradable desk items. **Conditioners** (each
+walk-forward as-of the item's date; unknown = inactive): (1) compression
+state (P2-C1, adopted); (2) wall proximity — months-to-next-≥$500mn
+maturity ≤ 6 (the P2-L3 series); (3) attribution state (P2-C4); (4)
+oil-precursor — any oil-tier flag in the prior 45 calendar days (45 = the
+oil grading window, reused). Item TYPE (escalation vs episode-first) is a
+STRATIFIER for display, never a conditioner.
+
+**Multiplicity discipline, pre-committed:**
+- **PRIMARY (the only analysis adoption rides on):** additive confluence
+  count → tiers 0 / 1 / 2 / 3+; hit rate per tier with seeded bootstrap
+  90% CIs; era-split shown. Sparse-tier rule, stated now: iterating from
+  the highest count downward, any tier with n < 8 merges into the adjacent
+  LOWER-count tier (3+ → "2+", then "2+" → "1+" if still sparse).
+  **Adoption of the confluence-tier badge iff the TOP-tier vs BOTTOM-tier
+  hit-rate difference CI (seeded 10k bootstrap) excludes 0.**
+- **SECONDARY — EXPLORATORY, so labeled:** the full 2⁴ combination table,
+  every cell reported, none hidden. With 16 cells at 90% CIs, 1–2 spurious
+  standouts are EXPECTED; any standout combination is hypothesis-generating
+  only and may NOT become a badge or a claim without fresh out-of-sample
+  validation under a future spec. The owner's "which combination is best"
+  is answered from this table with that framing permanently attached.
+
+**UI on adoption:** desk cards show the tier ("confidence: k of 4
+confirmations active — historically X% verified"), with active components
+listed and the tier table in the explainer; the existing individual badges
+remain. The open pending items' current tiers are reported in the results.
+
+## External code review & remediation (2026-08-07)
+
 An independent reviewer audited the engine, grading code, and this doc's claims.
 Verdict accepted in full (see `haircut-monitor/review-response.md` for the
 two-pass exchange). Bottom line: the framework and discipline survive, but the
