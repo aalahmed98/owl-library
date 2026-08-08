@@ -1465,6 +1465,73 @@ watch-list header caveat is updated. Oman unchanged (null ≠ zero).
 Presentation-layer only: zero deletion, zero Research-view change, zero
 grading or generation change.
 
+### P2-C7 RESULT (single run, 2026-08-08) — **PASSED the STOP rule; ADOPTED**
+
+Reproducible via `scripts/research/p2c7-evaluate.mjs`. Full history: 133
+desk items (126 gradable, 2 open).
+
+**[DESCRIPTIVE ONLY — per the disclosure above, this table is NOT evidence
+for the rule and may not be quoted as validation.]**
+
+| List | BEFORE (P2-P2 live) | AFTER (P2-C7) |
+|---|---|---|
+| Action | 22/59 = 37% (37 FP) | **22/50 = 44%** (28 FP) |
+| Watch | 12/67 = 18% (55 FP) | 12/76 = 16% (64 FP) |
+
+By tier/type (action list):
+
+| Tier / type | Scope | BEFORE | AFTER |
+|---|---|---|---|
+| escalation | exempt | 6/11 = 55% | 6/11 = 55% (unchanged) |
+| fundamental first-flag | exempt | 1/1 = 100% | 1/1 = 100% (unchanged) |
+| oil first-flag | exempt | 5/12 = 42% | 5/12 = 42% (unchanged) |
+| curve first-flag | **corroboration required** | 6/18 = 33% (12 FP) | **6/13 = 46%** (7 FP) |
+| recovery first-flag | **corroboration required** | 4/17 = 24% (13 FP) | **4/13 = 31%** (9 FP) |
+
+**Demoted: 9 items — ZERO hits, 9 false positives.** Every one active on
+`[wall, attribution]` only (context-only), and every one a curve- or
+recovery-tier first-flag:
+
+| Date | Tier | Rule | Grade | Peak |
+|---|---|---|---|---|
+| 2023-05-19 | recovery | trend_reversal | FP | +82bp |
+| 2023-06-15 | curve | inversion | FP | +20bp |
+| 2023-09-19 | curve | inversion | FP | +50bp |
+| 2023-10-13 | curve | slope_20d | FP | +43bp |
+| 2023-11-07 | recovery | trend_reversal | FP | +37bp |
+| 2024-05-29 | recovery | trend_reversal | FP | +1bp |
+| 2024-08-22 | curve | inversion | FP | +9bp |
+| 2024-12-05 | recovery | market_access | FP | +20bp |
+| 2025-10-27 | curve | level_pct | FP | +58bp |
+
+**STOP-rule check: 0 dropped hits, 0 major → PASS.** The tier exemption did
+exactly the work it was argued to do: the fundamental-tier 2025-01-27
+`rollover_wall` hit (+325bp) that stopped P2-C6 is retained, because a
+pre-market warning is not asked to wait for the market.
+
+**ADOPTED.** Resulting lists at adoption: **action 52 · watch 81** (9
+demoted vs P2-P2, all of them former false positives). Today's two open
+windows are BOTH on the action list: **2026-07-03 regime watch→distress
+(4/4 confirmations, escalation — exempt anyway)** and **2026-06-15
+fundamental/breakeven_gap (3/4, fundamental — exempt)**.
+
+**Shipped (presentation only):** the desk split now applies the tier-scoped
+placement; demoted curve/recovery items sit in their own labeled watch-list
+section ("Market-derived signal without market corroboration — …
+historically noise-prone: every one of these in the record resolved as a
+false positive"); watch-list header states both demotion reasons and their
+counts; the desk header shows "Action-list record — composition v3 (P2-C7)
+— live since 2026-08-08" with the v2/P2-P2 line and the untouched P2-P1
+historical composite retained; the tier chart's footnote now states the
+tier scoping precisely. Oman unchanged (null ≠ zero). **Integrity verified:
+all grades byte-identical, all pre-existing endpoints byte-identical, no
+generation or grading change.**
+
+**Standing:** per the exhaustion clause, this is the LAST composition
+refinement derivable from this population. The binding verdict on P2-C7 is
+the prospective action-list scoreboard (currently 0/0 resolved, 2 windows
+open).
+
 ## External code review & remediation (2026-08-07)
 
 An independent reviewer audited the engine, grading code, and this doc's claims.
