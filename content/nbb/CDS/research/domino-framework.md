@@ -1298,6 +1298,17 @@ demoted on missing data.
 **Not bundled:** the C-R4v2 hysteresis adoption remains a separate pending
 owner decision.
 
+**IMPLEMENTED (2026-08-08, same day).** Client-side presentation split only:
+/api/alerts and /api/transitions payloads unchanged (the confluence field
+already existed); /api/deskrecord gains the additive `actionList` block. At
+adoption: **action list = 71 historical items + the two open windows —
+2026-07-03 watch→distress escalation (4/4 confirmations) and 2026-06-15
+breakeven_gap first-flag (3/4)**; **watch list = 78 demoted items**
+(collapsed, muted, labeled with the 1-hit-per-~4.6-false-alarms record).
+Action-list live record at adoption: **0/0 resolved · 2 windows open**.
+Verified: every grade byte-stable, all snapshot endpoints byte-identical,
+Research view untouched, Oman presentation unchanged (null ≠ zero).
+
 ## External code review & remediation (2026-08-07)
 
 An independent reviewer audited the engine, grading code, and this doc's claims.
