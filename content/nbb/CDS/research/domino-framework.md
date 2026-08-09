@@ -2086,6 +2086,69 @@ only). Net: the frozen thresholds carried a real, measurable part of their
 skill to a second sovereign without any re-tuning, demonstrated by the
 inversion record.
 
+## Registered decision J-R0 — Jordan as a PARTIAL (D3/D4-only) out-of-sample country (2026-08-09, BEFORE seeding)
+
+Owner-approved. Registered before any Jordan data was loaded, so the scope
+restriction cannot be adjusted after seeing results.
+
+**Why Jordan, and why partial.** The purpose is statistical power: 126 desk
+items collapsing to 10 tradeable episodes is too small a sample for anything to
+be detectable, which is why five of the last six candidates failed their CIs. A
+third sovereign is the only way to grow the population that does not involve
+re-slicing it. **But Jordan is an oil IMPORTER.** Dominoes 0 and 1 encode an
+oil-EXPORTER mechanism — cheap oil is good news in Amman — so they do not
+transfer, and Domino 2's fiscal-breakeven component is meaningless there.
+
+**Scope, frozen now:**
+
+- Jordan is registered for **Domino 3 (curve) and Domino 4 (regime) ONLY.**
+- **The breakeven-gap component is DISABLED for Jordan** (new per-country flag
+  `hasFiscalBreakeven: false`). It is not set to a wrong number and it is not
+  left on the $125 Bahrain fallback — it is made UNAVAILABLE, so the regime
+  score renormalizes over its remaining components exactly as it already does
+  for any missing input. Without this, 20 of the score's 100 points would come
+  from an oil-exporter measure applied to an oil importer.
+- `breakeven_gap`, `rollover_wall` and `reserves_drain` therefore never fire for
+  Jordan (their inputs are null). No Domino 1 or 2 record will exist, and none
+  may be reported.
+- The shared Domino Zero oil tier stays Bahrain-owned and is NOT attributed to
+  Jordan in any scoreboard.
+
+**Bond set, two-source rule honored:**
+
+| ISIN | Bond | Leg | Sources |
+|---|---|---|---|
+| XS1405770220 | 5.75% 2027-01-31 | short | cbonds + Ariva/Deutsche Börse (`JORDAN 16/27`, WKN A188AX) |
+| XS1577950311 | 7.375% 2047-10-10 | long | cbonds + Deutsche Börse (`Jordanien … 7,375% 17/47`, WKN A19QEC) |
+
+**HELD OUT pending independent coupon confirmation** — the same discipline used
+for Bahrain's sukuk and type-ambiguous densification candidates:
+`XS2199272662` (5.85% 2030 — the recon explicitly flagged a possible coupon
+conflation), `XS2602742285` (7.50% 2029), `XS3218674136` (5.75% 2032). Ariva
+confirms issuer and issue/maturity YEARS for these but not their coupons.
+
+**Consequences of that conservatism, stated in advance:** with only a short and
+a long leg, Jordan's slope is a short-vs-long construction, which the framework
+already notes is weaker than mid-vs-long (very short bonds roll down and
+mechanically exaggerate inversion). And the 2027 leg hits the frozen 550-day
+pull-to-par trim around **2025-08**, so **Jordan's slope series dies there**
+unless a verified mid leg is added — the same class of data cliff already
+recorded for Bahrain at 2030-03-29. Usable curve window: **2017-10 → 2025-08,
+≈7.9 years**, covering COVID and the 2022 tightening.
+
+**Proxy calibration:** no free Jordan CDS exists (not searched exhaustively —
+recorded as an assumption, not a finding). Jordan therefore borrows Bahrain's
+fitted venue gap as a RATIO, identically to Oman, and the same caveats carry:
+the band LEVEL is assumption-bearing, while the slope (a difference) and
+`level_pct` (a percentile of Jordan's own history) are scale-invariant to it.
+
+**Grading stays DISARMED.** No `jor:backtest_rules` is stored by this decision.
+Per the C-R1/C-R3/O-R1 precedent, Jordan's bars must be solved outcome-blind
+from its own unconditional history under a separate pre-registered spec before
+a single Jordan flag is graded. **Seeding changes no threshold, no grade and no
+existing record**, and Bahrain/Oman byte-identity is verified as part of the
+change.
+
 ## Phase 2 — the four lenses (2026-08-08→)
 
 Executed per `cds-phase-2-plan.md` under the frozen v1 protocol. Every lens gets
