@@ -1738,6 +1738,42 @@ state-conditional base rates vary by as much as the hit rates do (46% vs 13%
 for cover, 31.5% vs 16% for compression) — is robust to that imprecision and
 is the part that must be carried forward.
 
+**Blast-radius measurement on `attribution` (2026-08-09, DESCRIPTIVE ONLY — no
+change proposed or made).** Because the base-rate test found attribution
+negative on AVERAGE, the obvious question is whether to drop it from the
+confluence count. Measured, the answer is a clear no:
+
+| | Action list WITH attribution | WITHOUT it |
+|---|---|---|
+| Items | 52 | 40 |
+| Record | 22/50 = **44%** | 17/38 = **45%** |
+
+Removing it demotes **12 items — 7 false positives but also 5 HITS**, for a
+one-point gain in the record. The five hits are not marginal:
+
+| Dropped hit | What it was |
+|---|---|
+| **2018-05-21** regime watch→distress | the 2018 crisis, caught at escalation (+245bp) |
+| **2018-05-21** curve/level_pct | same event, curve tier |
+| **2025-03-07** regime watch→distress | entry into the 2025 crisis |
+| **2025-12-23** regime watch→distress | 2025 arc re-entry |
+| **2025-01-27** fundamental/rollover_wall | **+325bp — the largest first-flag follow-through in the record**, and the flag that stopped P2-C6 |
+
+By the binding STOP rule already registered under P2-C6 (do not adopt if the
+change drops any ESCALATION hit, or a first-flag hit with peak ≥ 100bp),
+removing attribution fails immediately — it drops THREE escalation hits and the
++325bp rollover_wall hit.
+
+**Mechanistic reading, recorded:** attribution is a poor AVERAGE discriminator
+and a good TAIL-EVENT marker. Crisis entries genuinely are Bahrain-driven (2018
+was Bahrain's own fiscal crisis; the 2025 arc is 70% Bahrain-specific per
+P2-L1), so the conditioner correctly marks them — while also marking many small
+backward-looking Bahrain-driven moves that lead nowhere, which is what drags its
+average lift below 1×. **The average-lift test measures the wrong objective for
+a desk whose payoffs are asymmetric** (hedging-economics.md: one +325bp catch
+outweighs several false alarms). Both facts are now on the record; neither is
+acted on here.
+
 **Nothing was adopted, suppressed, re-graded or removed by this run.** The
 confluence count, the placement rule and every record stand exactly as before.
 Two OWNER DECISIONS are now open and are stated neutrally, not pre-judged:
