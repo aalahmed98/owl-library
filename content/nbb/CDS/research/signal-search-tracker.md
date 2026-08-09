@@ -340,6 +340,80 @@ that "no flags fired" cannot later be presented as either success or failure.
 
 **Nothing seeded. No config, threshold, grade or record touched by this sweep.**
 
+## Terminal extraction list — what to pull if Bloomberg access arrives
+
+**Read this first: pull the FOUNDATIONS before any new indicator.** Every
+candidate rejected in this project failed for one of four reasons, and none of
+them is a shortage of signals — n is tiny (10 tradeable episodes in 8.7 years),
+base rates swing further than the signals do (13%→46%), graded peaks diverge
+from traded exits, and execution cost is roughly the size of the whole edge.
+Adding a fifteenth indicator to that structure buys a fifteenth rejection. The
+items in Tier 1 attack all four; the items in Tier 2 are only worth pulling
+afterwards.
+
+### Tier 1 — the foundations (pull these even if you get 20 minutes)
+
+| # | What | What it unlocks |
+|---|---|---|
+| T1.1 | **Bahrain 5Y USD senior CDS — daily MID, 2008→today** | Retires the Ariva proxy outright. No venue gap, no borrowed ratio, no CDS-era/Ariva-era split, and ~7 extra years of history. Every grade in the system re-derives against the real instrument. |
+| T1.2 | **Bahrain 5Y CDS — daily BID and ASK, 2008→today** | **The single most valuable series on this page.** Whether the strategy makes money currently hinges on an *assumed* 10.9bp break-even round-trip. This turns the central question from a guess into a measurement. Bid/ask is rarely exported — ask for it explicitly. |
+| T1.3 | **Peer CDS 5Y mid, 15–20 EM sovereigns, 2008→today** | The real fix for statistical power. Testing frozen rules across twenty sovereigns with REAL CDS is the properly-powered version of what X-R1 attempted with three proxies. Suggested set: Oman, Qatar, Saudi, Kuwait, Abu Dhabi, Jordan, Egypt, Turkey, South Africa, Brazil, Mexico, Indonesia, Colombia, Nigeria, Angola, Morocco, Tunisia. |
+
+### Tier 2 — signals genuinely unobtainable free
+
+| # | What | What it unlocks |
+|---|---|---|
+| T2.1 | **Bahrain CDS term structure — 1Y / 3Y / 7Y / 10Y mid, daily** | Real curve inversion. Our Domino 3 slope is a two-bond *reconstruction*; this is the instrument itself, and it would show how much of the slope signal was bond-specific artifact (cf. the Jordan roll-down failure, J-R0 amendment). |
+| T2.2 | **Bahrain CDS quoted in EUR (quanto basis vs USD)** | A direct market price of devaluation / redenomination risk. **This is the peg-stress measure P2-L2 tried to build out of BHIBOR and failed** — right question, wrong instrument. S1.2 marked BHD forwards BLOCKED; this is the better substitute and needs no forwards market. |
+| T2.3 | **CDS–bond basis** (5Y CDS vs asset-swap spread on the benchmark bond) | Dislocation and funding stress. Also quantifies retrospectively how much of our proxy error was basis rather than noise. |
+| T2.4 | **Bahraini bank CDS** — NBB, BBK, Ahli United, where quoted | The sovereign–bank doom loop (N3) **directly and daily**, without the CBB bulletin's monthly publication lag that makes the free version slow. |
+
+### How to pull it
+
+Excel API is the practical route — `BDH` returns a date-indexed history that
+drops straight into a CSV:
+
+```
+=BDH("<ticker>","PX_LAST","1/1/2008","today")      ' mid
+=BDH("<ticker>","PX_BID","1/1/2008","today")       ' bid   ← ask for this
+=BDH("<ticker>","PX_ASK","1/1/2008","today")       ' ask   ← and this
+```
+
+**Do not trust ticker strings from memory — confirm them on the terminal.**
+Sovereign CDS tickers follow a `C<COUNTRY><SENIORITY><TENOR> <SOURCE> Curncy`
+convention, but the source suffix and seniority code vary. Use `SOVR <GO>` (the
+sovereign risk monitor) or `WCDS <GO>` to find the correct identifier for each
+name, then `CDSW <GO>` for curve/term-structure work.
+
+**Save in this repo's existing manual-series format** so it drops into the
+pipeline with no new parser (`data/manual/README.md`):
+
+```csv
+series,obs_date,value,source_note
+cds.bh.5y,2016-03-01,284.5,"Bloomberg <TICKER> PX_LAST, pulled 2026-xx-xx"
+```
+
+Use `cds.bh.5y` for the Bahrain mid series — that is the name the engine already
+reads for the real-CDS era, so an extended history slots straight in.
+
+### What must happen when it lands — do NOT skip this
+
+Replacing the grading reference re-derives **every historical grade in the
+system.** Per hard rule 3 that is a threshold-class change and needs a
+pre-registered spec BEFORE the re-run, with the full before/after diff published
+whatever it shows.
+
+**Stated in advance, so it cannot be spun afterwards: better data may make the
+record look WORSE.** The Ariva proxy is noisy, and noise inflates apparent
+moves; real CDS is cleaner, so base-rate-matched bars will land differently and
+some current hits may not survive. The C-R4 47% is measured against a proxy.
+**Expectation recorded now: the lift claims will likely shrink, and the decision
+framing ("don't spend premium on unfiltered warnings") will likely strengthen,
+because the latter is robust to measurement quality and the former is not.**
+
+Priority if access is brief: **T1.2 (bid/ask) first**, then T1.1, then T1.3.
+Bid/ask decides whether anything else is worth doing.
+
 ## Expanded — the reasoning behind each item
 
 ### Why sovereigns come before signals (S0)
