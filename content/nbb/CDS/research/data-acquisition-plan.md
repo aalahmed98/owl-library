@@ -62,6 +62,56 @@ never had the ground truth to measure it against. With auction data we could
 measure the bias **on our own construction** rather than importing someone
 else's estimate.
 
+### Transferability — the objection, and what survives it (owner, 2026-08-09)
+
+**Objection raised:** the defaulted sovereigns are not oil-dependent like
+Bahrain, so an estimator validated on them may not transfer.
+
+**Mechanism check first — the benchmark has NO oil input.** Verified in code:
+`computeBenchmark` consumes bond prices, the UST curve and the recovery prior,
+and nothing else; oil, Brent, breakeven and the DSA anchor appear nowhere in it.
+The BAND (the model's output) does use oil, through
+`fiscalSensPctGdpPer10Usd × oilDeltaUsd` in the DSA anchor at weight 0.5 — but
+the band is not what this validation targets. So the estimator is not
+oil-conditioned and the objection does not bite where it was aimed.
+
+**But it lands on something worse.** Realized recovery is determined by creditor
+mix, governing law and official-sector support — not by oil. And there the
+sample really is unlike Bahrain:
+
+> **Bahrain has not defaulted precisely BECAUSE of the GCC backstop** (the 2018
+> $10.2bn Saudi/UAE/Kuwait package). The set of sovereigns with observed
+> recoveries is therefore, almost by construction, **the set that had no rich
+> neighbour.** Validating on defaulters means validating on the group Bahrain is
+> structurally excluded from.
+
+That is a SELECTION EFFECT and no volume of data removes it.
+
+**Mitigation — stratify, do not pool.** The sample is not uniformly
+non-commodity. Commodity exporters with observed recoveries include **Ecuador
+(2008 and 2020), Venezuela (2017), Russia (2022), Suriname (2021), Ghana (2022),
+Zambia (2020, copper) and Mozambique (2016, gas)**. **Ecuador is the closest
+available analogue** — oil-dependent, dollarized (structurally close to a hard
+peg), and defaulted twice, giving two observations of one sovereign.
+
+The test to run is therefore NOT "does the method work on average" but **"does
+the method's error differ systematically between commodity exporters and the
+rest?"** If it does not, transfer to Bahrain is defensible. If it does, the
+size of that difference is the discount to apply.
+
+**What the validation can and cannot claim, fixed now:**
+
+- CAN: *"on sovereigns that actually defaulted, our construction predicted
+  realized recovery with an error of X ± Y, and that error was/was not different
+  for commodity exporters."*
+- CANNOT: *"the benchmark is accurate for Bahrain."* Bahrain's defining feature
+  is the backstop that keeps it out of the sample.
+
+Still worth doing: the benchmark currently has **no measured error bar at all**,
+resting on a ±8–12pt figure imported from other people's literature. Moving from
+"unmeasured" to "measured, with a stated transferability limit" is real. Moving
+to "validated for Bahrain" is not available at any price.
+
 **Free-first note:** the Cruces–Trebesch haircut database and the
 Asonuma–Trebesch restructuring dataset are academic publications covering ~180
 restructurings and may be obtainable without a terminal. **Check those before
