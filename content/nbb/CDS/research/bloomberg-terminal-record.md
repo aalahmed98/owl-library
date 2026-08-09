@@ -434,6 +434,17 @@ recognised securities with no accessible data. But it is a flag, and it lands on
 a bond whose size is *already* marked LOW CONFIDENCE in `HANDOVER.md` because it
 is cbonds-derived rather than primary-sourced.
 
+> **CORRECTION, same session.** This flag was originally written up as also
+> supported by a failed `=BDH("XS2384406612 Corp",...)` call. **That test never
+> happened** — the formula was entered into the terminal's search bar rather than
+> into Excel, where `BDH` has no meaning. The same applies to the `BHSEASI Index`
+> test. **Bond and equity export via BDH remains completely untested**, and the
+> only real evidence here is the bare-ISIN terminal lookup returning
+> "information currently unavailable" — one weak signal, not two.
+>
+> A test workbook (`formula-tests.xlsx`, 28 identifiers via `BDP` plus 6 `BDH`
+> history pulls) was built to settle this properly without hand-typing formulas.
+
 **Resolve before anyone acts on the countdown.** The clean test is enumerating
 Bahrain's bonds (`SRCH <GO>` filtered by country, or the `Fixed Income` tab of
 the security search) and checking whether *any* September-2026 maturity appears.
