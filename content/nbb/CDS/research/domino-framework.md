@@ -1652,6 +1652,115 @@ attached.
 
 **Published whatever it says, including rejections.**
 
+### P2-C8 RESULTS (single run, 2026-08-09; reproducible via `scripts/research/p2c8-evaluate.mjs`) — **BOTH REJECTED**
+
+**Outcome-blind solves, run and printed before any grade was read:** N1
+`cover ≤ 1.6` (unconditional share 19.42% of 1,910 days; next 0.1 up → 25.34%).
+N2 `oil_stress ≥ 31` (18.77% of 2,403 days; 30 → 21.43%). Population: 126
+gradable desk items, 2 open.
+
+**N2 oil-stress score level — NOT ADOPTED on its pre-committed criterion.**
+Confirmed 11/39 = 28% vs unconfirmed 23/86 = 27%; difference 90% CI
+**−13pp…+16pp** (includes 0). The continuous score adds nothing over the
+existing binary oil-precursor. Recorded, not flipped.
+
+**N1 rollover-cover magnitude — PASSED its literal criterion, then FAILED the
+standing base-rate rule. NOT ADOPTED.** This is the substantive result of the
+run and the criterion defect is recorded as a protocol lesson below.
+
+- Raw: confirmed 13/21 = **62%** vs unconfirmed 15/74 = **20%**; difference 90%
+  CI **+22pp…+60pp** — excludes 0 in the stated direction, so the spec's
+  literal acceptance test PASSES.
+- Era split: **zero confirmed items exist in the real-CDS era** — cover never
+  fell to 1.6 before 2019. Unlike P2-C1, era-robustness cannot be shown.
+- Arc-cluster bootstrap (8 arcs): +39pp…+45pp, P(≤0) = 0.0% — the effect
+  repeats across 2020, 2023 and 2025, so it is not one crisis.
+- **The killer, per hard rules 3 and 5** — a rate without its base rate is
+  meaningless, and precision *vs base rate* must not degrade. Measuring the
+  unconditional probability that a RANDOM DAY clears its era bar within 60d,
+  **separately in each state**:
+
+| State | Desk-item hit rate | Base rate PREVAILING in that state | Lift |
+|---|---|---|---|
+| cover ≤ 1.6 (active) | 62% | **46.0%** (160/348 days) | **1.35×** |
+| cover > 1.6 (inactive) | 20% | **13.4%** (203/1,518 days) | **1.50×** |
+
+  The conditioner's lift is **LOWER when it is active.** The spectacular
+  62%-vs-20% gap is base-rate variation, not information: cover falls below 1.6
+  precisely in periods when everything clears the bar more easily. **Rejected.**
+
+**Protocol lesson (binding on future specs):** P2-C8's acceptance criterion
+compared RAW hit rates, inheriting the P2-C1/C4/C5 conditioner frame. That
+frame is defective — it cannot distinguish added information from base-rate
+variation. **Every future conditioner spec must pre-commit to a BASE-RATE-
+MATCHED difference** (item rate ÷ the unconditional exceedance rate prevailing
+in that state), not a raw-rate difference.
+
+### Consequence for the ADOPTED conditioners — the tier ladder is materially base-rate confounded
+
+Applying the same base-rate-matched test to the four incumbents (same run;
+this is the standing robustness annex applied to a headline claim, which had
+not previously been done for P2-C5):
+
+| Conditioner | Active: rate / base / lift | Inactive: rate / base / lift | Adds information? |
+|---|---|---|---|
+| **oil precursor** | 35% / 16.0% / **2.19×** | 20% / 16.8% / 1.21× | **YES — clearly** |
+| price compression | 53% / 31.5% / **1.67×** | 22% / 16.0% / 1.41× | yes, modest |
+| wall proximity | 37% / 21.4% / **1.71×** | 19% / 11.6% / 1.59× | **marginal** |
+| attribution | 25% / 18.4% / **1.36×** | 36% / 18.1% / 2.00× | **NO — negative** |
+
+Readings, published as-is:
+
+1. **Wall proximity's headline "33% vs 7%" (≈5×) collapses to 1.71× vs 1.59×
+   once each side is compared to its own period's base rate** — i.e. nearly all
+   of that famous split is the near-wall periods simply being more volatile.
+   The P2-L3 caveat "near-wall is Bahrain's usual state" understated the
+   problem; the honest statement is stronger.
+2. **`attribution` has NEGATIVE information content by this test (1.36× active
+   vs 2.00× inactive)** — exactly consistent with P2-C4's own rejection, which
+   found the difference CI leaning negative. It was nevertheless included as
+   one of the four conditioners in the P2-C5 confluence COUNT. That is an
+   inconsistency in the live system: a conditioner rejected as a standalone
+   badge is still contributing to desk placement.
+3. **The oil precursor is the one conditioner that unambiguously earns its
+   place** (2.19× vs 1.21×).
+4. Therefore **the P2-C5 tier ladder (10% / 21% / 34% / 43%) overstates the
+   discrimination the conditioners actually provide.** The ladder is not
+   fabricated — the ordering is real — but a material share of its gradient is
+   base-rate variation rather than signal.
+
+**Stated limitation of this test (do not overclaim it either):** the base rate
+used is the curve-tier bar over a 60d window applied to a MIXED population
+whose members sit different exams (fundamental 180d, oil 45d, recovery
+residual). P2-P1 declined to quote any lift for exactly this reason. The exact
+lift figures above are therefore approximate; the DIRECTIONAL finding — that
+state-conditional base rates vary by as much as the hit rates do (46% vs 13%
+for cover, 31.5% vs 16% for compression) — is robust to that imprecision and
+is the part that must be carried forward.
+
+**Nothing was adopted, suppressed, re-graded or removed by this run.** The
+confluence count, the placement rule and every record stand exactly as before.
+Two OWNER DECISIONS are now open and are stated neutrally, not pre-judged:
+(a) whether to attach a base-rate caveat to the tier ladder wherever it is
+shown (including `hedging-economics.md`, which quotes 43% as current measured
+accuracy); (b) whether `attribution` should remain in the confluence count
+given both P2-C4 and this run. Either change is a composition change and would
+require its own pre-registered spec.
+
+**SECONDARY — EXPLORATORY, published in full, adopting nothing.** Additive
+ladder over all six conditioners: 0→14% (n=14), 1→19% (32), 2→21% (43),
+3→27% (22), 4→**73%** (11), 5→**75%** (4). The 4-and-5 cells are the
+eye-catching ones and are exactly what multiplicity manufactures: n=11 and n=4,
+and both are dominated by the cover conditioner that the base-rate test just
+rejected. The full 64-cell table and all pairwise cells are in the run output;
+with 64 cells at 90% CIs roughly 6 spurious standouts are EXPECTED. **None of
+it may become a badge, a placement rule or a quoted number without fresh
+out-of-sample validation under a future spec.**
+
+**Live at evaluation:** the open 2026-07-03 watch→distress escalation carries 5
+of 6 conditioners (compression, wall, attribution, oil, cover); the open
+2026-06-15 breakeven_gap first-flag carries 3 of 6.
+
 ## External code review & remediation (2026-08-07)
 
 An independent reviewer audited the engine, grading code, and this doc's claims.
