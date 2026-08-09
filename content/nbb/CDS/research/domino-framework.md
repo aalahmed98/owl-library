@@ -2142,6 +2142,33 @@ fitted venue gap as a RATIO, identically to Oman, and the same caveats carry:
 the band LEVEL is assumption-bearing, while the slope (a difference) and
 `level_pct` (a percentile of Jordan's own history) are scale-invariant to it.
 
+### J-R0 AMENDMENT (2026-08-09, same day, BEFORE any grading) — mid leg added
+
+The short-vs-long construction registered above was implemented, seeded and
+inspected, and it **failed on its own pre-stated risk.** Measured median slope
+by year: 2023 **+4bp** → 2024 **+135bp** → 2025 **+431bp** (max +904bp), rising
+in lockstep with the 2027 leg running down to 13 months. That is pull-to-par
+roll-down, not credit — exactly the distortion the framework warns short legs
+cause, and far larger than Oman's flagged +129bp artifact.
+
+Correction: `XS2199272662` (**5.85% 2030-07-07**) was promoted from the held-out
+list to the MID leg after its coupon was independently confirmed on Deutsche
+Börse master data ("Jordanien, Haschemitisches Königreich 5,85% 20/30"),
+resolving the conflation the recon had flagged. Two sources now hold.
+
+Measured after the fix — the runaway is gone: 2023 **−36bp** · 2024 **+12bp** ·
+2025 **+131bp** · 2026 **+183bp** (max +245). The series oscillates about zero
+through 2024 and inverts moderately in the current stress, which is a credible
+credit signal rather than a mechanical one. Coverage improves to **2017-10-06 →
+2026-08-07 (2,240 days)** with no cliff until the 2030 leg trims in Jan-2029, so
+the 2025-08 death registered above no longer applies.
+
+**This is not scoreboard curation.** Jordan grading was never armed, no Jordan
+result has ever been computed or published, and the flaw was found by inspecting
+the SERIES, not outcomes. Recorded here because the original construction is
+part of the record even though it never produced one. Leg history is now
+short-vs-long 2017-10→2020-09, mid-vs-long thereafter.
+
 **Grading stays DISARMED.** No `jor:backtest_rules` is stored by this decision.
 Per the C-R1/C-R3/O-R1 precedent, Jordan's bars must be solved outcome-blind
 from its own unconditional history under a separate pre-registered spec before
