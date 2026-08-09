@@ -145,6 +145,70 @@ splits suggest — oil precursor 2.19× vs 1.21× (genuinely strong), compressio
 average. The ladder's *ordering* is real and the tier-vs-period table above shows
 the selection adds value; the raw gradient overstates how much.
 
+## Sizing by tier — the one lever that needs no new accuracy
+
+Everything above assumes **every flag is the same size trade**. That is the
+current implied policy, and it is leaving money on the table: you already know
+tier 3+ returns roughly five times what tier 1 does, and that tier 0 is
+negative. Allocating equally across them discards information you have already
+paid to measure.
+
+Expected value per unit of risk (1 unit = the $10m hedge modelled above), using
+the middle assumption set:
+
+| Tier | Hit rate | EV per unit |
+|---|---|---|
+| 3+ | 43% | **+$322k** |
+| 2 | 34% | **+$215k** |
+| 1 | 21% | +$60k |
+| 0 | 10% | **−$71k** |
+
+Applying weights to those tiers:
+
+| Sizing policy | Weights (3+ / 2 / 1 / 0) | Total EV | EV per unit deployed | vs uniform |
+|---|---|---|---|---|
+| **Uniform — today's implied policy** | 1 / 1 / 1 / 1 | +$525k | +$131k | 1.00× |
+| **Skip tier 0 only** | 1 / 1 / 1 / 0 | +$596k | **+$199k** | **1.51×** |
+| Linear by tier | 2 / 1.5 / 1 / 0 | +$1,025k | +$228k | 1.74× |
+| Concentrated | 3 / 1.5 / 0.5 / 0 | +$1,317k | +$263k | 2.01× |
+| Top tier only | 1 / 0 / 0 / 0 | +$322k | +$322k | 2.45× |
+
+**The single biggest step is free: stop hedging tier 0.** Declining to act on
+0-confirmation flags raises return per unit of capital by **~50%** and requires
+no forecast, no new data, and no change to any threshold — only a decision not
+to spend premium on the one tier measured to lose money.
+
+Read the last two columns as answering different questions. **Total EV** matters
+if opportunities are scarce and capital is not; **EV per unit deployed** matters
+if capital or risk budget is the constraint. "Top tier only" wins on the second
+and loses badly on the first — it deploys least and forgoes the profitable
+middle tiers.
+
+**Caveats, and they are not small:**
+
+- This is the **expected-value model, not the backtest.** The backtest produced
+  only 10 trades in 8.5 years — far too few to split four ways, so these
+  weights cannot be validated on realised P&L. They are arithmetic on measured
+  hit rates, and inherit every caveat those carry.
+- **Sizing amplifies whatever edge exists — including the concentration risk.**
+  Two trades produced the entire backtested profit. Concentrating into the top
+  tier concentrates into fewer, larger events, so the distribution gets more
+  skewed, not less. A policy that doubles expected return also widens the range
+  of outcomes around it.
+- Tier hit rates carry the **base-rate caveat above**, and tier 3+ rests on
+  n=21 with a 24–62% CI. Weighting 3× on a number that uncertain is a strong
+  bet on a soft estimate.
+- **No sizing policy is registered or adopted by this note.** Sizing is a desk
+  decision, not a scoring rule — it changes no threshold, grade or record, and
+  therefore needs no spec. But it also gets no protocol protection: nothing here
+  has been pre-registered or tested forward.
+
+**Recommendation, stated plainly:** adopt "skip tier 0" — it is the largest
+single gain, needs no conviction about the rest of the ladder, and follows
+directly from the one thing measured with confidence (that tier 0 loses money).
+Treat the more aggressive weightings as a discussion to have with the risk
+budget in hand, not as a result.
+
 ## Two effects the tables understate
 
 1. **The cheapest responses cost nothing.** "Don't add to the position" and
