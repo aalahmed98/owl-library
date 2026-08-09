@@ -145,69 +145,87 @@ splits suggest — oil precursor 2.19× vs 1.21× (genuinely strong), compressio
 average. The ladder's *ordering* is real and the tier-vs-period table above shows
 the selection adds value; the raw gradient overstates how much.
 
-## Sizing by tier — the one lever that needs no new accuracy
+## Sizing by tier — PROPOSED, THEN REFUTED BY THE RECORD
 
-Everything above assumes **every flag is the same size trade**. That is the
-current implied policy, and it is leaving money on the table: you already know
-tier 3+ returns roughly five times what tier 1 does, and that tier 0 is
-negative. Allocating equally across them discards information you have already
-paid to measure.
+> **This section originally recommended weighting the top tier more heavily. The
+> backtest was then run and CONTRADICTED it. The recommendation is withdrawn.
+> The workings are kept because the failure is more instructive than the
+> proposal was.**
 
-Expected value per unit of risk (1 unit = the $10m hedge modelled above), using
-the middle assumption set:
+### What was proposed
+
+Expected value per unit of risk, from the measured tier hit rates:
 
 | Tier | Hit rate | EV per unit |
 |---|---|---|
-| 3+ | 43% | **+$322k** |
-| 2 | 34% | **+$215k** |
+| 3+ | 43% | +$322k |
+| 2 | 34% | +$215k |
 | 1 | 21% | +$60k |
-| 0 | 10% | **−$71k** |
+| 0 | 10% | −$71k |
 
-Applying weights to those tiers:
+On that arithmetic, weighting tier 3+ roughly 2.5× tier 2 looked like it should
+raise return per unit of capital by ~50–100% with no new data.
 
-| Sizing policy | Weights (3+ / 2 / 1 / 0) | Total EV | EV per unit deployed | vs uniform |
+### What the record actually says
+
+Same ten trades, same premium spent, only the weights changed:
+
+| Policy | Trades | Profitable | Premium | **Net P&L** |
 |---|---|---|---|---|
-| **Uniform — today's implied policy** | 1 / 1 / 1 / 1 | +$525k | +$131k | 1.00× |
-| **Skip tier 0 only** | 1 / 1 / 1 / 0 | +$596k | **+$199k** | **1.51×** |
-| Linear by tier | 2 / 1.5 / 1 / 0 | +$1,025k | +$228k | 1.74× |
-| Concentrated | 3 / 1.5 / 0.5 / 0 | +$1,317k | +$263k | 2.01× |
-| Top tier only | 1 / 0 / 0 / 0 | +$322k | +$322k | 2.45× |
+| **Uniform (today's policy)** | 10 | 4/10 | $0.99m | **+$0.44m (+4.4%)** |
+| **Tier-sized (3+ at 2.5×)** | 10 | 4/10 | $0.99m | **−$0.30m (−3.0%)** |
 
-**The single biggest step is free: stop hedging tier 0.** Declining to act on
-0-confirmation flags raises return per unit of capital by **~50%** and requires
-no forecast, no new data, and no change to any threshold — only a decision not
-to spend premium on the one tier measured to lose money.
+**Sizing by tier cost $0.73m.** The reason is visible in the trade list: all
+three tier-3+ trades LOST money (−$0.10m, −$0.39m, −$0.12m), while both of the
+large winners — 2020-02-03 contango_flip (+$1.03m) and 2025-01-27 rollover_wall
+(+$1.01m) — were **tier 2**. Weighting the top tier concentrated capital into
+the losers.
 
-Read the last two columns as answering different questions. **Total EV** matters
-if opportunities are scarce and capital is not; **EV per unit deployed** matters
-if capital or risk budget is the constraint. "Top tier only" wins on the second
-and loses badly on the first — it deploys least and forgoes the profitable
-middle tiers.
+### Why the EV model misled, and what it means
 
-**Caveats, and they are not small:**
+This is the peak-versus-expiry problem again, in its most expensive form.
 
-- This is the **expected-value model, not the backtest.** The backtest produced
-  only 10 trades in 8.5 years — far too few to split four ways, so these
-  weights cannot be validated on realised P&L. They are arithmetic on measured
-  hit rates, and inherit every caveat those carry.
-- **Sizing amplifies whatever edge exists — including the concentration risk.**
-  Two trades produced the entire backtested profit. Concentrating into the top
-  tier concentrates into fewer, larger events, so the distribution gets more
-  skewed, not less. A policy that doubles expected return also widens the range
-  of outcomes around it.
-- Tier hit rates carry the **base-rate caveat above**, and tier 3+ rests on
-  n=21 with a 24–62% CI. Weighting 3× on a number that uncertain is a strong
-  bet on a soft estimate.
-- **No sizing policy is registered or adopted by this note.** Sizing is a desk
-  decision, not a scoring rule — it changes no threshold, grade or record, and
-  therefore needs no spec. But it also gets no protocol protection: nothing here
-  has been pre-registered or tested forward.
+**The confluence tier predicts whether a flag gets GRADED a hit — not whether
+the trade makes money.** Grading asks whether the spread touched the bar at any
+point inside the window; P&L asks where the spread was when you closed. A
+tier-3+ item can clear the bar on a spike, revert, and lose money. Across these
+ten trades that is exactly what happened.
 
-**Recommendation, stated plainly:** adopt "skip tier 0" — it is the largest
-single gain, needs no conviction about the rest of the ladder, and follows
-directly from the one thing measured with confidence (that tier 0 loses money).
-Treat the more aggressive weightings as a discussion to have with the risk
-budget in hand, not as a result.
+So the tier ladder is a **credibility** measure, not a **sizing** signal. It
+earns its place deciding *what reaches the desk* — the action-list filter is
+still worth $1.8m versus hedging everything — but it does not tell you how much
+to put behind each item.
+
+### On "skip tier 0" — already shipped, no gain available
+
+The other half of the original recommendation was redundant. Measured on the
+current composition:
+
+| Tier | On action list | On watch list |
+|---|---|---|
+| 0 | **0** | 20 |
+| 1 | **0** | 47 |
+| 2 | 29 | 9 |
+| 3+ | 21 | 0 |
+
+Composition v3 (P2-C7) already requires ≥2 confirmations, so **tiers 0 and 1 are
+entirely excluded from the action list today.** There was no gain to capture;
+the policy was already in force.
+
+### Honest limits on this refutation
+
+- **n = 3 tier-3+ trades.** That is far too few to prove sizing is harmful. What
+  it does establish is that the EV model's case is **not supported by the only
+  realised evidence available**, which is enough to withdraw a recommendation.
+- The mechanism (hit ≠ P&L) is not a small-sample artifact — it is structural,
+  and it argues the EV model was measuring the wrong thing regardless of n.
+- **Nothing here says tier 3+ is worse than tier 2.** It says the tier ordering
+  measured on grading outcomes does not carry over to trading outcomes, and that
+  a sizing policy built on it has no evidential support.
+
+**Disposition: sizing stays uniform across the action list.** Revisit only if a
+persistence measure (see the signal-search tracker, N7) ever makes graded
+outcomes and traded outcomes agree.
 
 ## Two effects the tables understate
 
