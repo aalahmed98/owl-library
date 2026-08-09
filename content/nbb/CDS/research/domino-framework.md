@@ -2995,6 +2995,143 @@ criterion 1.** Full record:
   ever surfaces) would require a new pre-registered spec — not iterated until
   it passes.
 
+## Registered spec G-R1 (2026-08-09): grading-reference replacement — real CDS 2019-07→2026-08 replaces the Ariva proxy — written BEFORE the run
+
+**Owner-approved 2026-08-09 ("yes start G-R1"). This section is the spec-commit.
+The evaluation has NOT run. It will run exactly once; the results-commit publishes
+the full before/after diff whatever it shows.**
+
+### What exists that didn't before
+
+The Bloomberg session (`bloomberg-terminal-record.md`) produced a real Bahrain 5Y
+USD senior CDS series — mid and bid, daily — validated year-by-year against the
+terminal's own High/Low/mean statistics (four of six periods to ±0.000 on both
+columns):
+
+- **CMAN screen transcription** 2018-01-02 → 2023-12-29 (1,564 days), single
+  source, sha256 `4538663458f9f5f7…`
+- **CBIN Excel export** 2022-01 → 2026-08-10 dense from 2023 (1,101 rows,
+  2009–2010 tail unused), sha256 `6f8a509ee364f6b1…`
+- Measured CMAN↔CBIN basis on 253 overlap days: median −0.20bp, 12.6% of days
+  differ >5bp (§4 of the terminal record).
+
+The current grading reference (`bundle.proxy`) is real CDS to 2019-06-30 (the
+cbb-report seed) then a bond-derived venue proxy. Specs C-R1/C-R3 exist
+precisely because that proxy era has a different base rate. Real data now covers
+the proxy era almost entirely.
+
+### SCOPE — grading reference ONLY; signal generation does not change
+
+**The single most important boundary of this spec.** Historical flags were
+generated walk-forward from data the system receives live (bond prices, the
+proxy composite). The live feed after 2026-08-10 REMAINS Ariva/bonds — there is
+no ongoing Bloomberg feed. Regenerating historical flags from a series that
+cannot be observed live would make the record forward-inconsistent: the
+backtest would fire from data the live system will never have.
+
+Therefore: **every flag, firing date, signal value, state transition and
+composition rule stays exactly as it is. Only the OUTCOME grading — the
+reference series each alert's forward window is measured against, and the
+era-matched bars — changes.** This is the same boundary C-R1 and C-R3 used
+("grading bar", "reference series"), now applied to the series itself.
+
+Explicitly out of scope: oil-tier grading (grades on Brent, `oilDropPct`
+15%/45d — no CDS reference involved); Oman and Jordan (own references);
+`hedging-economics.md` corrections (decision framing, never a scoring input);
+any threshold, trigger, or composition change anywhere.
+
+### The new reference composite (frozen)
+
+| Segment | Dates | Source |
+|---|---|---|
+| Era 1 — real CDS, cbb-report seed | → 2019-06-30 | unchanged |
+| **Era 2 — real CDS, Bloomberg** | **2019-07-01 → 2023-12-29** | CMAN screen series |
+| **Era 2 (cont.)** | **2024-01-01 → 2026-08-10** | CBIN export |
+| Era 3 — live venue proxy | 2026-08-11 → | Ariva/bond composite, unchanged pipeline |
+
+- Joins declared: 2019-07-01 (seed→CMAN, both real CDS) and 2024-01-01
+  (CMAN→CBIN, basis measured above). Mid (PX_LAST) only — consistent with all
+  prior grading; the bid column is decision-framing material, never grading.
+- CMAN's 2018-01-02→2019-06-30 stretch is deliberately NOT substituted into
+  era 1 — it serves as QA annex A instead (below). Era 1's record is untouched
+  by construction.
+- No interpolation of the 3 missing business days: the frozen grader's `asof`
+  semantics and coverage guard handle gaps natively.
+- The known 2019 data-quality flags (alternating half-spread, stale runs — §3
+  of the terminal record) affect mid levels only marginally; they enter the
+  bar-solving base rate and the outcome measurement SYMMETRICALLY, which is
+  what base-rate matching is for. Recorded, not adjusted.
+
+### Bars (frozen procedure, C-R1/C-R3 verbatim)
+
+Targets stay the frozen ones: **curve 17.76% exceedance of +bar within 60d;
+fundamental 19.9% within 180d**.
+
+- **Era 1**: bars unchanged (curve 50bp, fundamental 100bp). Record unchanged by
+  construction.
+- **Era 2**: bars re-solved outcome-blind on the era's own unconditional
+  exceedance — smallest 10bp-rounded level whose exceedance ≤ target (rounded
+  AGAINST us). One solve, published with the sweep values.
+- **Era 3** (live, no history yet): inherits the current Ariva bars (curve 90bp,
+  fundamental 180bp) as PROVISIONAL — they were solved for exactly this proxy
+  pipeline's character. Re-solving era 3 requires a future export and its own
+  spec (the acquisition plan's "wrinkle" note).
+- Residual lens (P2-L1 tiers): `derived.residual_bp` regenerates from the new
+  level series; `residual_bars` re-solve by the frozen P2-L1 procedure at the
+  frozen targets, one run, same commit. Peg stays disarmed.
+
+### Blast radius — every consumer re-derives, all published side-by-side
+
+Alert grades + peak moves (curve & fundamental tiers) · C-R2 episode
+scoreboards · C-R4 and C-R4v2 transition records · P2-P1 desk composite ·
+action/watch outcome columns (composition rules untouched) · P2-L4 recovery
+records via the regenerated residual. Before/after diff published per rule and
+per era, including every individual grade that flips, in both directions.
+
+### Pre-registered QA gate (runs BEFORE any grading; failing it STOPS the run)
+
+**Annex A — seed vs Bloomberg overlap, 2018-01-02→2019-06-30**: both series are
+real CDS from independent routes. If median |Δmid| > 25bp, STOP — a source
+problem exists and must be resolved before any re-grade; the investigation and
+resolution get their own results-commit. If it passes, publish the error stats.
+
+**Annex B — proxy vs real, 2019-07-01→2026-08-10** (descriptive, mandatory):
+the direct validation of seven years of proxy-based grading — error
+distribution by year, and specifically the proxy error on the dates of every
+graded flag. This is the number P2-V1 could only approximate via the NBER
+change series.
+
+### Predictions on record, falsifiable, before the run
+
+1. Era-2 bars land BETWEEN the era-1 bars (50/100) and the Ariva bars (90/180):
+   2019–26 is genuinely more volatile than 2015–19, but real CDS is less noisy
+   than the retail proxy.
+2. Individual grades flip in BOTH directions (lower bar helps; smaller real
+   peaks hurt). Net headline direction uncertain; my stated prior (recorded
+   repeatedly this week): headline hit rates drift DOWN.
+3. The C-R4 47.1% moves; the decision framing ("filter beats hedging
+   everything") survives.
+
+### Adoption is UNCONDITIONAL
+
+This is a data-quality upgrade, not a candidate signal. There is no
+adopt/reject gate on the outcome: if the QA gate passes, the new reference is
+adopted and the record is whatever it is. Running it to see whether we like the
+answer is precisely what the protocol forbids.
+
+### Implementation notes (for the run; no discretion left)
+
+- Data enters as CSV (`series,obs_date,value,source_note`) under an
+  **untracked** local directory (licensed data stays out of the repo; hashes
+  above pin the inputs; the xlsx→csv converter script IS committed).
+- `backtest_rules` schema gains the third era: `bbgEraFrom = 2019-07-01`,
+  `curveWidenBpBbgEra` / `fundWidenBpBbgEra` (solved values), with
+  `arivaEraFrom` moving to `2026-08-11`. Era selection in `backfill.ts`,
+  `apiTransitions.ts`, `apiDomino4.ts` extends from two eras to three.
+- Regression discipline: endpoint snapshots before/after; every diff classified
+  deliberate (grade changes) or bug.
+- Single evaluation. Results-commit follows, including rejections of any part.
+
 ## APIs & data sources in use
 
 | Source | What | URL / notes |
