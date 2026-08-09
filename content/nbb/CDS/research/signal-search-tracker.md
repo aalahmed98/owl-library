@@ -492,3 +492,52 @@ owning protection through COVID and the 2025 blowout. It makes the insurance
 approximately free.*
 
 Anything found here that raises accuracy is upside, not the plan.
+
+---
+
+## 2026-08-09 — L-R1 design scan: bid/ask stress as a LEADING indicator — NEGATIVE at design stage
+
+**The candidate.** The Bloomberg session produced the first daily bid/ask series
+this project has ever had (2018–2023, single source CMAN, see
+`bloomberg-terminal-record.md`). Hypothesis: dealers widen quotes *before*
+spreads blow out, so a half-spread z-score / percentile trigger could lead the
+move — a genuinely NEW kind of data, permitted under the exhaustion clause.
+
+**Protocol position.** Design sample **2018-06 → 2020-12 only** (663 valid days).
+**2021–2023 was never touched** and remains clean for any future registered test.
+No spec was committed because the candidate died at design stage. Script:
+`haircut-monitor/scripts/research/lr1-design-scan.py`, input sha256 `45386634…`.
+
+**Result: the quote spread does not lead — it is coincident-to-lagging.**
+
+| Trigger (on 5d-median rel. half-spread) | Episodes | Hit rate vs 10.1% base (100bp/60d bar) |
+|---|---|---|
+| z ≥ 1.5 / 2.0 / 2.5 (120d window) | 3 / 4 / 4 | 33% / **0%** / **0%** |
+| pct ≥ 90 / 95 (250d window) | 2 / 2 | 50% / 50% (n=2 — meaningless) |
+
+The narrative check is the decisive part:
+
+- z≥2 first fired **2018-06-27 — two days AFTER the 609bp peak** of 2018-06-25.
+- It produced **no fire at all in Jan–Feb 2020**: quotes stayed tight right up to
+  the COVID blowout. The nearest prior fire (2019-12-12, inside a flagged
+  stale-quote stretch) had its 60d window close on 2020-03-02 — days short.
+- Median trailing-20d mid change at first fire is negative (−14 to −20bp):
+  fires happen during retracements *after* stress, not ahead of it.
+
+Consistent with the project-wide design filter: backward-looking change measures
+are now **5-for-5 failures** (attribution, GCC decoupling, reserves drain,
+liquidity_dry, and now quote-spread stress).
+
+**The salvage, and it is real: the half-spread is not a predictor, it is the
+LIVE PRICE OF ACTING.** Measured full round-trips ran 20–30bp in 2018–2022 vs
+~10bp in 2025–26 — 2–3× the strategy's break-even exactly when flags fire. As
+**decision framing** (never a scoring input, same standing as
+`hedging-economics.md`), a cost-to-act gauge belongs in the exposure tool: when
+quoted cost is in its stressed regime, the free responses (don't add, don't
+roll) dominate and the premium-paying response is off the table. This requires
+no predictive claim and no pre-registration.
+
+**Remaining live candidate for detection in non-calm markets: the real CDS term
+structure** (1Y–10Y all confirmed to exist; Domino 3's slope is currently a
+two-bond reconstruction). Needs ~36 pages of screen capture for 2018/2020/2022
+before any spec can be designed.
