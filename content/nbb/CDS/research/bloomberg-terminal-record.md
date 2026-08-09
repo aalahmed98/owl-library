@@ -525,14 +525,35 @@ better measurement of things already in the model**, and almost **no new signal*
 | T1.4 quoted recovery | dead — ISDA convention, carries no market view |
 | T2.2 EUR quanto basis | **dead — instrument does not exist** |
 | T2.7 ratings as signal | dead — coin flips; confirms the registry's existing call |
-| T2.4 bank CDS | unverified |
+| T2.4 bank CDS | **dead — no CDS exists for NBB (loans only)** |
 | T2.1 CDS term structure | **alive** — but a better measure of Domino 3, not a new domino |
+
+### The new-signal search is exhausted, not merely unfinished
+
+Every Tier-2 candidate has now been checked and closed. This is not "we ran out
+of time" — the instruments themselves do not exist:
+
+- **No EUR CDS** at any tenor → peg/redenomination risk is unpriced.
+- **No bank CDS** → `nbb cds` returns syndicated loans only. Small local banks
+  rarely have a CDS market; this is the expected answer, not a surprise. (AUB is
+  the only Bahraini bank internationally active enough to plausibly carry one and
+  was not checked; judged not worth the keystrokes.)
+- **Recovery is a convention**, ratings are **coin flips**.
 
 This matters for the exhaustion clause. Re-slicing Bahrain's existing ~126 desk
 items is closed off, and new external data was the stated route forward. **The
-terminal has now largely closed that route too.** What remains is measurement
-quality — which is real, and is what changed two published claims today — but it
-is not the same as finding new predictive content.
+terminal has now closed that route as well.**
+
+What the session did deliver is **measurement quality**: real CDS replacing a
+proxy, observed bid/ask replacing an assumed 10.9bp, a measured duration curve
+replacing a flat 4.0. That is real — it overturned two published claims in one
+afternoon — but it is a different thing from finding new predictive content, and
+the record should not blur them.
+
+**The honest forward statement: absent new *kinds* of data (not more of the same
+kind), this system's predictive content is what it is. Further gains are
+available in how accurately it is measured and how honestly it is framed, not in
+how much it can be made to forecast.**
 
 ---
 
@@ -542,7 +563,7 @@ is not the same as finding new predictive content.
 |---|---|---|
 | ~~Rating action history~~ | **DONE — exported, 2008-2026** | — |
 | ~~EUR quanto basis~~ | **RETIRED — no EUR CDS exists at any tenor** | — |
-| Bahraini bank CDS (NBB/BBK/AUB) exists? | **unverified — same** | 1 min |
+| ~~Bahraini bank CDS~~ | **RETIRED — no CDS for NBB, loans only** | — |
 | Bond prices via BDH | **XS2384406612 did not resolve — see 6d flag** | — |
 | Verify a Sep-2026 Bahrain maturity exists | **BLOCKING for /domino2 countdown** | 2 min |
 | Equities via BDH (`BHSEASI Index`) | untested — **likely works** | 2 min |
