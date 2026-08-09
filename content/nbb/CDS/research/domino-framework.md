@@ -2411,3 +2411,12 @@ in the Oman section's provenance table above.
 
 Related: the original scoping note lives one level up —
 `nbb/CDS/cds-haircut-prediction-scoping.html`.
+
+`hedging-economics.md` (same folder, 2026-08-09) works the break-even hit rate
+for acting on a flag — ~16% middle case, ~26% pessimistic, not 50% — against the
+P2-C5 tier record. It is **presentation/decision framing layered on top of the
+measured record: not a spec, not a protocol object, and never a scoring input.**
+Its numbers must not feed back into any threshold or grading bar.
+
+Working state, open threads and pending owner decisions for the implementation:
+`~/nbb/haircut-monitor/HANDOVER.md`.
