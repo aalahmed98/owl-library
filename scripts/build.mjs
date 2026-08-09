@@ -14,4 +14,6 @@ await Promise.all([
 ]);
 
 execSync("npx tsc -p tsconfig.build.json", { stdio: "inherit" });
-console.log("[build] done — client bundles in public/js, server in dist/");
+
+execSync("mkdir -p public/downloads && tar -czf public/downloads/skills.tar.gz -C .claude skills", { stdio: "inherit" });
+console.log("[build] done — client bundles in public/js, server in dist/, skills bundle in public/downloads/");

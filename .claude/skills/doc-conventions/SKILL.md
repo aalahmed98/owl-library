@@ -1,11 +1,11 @@
 ---
 name: doc-conventions
-description: theArchive document conventions — frontmatter schema, naming, folder rules, tag style. Use BEFORE creating or reorganizing any doc in theArchive (via the-archive MCP tools or otherwise), and when deciding where a doc belongs or which format (.md / .html / .pdf) to use.
+description: owl-library document conventions — frontmatter schema, naming, folder rules, tag style. Use BEFORE creating or reorganizing any doc in owl-library (via owl-library MCP tools or otherwise), and when deciding where a doc belongs or which format (.md / .html / .pdf) to use.
 ---
 
-# theArchive Document Conventions
+# owl-library Document Conventions
 
-Every doc in the archive follows these rules. Always use the **the-archive MCP tools** (`create_doc`, `edit_doc`, `set_meta`, …) rather than raw file writes — they enforce the path jail, hashing, trash-based deletes, and search indexing. (Do not confuse them with the keops-wiki tools of similar names.)
+Every doc in the archive follows these rules. Always use the **owl-library MCP tools** (`create_doc`, `edit_doc`, `set_meta`, …) rather than raw file writes — they enforce the path jail, hashing, trash-based deletes, and search indexing. (Do not confuse them with the keops-wiki tools of similar names.)
 
 ## Metadata schema
 

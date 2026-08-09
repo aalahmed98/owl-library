@@ -1,9 +1,9 @@
-# theArchive
+# owl-library
 
 Personal archive for documentation and research papers (`.md`, self-contained interactive `.html` papers, `.pdf`), stored as plain files under `content/`, versioned with git.
 
 - **Website** — local reader/browser/editor at http://localhost:7333
-- **MCP server** (`the-archive`) — AI CRUD over docs and folders via Claude Code / Claude Desktop
+- **MCP server** (`owl-library`) — AI CRUD over docs and folders via Claude Code / Claude Desktop
 - **Skills** — standardized doc conventions, interactive paper builder, research ingestion, library maintenance (`.claude/skills/`)
 
 ## Run the website
@@ -30,7 +30,7 @@ Metadata: `.md` uses YAML frontmatter; `.html` uses `<title>` + `<meta name="arc
 
 ## MCP: Claude Code
 
-Registered via the project's `.mcp.json` — just open Claude Code in this repo and approve the `the-archive` server. Tools: `list_tree`, `read_doc`, `create_doc`, `update_doc`, `edit_doc`, `set_meta`, `delete_node` (→ trash), `move_node`, `create_folder`, `search`, `list_tags`.
+Registered via the project's `.mcp.json` — just open Claude Code in this repo and approve the `owl-library` server. Tools: `list_tree`, `read_doc`, `create_doc`, `update_doc`, `edit_doc`, `set_meta`, `delete_node` (→ trash), `move_node`, `create_folder`, `search`, `list_tags`.
 
 Safety model: all paths are jailed to `content/`; deletes go to `content/.trash/`; every content write requires the `contentHash` from a fresh `read_doc`, so concurrent edits (e.g. the browser editor) are rejected as conflicts instead of clobbered.
 
@@ -44,20 +44,24 @@ Claude Desktop runs on Windows; this repo lives in WSL. The bridge is `bin/mcp.s
 ```json
 {
   "mcpServers": {
-    "the-archive": {
+    "owl-library": {
       "command": "wsl.exe",
-      "args": ["-d", "Ubuntu", "-e", "/home/haman/nbb/theArchive/bin/mcp.sh"]
+      "args": ["-d", "Ubuntu", "-e", "/home/haman/nbb/owl-library/bin/mcp.sh"]
     }
   }
 }
 ```
 
-3. Restart Claude Desktop; the `the-archive` tools should appear.
+3. Restart Claude Desktop; the `owl-library` tools should appear.
 
 **Caveats**
 - `bin/mcp.sh` hardcodes the nvm node path (`~/.nvm/versions/node/v22.22.3/bin/node`) because `wsl.exe -e` runs a bare shell without nvm. After a Node upgrade, update that path.
 - Re-run `npm run build` after changing `src/core` or `src/mcp` so Desktop picks up the new code (Claude Code uses `tsx` and always runs the latest source).
-- Sanity check from a Windows terminal: `wsl.exe -d Ubuntu -e /home/haman/nbb/theArchive/bin/mcp.sh`, then paste one line: `{"jsonrpc":"2.0","id":1,"method":"initialize","params":{"protocolVersion":"2025-06-18","capabilities":{},"clientInfo":{"name":"t","version":"0"}}}` — you should get a single-line JSON reply.
+- Sanity check from a Windows terminal: `wsl.exe -d Ubuntu -e /home/haman/nbb/owl-library/bin/mcp.sh`, then paste one line: `{"jsonrpc":"2.0","id":1,"method":"initialize","params":{"protocolVersion":"2025-06-18","capabilities":{},"clientInfo":{"name":"t","version":"0"}}}` — you should get a single-line JSON reply.
+
+## Remote access (second user, own machine)
+
+Site is hosted at `https://archive.owl-library.com`, behind Cloudflare Access (email login gate). See **[SETUP.md](SETUP.md)** for the connect-your-own-Claude walkthrough.
 
 ## Troubleshooting
 

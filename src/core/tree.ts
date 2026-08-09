@@ -2,7 +2,7 @@ import fs from "node:fs/promises";
 import path from "node:path";
 import { CONTENT_DIR, TRASH_DIR_NAME, formatOf, DocFormat } from "./config.js";
 import { resolveContentPath, toRelPath, isSidecar } from "./paths.js";
-import { extractDoc } from "./meta.js";
+import { extractDoc, DEFAULT_SPACE, DocSpace } from "./meta.js";
 
 export interface DocNode {
   kind: "doc";
@@ -13,6 +13,12 @@ export interface DocNode {
   tags: string[];
   summary?: string;
   status?: string;
+  /** From metadata (frontmatter / html meta / sidecar), YYYY-MM-DD. */
+  created?: string;
+  /** File mtime, YYYY-MM-DD — fallback recency signal when `created` is absent. */
+  modified: string;
+  /** Draft/published tab this doc shows under; falls back to DEFAULT_SPACE when unset. */
+  space: DocSpace;
 }
 
 export interface FolderNode {
@@ -51,6 +57,7 @@ export async function buildTree(rel = "", depth = Infinity): Promise<FolderNode>
     if (isSidecar(e.name)) continue;
     const fmt = formatOf(e.name);
     if (!fmt) continue;
+    const modified = (await fs.stat(path.join(abs, e.name))).mtime.toISOString().slice(0, 10);
     try {
       const { meta } = await extractDoc(path.join(abs, e.name));
       node.children.push({
@@ -62,15 +69,36 @@ export async function buildTree(rel = "", depth = Infinity): Promise<FolderNode>
         tags: meta.tags,
         summary: meta.summary,
         status: meta.status,
+        created: meta.created,
+        modified,
+        space: meta.space ?? DEFAULT_SPACE,
       });
     } catch {
       node.children.push({
         kind: "doc", name: e.name, path: childRel, format: fmt,
-        title: e.name, tags: [],
+        title: e.name, tags: [], modified, space: DEFAULT_SPACE,
       });
     }
   }
   return node;
+}
+
+/** All docs in a built tree, flattened. */
+export function collectDocs(root: FolderNode): DocNode[] {
+  const out: DocNode[] = [];
+  const walk = (n: TreeNode): void => {
+    if (n.kind === "doc") out.push(n);
+    else n.children.forEach(walk);
+  };
+  walk(root);
+  return out;
+}
+
+/** All folder paths in a built tree ("" = content root), depth-first. */
+export function collectFolders(root: FolderNode): string[] {
+  const out: string[] = [root.path];
+  for (const c of root.children) if (c.kind === "folder") out.push(...collectFolders(c));
+  return out;
 }
 
 /** Flat list of all doc paths under content/ (excluding .trash and sidecars). */

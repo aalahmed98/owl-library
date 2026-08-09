@@ -1,15 +1,17 @@
 import type { FastifyInstance } from "fastify";
 import fs from "node:fs";
 import { readDoc } from "../../core/docs.js";
-import { buildTree } from "../../core/tree.js";
+import { buildTree, collectDocs, collectFolders } from "../../core/tree.js";
 import { ArchiveIndex } from "../../core/search.js";
 import { PathError, resolveContentPath } from "../../core/paths.js";
 import { renderMarkdown } from "../markdown.js";
 import { renderSidebarTree } from "../render/tree.js";
 import {
   homePage, folderPage, markdownDocPage, htmlDocPage, pdfDocPage,
-  searchPage, editPage, errorPage,
+  searchPage, editPage, newDocPage, errorPage,
 } from "../render/pages.js";
+
+const RECENT_COUNT = 10;
 
 async function sidebarFor(activePath = ""): Promise<string> {
   return renderSidebarTree(await buildTree(), activePath);
@@ -18,8 +20,24 @@ async function sidebarFor(activePath = ""): Promise<string> {
 export function registerPageRoutes(app: FastifyInstance, index: ArchiveIndex): void {
   app.get("/", async (_req, reply) => {
     const root = await buildTree();
+    const recent = collectDocs(root)
+      .sort((a, b) => {
+        const ka = a.created ?? a.modified;
+        const kb = b.created ?? b.modified;
+        return kb === ka ? b.modified.localeCompare(a.modified) : kb.localeCompare(ka);
+      })
+      .slice(0, RECENT_COUNT);
     reply.type("text/html");
-    return homePage(renderSidebarTree(root), root, index.listTags());
+    return homePage(renderSidebarTree(root), root, index.listTags(), recent);
+  });
+
+  app.get<{ Querystring: { folder?: string } }>("/new", async (req, reply) => {
+    const root = await buildTree();
+    const folders = collectFolders(root);
+    const requested = req.query.folder ?? "";
+    const initial = folders.includes(requested) ? requested : folders.includes("notes") ? "notes" : "";
+    reply.type("text/html");
+    return newDocPage(renderSidebarTree(root), folders, initial);
   });
 
   app.get<{ Params: { "*": string } }>("/folder/*", async (req, reply) => {

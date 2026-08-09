@@ -1,0 +1,361 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Deposit Rates vs Loan Rates — Treasury Basics, Part 2</title>
+  <meta name="archive-tags" content="banking, interest-rate, treasury">
+  <meta name="archive-summary" content="How banks build a loan rate from cost components and set deposit rates via deposit beta — and why the two sides move so differently. With a loan-rate build-up widget and a deposit-beta explorer.">
+  <meta name="archive-created" content="2026-08-04">
+  <meta name="archive-updated" content="2026-08-04">
+  <meta name="archive-status" content="final">
+  <style>
+    /* ==tokens== (synced from design/tokens.css — do not edit inside the markers) */
+    :root {
+      --color-bg: #faf9f7;
+      --color-surface: #ffffff;
+      --color-fg: #1a1a1e;
+      --color-muted: #6b6b76;
+      --color-border: #e4e2dd;
+      --color-accent: #2f6fed;
+      --color-accent-fg: #ffffff;
+      --color-accent-soft: #e8effd;
+      --color-danger: #c4483c;
+      --color-warn-bg: #fdf6e3;
+      --color-code-bg: #f2f1ee;
+      --color-mark: #fff3bf;
+      --font-body: "Charter", "Georgia", "Cambria", "Times New Roman", serif;
+      --font-ui: system-ui, -apple-system, "Segoe UI", sans-serif;
+      --font-mono: "SFMono-Regular", "Cascadia Code", "Consolas", "Menlo", monospace;
+      --text-xs: 0.75rem;
+      --text-sm: 0.875rem;
+      --text-base: 1.0625rem;
+      --text-lg: 1.25rem;
+      --text-xl: 1.5rem;
+      --text-2xl: 1.875rem;
+      --text-3xl: 2.375rem;
+      --leading-body: 1.65;
+      --leading-tight: 1.25;
+      --measure: 68ch;
+      --space-1: 0.25rem;
+      --space-2: 0.5rem;
+      --space-3: 0.75rem;
+      --space-4: 1rem;
+      --space-5: 1.5rem;
+      --space-6: 2rem;
+      --space-7: 3rem;
+      --space-8: 4rem;
+      --radius-sm: 4px;
+      --radius-md: 8px;
+      --radius-lg: 12px;
+      --shadow-sm: 0 1px 2px rgba(20, 20, 25, 0.06);
+      --shadow-md: 0 2px 8px rgba(20, 20, 25, 0.1);
+    }
+    [data-theme="dark"] {
+      --color-bg: #16161a;
+      --color-surface: #1e1e24;
+      --color-fg: #e8e6e3;
+      --color-muted: #9a98a0;
+      --color-border: #32323a;
+      --color-accent: #6b9bff;
+      --color-accent-fg: #10101c;
+      --color-accent-soft: #23304d;
+      --color-danger: #e0685c;
+      --color-warn-bg: #2e2a1e;
+      --color-code-bg: #24242b;
+      --color-mark: #4d4425;
+      --shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.4);
+      --shadow-md: 0 2px 8px rgba(0, 0, 0, 0.5);
+    }
+    /* ==/tokens== */
+
+    /* When opened standalone (not in the app frame), follow the OS theme. */
+    @media (prefers-color-scheme: dark) {
+      :root:not([data-theme]) {
+        --color-bg: #16161a;
+        --color-surface: #1e1e24;
+        --color-fg: #e8e6e3;
+        --color-muted: #9a98a0;
+        --color-border: #32323a;
+        --color-accent: #6b9bff;
+        --color-accent-fg: #10101c;
+        --color-accent-soft: #23304d;
+        --color-danger: #e0685c;
+        --color-warn-bg: #2e2a1e;
+        --color-code-bg: #24242b;
+        --color-mark: #4d4425;
+      }
+    }
+
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      background: var(--color-bg);
+      color: var(--color-fg);
+      font-family: var(--font-body);
+      font-size: var(--text-base);
+      line-height: var(--leading-body);
+    }
+    .paper {
+      max-width: var(--measure);
+      margin: 0 auto;
+      padding: var(--space-6) var(--space-4) var(--space-8);
+    }
+    h1 { font-size: var(--text-3xl); line-height: var(--leading-tight); margin: 0 0 var(--space-2); }
+    h2 { font-size: var(--text-xl); line-height: var(--leading-tight); margin: var(--space-6) 0 var(--space-3); border-bottom: 1px solid var(--color-border); padding-bottom: var(--space-2); }
+    h3 { font-size: var(--text-lg); margin: var(--space-5) 0 var(--space-2); }
+    .byline { color: var(--color-muted); font-family: var(--font-ui); font-size: var(--text-sm); margin-bottom: var(--space-6); }
+    a { color: var(--color-accent); }
+    code { font-family: var(--font-mono); font-size: 0.88em; background: var(--color-code-bg); padding: 1px 5px; border-radius: var(--radius-sm); }
+    pre { background: var(--color-code-bg); padding: var(--space-4); border-radius: var(--radius-md); overflow-x: auto; }
+    pre code { background: none; padding: 0; font-size: var(--text-sm); }
+    blockquote { margin: var(--space-4) 0; padding: var(--space-2) var(--space-4); border-left: 3px solid var(--color-accent); background: var(--color-surface); color: var(--color-muted); }
+
+    /* interactive widgets */
+    .widget {
+      font-family: var(--font-ui);
+      background: var(--color-surface);
+      border: 1px solid var(--color-border);
+      border-radius: var(--radius-lg);
+      padding: var(--space-4);
+      margin: var(--space-5) 0;
+      box-shadow: var(--shadow-sm);
+    }
+    .widget-title { font-weight: 600; font-size: var(--text-sm); margin: 0 0 var(--space-3); color: var(--color-muted); text-transform: uppercase; letter-spacing: 0.05em; }
+    .control { display: flex; align-items: center; gap: var(--space-3); margin: var(--space-2) 0; font-size: var(--text-sm); }
+    .control label { min-width: 9rem; }
+    .control input[type="range"] { flex: 1; accent-color: var(--color-accent); }
+    .control output { min-width: 4rem; text-align: right; font-family: var(--font-mono); font-size: var(--text-sm); }
+    .chart { width: 100%; height: auto; display: block; margin-top: var(--space-3); }
+    .chart .axis { stroke: var(--color-border); stroke-width: 1; }
+    .chart .axis-label { fill: var(--color-muted); font-family: var(--font-ui); font-size: 11px; }
+    .chart .series { fill: none; stroke: var(--color-accent); stroke-width: 2; }
+    .chart .series-2 { fill: none; stroke: var(--color-danger); stroke-width: 2; }
+    .chart .bar { fill: var(--color-accent); }
+    figure { margin: var(--space-5) 0; }
+    figcaption { font-family: var(--font-ui); font-size: var(--text-sm); color: var(--color-muted); margin-top: var(--space-2); }
+    details.derivation { margin: var(--space-4) 0; border: 1px solid var(--color-border); border-radius: var(--radius-md); padding: var(--space-3) var(--space-4); background: var(--color-surface); }
+    details.derivation summary { cursor: pointer; font-family: var(--font-ui); font-weight: 600; font-size: var(--text-sm); }
+
+    /* custom styles (after token markers) */
+    .chart .bar-total { fill: var(--color-muted); }
+    .readout { display: flex; gap: var(--space-4); font-family: var(--font-ui); margin-top: var(--space-3); flex-wrap: wrap; }
+    .readout .stat { background: var(--color-accent-soft); border-radius: var(--radius-md); padding: var(--space-2) var(--space-4); font-size: var(--text-sm); }
+    .readout .stat b { font-size: var(--text-lg); font-family: var(--font-mono); display: block; }
+    .series-nav { font-family: var(--font-ui); font-size: var(--text-sm); background: var(--color-surface); border: 1px solid var(--color-border); border-radius: var(--radius-md); padding: var(--space-3) var(--space-4); margin-top: var(--space-6); }
+  </style>
+</head>
+<body>
+  <main class="paper">
+    <h1>Deposit Rates vs Loan Rates</h1>
+    <p class="byline">NBB research · Bank treasury series, part 2 of 4 · 2026</p>
+
+    <p>In <a href="how-a-bank-makes-money.html">part 1</a> we saw that a bank lives on the spread between what it charges borrowers and what it pays depositors. But the two rates are not set the same way, by the same people, or with the same logic. A loan rate is <strong>built up from costs</strong>; a deposit rate is <strong>negotiated down from the market</strong>. Understanding this asymmetry is the key that unlocks FTP (part 3) and ALM (part 4).</p>
+
+    <h2>1. Loan rates: a cost build-up</h2>
+
+    <p>When a bank prices a loan, it is not guessing a number the customer will accept — it is stacking up every cost the loan creates and adding a profit margin on top. A typical build-up:</p>
+
+    <ul>
+      <li><strong>Cost of funds</strong> — what the bank internally "pays" to fund the loan for its full term. This is the FTP rate, the subject of part 3. It reflects market interest rates for the loan's maturity.</li>
+      <li><strong>Expected credit loss</strong> — some borrowers won't pay back. If 1 in 100 similar loans defaults with everything lost, every loan must carry ~1% extra to cover it. This is why credit cards (high default risk) cost far more than mortgages (secured by a house).</li>
+      <li><strong>Operating cost</strong> — underwriting, systems, branches, collections, spread over the loan book.</li>
+      <li><strong>Cost of capital &amp; margin</strong> — regulators force the bank to hold equity against each loan; shareholders expect a return on it, plus the bank wants actual profit.</li>
+    </ul>
+
+    <div class="widget">
+      <p class="widget-title">Loan rate build-up</p>
+      <div class="control">
+        <label for="cof">Cost of funds (FTP)</label>
+        <input type="range" id="cof" min="0" max="8" step="0.1" value="3.5">
+        <output id="cof-out">3.5%</output>
+      </div>
+      <div class="control">
+        <label for="ecl">Expected credit loss</label>
+        <input type="range" id="ecl" min="0" max="5" step="0.1" value="1.2">
+        <output id="ecl-out">1.2%</output>
+      </div>
+      <div class="control">
+        <label for="opx">Operating cost</label>
+        <input type="range" id="opx" min="0" max="3" step="0.1" value="1.0">
+        <output id="opx-out">1.0%</output>
+      </div>
+      <div class="control">
+        <label for="mgn">Capital cost + margin</label>
+        <input type="range" id="mgn" min="0" max="4" step="0.1" value="1.3">
+        <output id="mgn-out">1.3%</output>
+      </div>
+      <div class="readout">
+        <div class="stat">Customer loan rate <b id="rate-out"></b></div>
+      </div>
+      <svg id="buildup-chart" class="chart" viewBox="0 0 640 280" role="img" aria-label="Loan rate components"></svg>
+    </div>
+
+    <figure>
+      <figcaption><strong>Figure 1.</strong> The customer's loan rate is simply the sum of the four components. Slide "expected credit loss" up to see why riskier lending must charge more, not because banks are greedy but because the losses are real.</figcaption>
+    </figure>
+
+    <h3>Reading the build-up sliders</h3>
+
+    <p>These four sliders don't affect <em>each other</em> — they are independent costs that simply stack. Every 0.1% you add to any slider adds exactly 0.1% to the customer's loan rate. What changes as you play is the <strong>composition</strong> of the rate, and that's the real lesson:</p>
+
+    <ul>
+      <li><strong>Cost of funds (FTP)</strong> — the only component the bank doesn't control at all; it comes from the market via the FTP curve (part 3). When the central bank hikes, this slider moves for every bank at once, which is why loan rates rise across the whole market together.</li>
+      <li><strong>Expected credit loss</strong> — the borrower-quality component. At the default settings it's 1.2% of a 7% rate: about one-sixth of what the customer pays exists purely to cover other customers who won't pay. Set it to 4–5% and you've priced a credit card; set it near 0 and you've priced a government-backed mortgage.</li>
+      <li><strong>Operating cost</strong> — why small loans are proportionally expensive: processing a 5k loan costs the bank almost as much as a 500k one, so this component (as a %) is much bigger on small tickets.</li>
+      <li><strong>Capital cost + margin</strong> — the only truly discretionary slider. Competition acts here: when rivals undercut, this is the component that gets squeezed, because the other three are real costs that don't negotiate.</li>
+    </ul>
+
+    <p>So when a customer asks "why is my rate 7% when deposits pay 1.5%?", the build-up is the answer: only 3.5% of it is money cost — the rest is risk, operations, and capital.</p>
+
+    <h2>2. Deposit rates: negotiated down from the market</h2>
+
+    <p>Deposits are priced with completely different logic. The bank's alternative to your deposit is borrowing the same money in the wholesale market at (roughly) the central bank's policy rate. So your deposit is worth <em>at most</em> the market rate to the bank — and the bank will pay you as little below that as competition allows.</p>
+
+    <p>How much of a market-rate move gets passed on to depositors is called the <strong>deposit beta</strong>:</p>
+
+    <blockquote>deposit rate ≈ β × market rate, where β is typically 0.2–0.6 and varies by product.</blockquote>
+
+    <ul>
+      <li><strong>Current/checking accounts:</strong> β near 0. People keep them for payments, not yield; many pay zero interest at any market rate.</li>
+      <li><strong>Savings accounts:</strong> β maybe 0.3–0.5, adjusted slowly and grudgingly.</li>
+      <li><strong>Term deposits:</strong> β close to 1. Customers explicitly shop for rate, so these track the market tightly.</li>
+    </ul>
+
+    <div class="widget">
+      <p class="widget-title">Deposit beta explorer</p>
+      <div class="control">
+        <label for="pol">Market / policy rate</label>
+        <input type="range" id="pol" min="0" max="10" step="0.25" value="4">
+        <output id="pol-out">4.00%</output>
+      </div>
+      <div class="control">
+        <label for="beta">Deposit beta (β)</label>
+        <input type="range" id="beta" min="0" max="1" step="0.05" value="0.4">
+        <output id="beta-out">0.40</output>
+      </div>
+      <div class="readout">
+        <div class="stat">Deposit rate paid <b id="dep-out"></b></div>
+        <div class="stat">Bank's funding advantage <b id="adv-out"></b></div>
+      </div>
+      <svg id="beta-chart" class="chart" viewBox="0 0 640 280" role="img" aria-label="Market rate vs deposit rate"></svg>
+    </div>
+
+    <figure>
+      <figcaption><strong>Figure 2.</strong> Blue: the market rate (what money is worth). Red: what depositors actually get at your chosen β. The vertical distance between the lines is the bank's funding advantage — notice how it <em>widens</em> as rates rise. This is why bank profits usually jump when central banks hike.</figcaption>
+    </figure>
+
+    <h3>Reading the beta sliders</h3>
+
+    <p>Unlike the build-up widget, these two sliders <strong>multiply</strong> each other — deposit rate = β × market rate — so each one changes what the other one <em>means</em>:</p>
+
+    <ul>
+      <li><strong>Market / policy rate</strong> moves both lines, but not equally. The blue line (market) rises 1-for-1; the red line (deposits) rises only β-for-1. So every hike widens the gap between them by (1−β) × the hike: at β = 0.40, a 1% hike gives depositors 0.40% and the bank keeps the other 0.60%. That's why the funding-advantage readout grows as you push this slider right.</li>
+      <li><strong>Deposit beta (β)</strong> controls how much of the blue line's height reaches depositors — it rotates the red line between flat (β = 0, current accounts: hikes pass through nothing) and fully overlapping blue (β = 1, term deposits: hikes pass through completely). Notice β only matters <em>because</em> rates are positive: slide the market rate to 0% and β becomes irrelevant — there is nothing to share.</li>
+      <li><strong>The interaction in one sentence:</strong> the bank's funding advantage = (1−β) × market rate — it needs <em>both</em> a low beta <em>and</em> a non-zero market rate. This is why the 2010s zero-rate decade starved bank margins even though betas were low (0 × anything = 0), and why the 2022–23 hiking cycle fattened them dramatically.</li>
+    </ul>
+
+    <h2>3. Why the asymmetry matters</h2>
+
+    <p>Put the two pricing logics side by side and three structural facts fall out:</p>
+
+    <ol>
+      <li><strong>Loan rates reprice on a schedule; deposit rates reprice at the bank's discretion.</strong> A 5-year fixed loan keeps its rate for 5 years no matter what. A savings rate can change tomorrow — but competitive and political pressure means it moves slowly upward and quickly downward.</li>
+      <li><strong>Rising rates are (usually) good for banks.</strong> Loan and securities income tracks the market with a lag, while low-beta deposits stay cheap. NIM expands. Falling rates squeeze it.</li>
+      <li><strong>But mismatched speed = risk.</strong> If a bank funds 20-year fixed mortgages with overnight deposits and rates jump 3%, its funding cost rises immediately while asset income doesn't. Get this wrong badly enough and you get the 2023 Silicon Valley Bank failure — a pure ALM accident.</li>
+    </ol>
+
+    <p>So the bank needs two pieces of internal machinery: a fair way to <strong>charge each loan and credit each deposit for the market value of its term</strong> (FTP, next part), and a discipline for <strong>measuring and capping the residual mismatch</strong> (ALM, part 4).</p>
+
+    <div class="series-nav">
+      <strong>Series:</strong> Part 2 of 4 ·
+      <a href="how-a-bank-makes-money.html">← Part 1: How a bank makes money</a> ·
+      Next: <a href="ftp-explained.html">Funds transfer pricing →</a>
+    </div>
+  </main>
+  <script>
+    // All JS inline. No external requests of any kind (page runs sandboxed & offline).
+    function bindSlider(id, outId, fmt, onChange) {
+      const el = document.getElementById(id), out = document.getElementById(outId);
+      const update = () => { out.textContent = fmt(el.valueAsNumber); onChange(el.valueAsNumber); };
+      el.addEventListener("input", update);
+      update();
+    }
+
+    function lineChart(svgId, seriesList, opts = {}) {
+      const svg = document.getElementById(svgId);
+      const W = 640, H = 280, m = { t: 12, r: 12, b: 28, l: 44 };
+      const pts = seriesList.flatMap(s => s.points);
+      const xs = pts.map(p => p[0]), ys = pts.map(p => p[1]);
+      const x0 = opts.xMin ?? Math.min(...xs), x1 = opts.xMax ?? Math.max(...xs);
+      const y0 = opts.yMin ?? Math.min(...ys), y1 = opts.yMax ?? Math.max(...ys);
+      const X = v => m.l + ((v - x0) / (x1 - x0 || 1)) * (W - m.l - m.r);
+      const Y = v => H - m.b - ((v - y0) / (y1 - y0 || 1)) * (H - m.t - m.b);
+      const tickFmt = v => Math.abs(v) >= 1000 ? v.toExponential(0) : +v.toFixed(3);
+      let out = `<line class="axis" x1="${m.l}" y1="${H - m.b}" x2="${W - m.r}" y2="${H - m.b}"/>` +
+                `<line class="axis" x1="${m.l}" y1="${m.t}" x2="${m.l}" y2="${H - m.b}"/>`;
+      for (let i = 0; i <= 4; i++) {
+        const xv = x0 + (i / 4) * (x1 - x0), yv = y0 + (i / 4) * (y1 - y0);
+        out += `<text class="axis-label" x="${X(xv)}" y="${H - m.b + 16}" text-anchor="middle">${tickFmt(xv)}</text>`;
+        out += `<text class="axis-label" x="${m.l - 6}" y="${Y(yv) + 4}" text-anchor="end">${tickFmt(yv)}</text>`;
+      }
+      seriesList.forEach((s, i) => {
+        const d = s.points.map((p, j) => `${j ? "L" : "M"}${X(p[0]).toFixed(1)},${Y(p[1]).toFixed(1)}`).join("");
+        out += `<path class="${i === 0 ? "series" : "series-2"}" d="${d}"/>`;
+      });
+      if (opts.xLabel) out += `<text class="axis-label" x="${(W + m.l) / 2}" y="${H - 4}" text-anchor="middle">${opts.xLabel}</text>`;
+      svg.innerHTML = out;
+    }
+
+    function componentBars(svgId, items) {
+      const svg = document.getElementById(svgId);
+      const W = 640, H = 280, m = { t: 20, r: 12, b: 40, l: 44 };
+      const max = Math.max(...items.map(i => i.v), 0.1);
+      const bw = (W - m.l - m.r) / items.length;
+      let out = `<line class="axis" x1="${m.l}" y1="${H - m.b}" x2="${W - m.r}" y2="${H - m.b}"/>`;
+      items.forEach((it, i) => {
+        const h = (it.v / max) * (H - m.t - m.b);
+        const x = m.l + i * bw + bw * 0.15, y = H - m.b - h;
+        out += `<rect class="${it.cls || "bar"}" x="${x.toFixed(1)}" y="${y.toFixed(1)}" width="${(bw * 0.7).toFixed(1)}" height="${h.toFixed(1)}" rx="3"/>`;
+        out += `<text class="axis-label" x="${(m.l + (i + 0.5) * bw).toFixed(1)}" y="${H - m.b + 16}" text-anchor="middle">${it.label}</text>`;
+        out += `<text class="axis-label" x="${(m.l + (i + 0.5) * bw).toFixed(1)}" y="${(y - 5).toFixed(1)}" text-anchor="middle">${it.v.toFixed(1)}%</text>`;
+      });
+      svg.innerHTML = out;
+    }
+
+    // — Widget 1: loan rate build-up —
+    const B = { cof: 3.5, ecl: 1.2, opx: 1.0, mgn: 1.3 };
+    function drawBuildup() {
+      const total = B.cof + B.ecl + B.opx + B.mgn;
+      document.getElementById("rate-out").textContent = total.toFixed(1) + "%";
+      componentBars("buildup-chart", [
+        { label: "Cost of funds", v: B.cof },
+        { label: "Credit loss", v: B.ecl },
+        { label: "Operating cost", v: B.opx },
+        { label: "Capital + margin", v: B.mgn },
+        { label: "= Loan rate", v: total, cls: "bar-total" },
+      ]);
+    }
+    bindSlider("cof", "cof-out", v => v.toFixed(1) + "%", v => { B.cof = v; drawBuildup(); });
+    bindSlider("ecl", "ecl-out", v => v.toFixed(1) + "%", v => { B.ecl = v; drawBuildup(); });
+    bindSlider("opx", "opx-out", v => v.toFixed(1) + "%", v => { B.opx = v; drawBuildup(); });
+    bindSlider("mgn", "mgn-out", v => v.toFixed(1) + "%", v => { B.mgn = v; drawBuildup(); });
+
+    // — Widget 2: deposit beta —
+    const D = { pol: 4, beta: 0.4 };
+    function drawBeta() {
+      const depRate = D.beta * D.pol;
+      document.getElementById("dep-out").textContent = depRate.toFixed(2) + "%";
+      document.getElementById("adv-out").textContent = (D.pol - depRate).toFixed(2) + "%";
+      const mkt = [], dep = [];
+      for (let r = 0; r <= 10; r += 0.5) {
+        mkt.push([r, r]);
+        dep.push([r, D.beta * r]);
+      }
+      lineChart("beta-chart", [{ points: mkt }, { points: dep }], { yMin: 0, yMax: 10, xLabel: "market / policy rate (%)" });
+    }
+    bindSlider("pol", "pol-out", v => v.toFixed(2) + "%", v => { D.pol = v; drawBeta(); });
+    bindSlider("beta", "beta-out", v => v.toFixed(2), v => { D.beta = v; drawBeta(); });
+  </script>
+</body>
+</html>

@@ -1,0 +1,474 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>What Moves FTP — Drivers and Consequences</title>
+  <meta name="archive-tags" content="banking, ftp, fundamentals, interest-rate">
+  <meta name="archive-summary" content="The bare-bones basics of what pushes FTP up and down — central bank policy, country ratings, war, liquidity stress — and what FTP movements do to the bank and the economy. With an interactive driver widget and scenario buttons.">
+  <meta name="archive-created" content="2026-08-04">
+  <meta name="archive-updated" content="2026-08-04">
+  <meta name="archive-status" content="final">
+  <style>
+    /* ==tokens== (synced from design/tokens.css — do not edit inside the markers) */
+    :root {
+      --color-bg: #faf9f7;
+      --color-surface: #ffffff;
+      --color-fg: #1a1a1e;
+      --color-muted: #6b6b76;
+      --color-border: #e4e2dd;
+      --color-accent: #2f6fed;
+      --color-accent-fg: #ffffff;
+      --color-accent-soft: #e8effd;
+      --color-danger: #c4483c;
+      --color-warn-bg: #fdf6e3;
+      --color-code-bg: #f2f1ee;
+      --color-mark: #fff3bf;
+      --font-body: "Charter", "Georgia", "Cambria", "Times New Roman", serif;
+      --font-ui: system-ui, -apple-system, "Segoe UI", sans-serif;
+      --font-mono: "SFMono-Regular", "Cascadia Code", "Consolas", "Menlo", monospace;
+      --text-xs: 0.75rem;
+      --text-sm: 0.875rem;
+      --text-base: 1.0625rem;
+      --text-lg: 1.25rem;
+      --text-xl: 1.5rem;
+      --text-2xl: 1.875rem;
+      --text-3xl: 2.375rem;
+      --leading-body: 1.65;
+      --leading-tight: 1.25;
+      --measure: 68ch;
+      --space-1: 0.25rem;
+      --space-2: 0.5rem;
+      --space-3: 0.75rem;
+      --space-4: 1rem;
+      --space-5: 1.5rem;
+      --space-6: 2rem;
+      --space-7: 3rem;
+      --space-8: 4rem;
+      --radius-sm: 4px;
+      --radius-md: 8px;
+      --radius-lg: 12px;
+      --shadow-sm: 0 1px 2px rgba(20, 20, 25, 0.06);
+      --shadow-md: 0 2px 8px rgba(20, 20, 25, 0.1);
+    }
+    [data-theme="dark"] {
+      --color-bg: #16161a;
+      --color-surface: #1e1e24;
+      --color-fg: #e8e6e3;
+      --color-muted: #9a98a0;
+      --color-border: #32323a;
+      --color-accent: #6b9bff;
+      --color-accent-fg: #10101c;
+      --color-accent-soft: #23304d;
+      --color-danger: #e0685c;
+      --color-warn-bg: #2e2a1e;
+      --color-code-bg: #24242b;
+      --color-mark: #4d4425;
+      --shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.4);
+      --shadow-md: 0 2px 8px rgba(0, 0, 0, 0.5);
+    }
+    /* ==/tokens== */
+
+    /* When opened standalone (not in the app frame), follow the OS theme. */
+    @media (prefers-color-scheme: dark) {
+      :root:not([data-theme]) {
+        --color-bg: #16161a;
+        --color-surface: #1e1e24;
+        --color-fg: #e8e6e3;
+        --color-muted: #9a98a0;
+        --color-border: #32323a;
+        --color-accent: #6b9bff;
+        --color-accent-fg: #10101c;
+        --color-accent-soft: #23304d;
+        --color-danger: #e0685c;
+        --color-warn-bg: #2e2a1e;
+        --color-code-bg: #24242b;
+        --color-mark: #4d4425;
+      }
+    }
+
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      background: var(--color-bg);
+      color: var(--color-fg);
+      font-family: var(--font-body);
+      font-size: var(--text-base);
+      line-height: var(--leading-body);
+    }
+    .paper {
+      max-width: var(--measure);
+      margin: 0 auto;
+      padding: var(--space-6) var(--space-4) var(--space-8);
+    }
+    h1 { font-size: var(--text-3xl); line-height: var(--leading-tight); margin: 0 0 var(--space-2); }
+    h2 { font-size: var(--text-xl); line-height: var(--leading-tight); margin: var(--space-6) 0 var(--space-3); border-bottom: 1px solid var(--color-border); padding-bottom: var(--space-2); }
+    h3 { font-size: var(--text-lg); margin: var(--space-5) 0 var(--space-2); }
+    .byline { color: var(--color-muted); font-family: var(--font-ui); font-size: var(--text-sm); margin-bottom: var(--space-6); }
+    a { color: var(--color-accent); }
+    code { font-family: var(--font-mono); font-size: 0.88em; background: var(--color-code-bg); padding: 1px 5px; border-radius: var(--radius-sm); }
+    pre { background: var(--color-code-bg); padding: var(--space-4); border-radius: var(--radius-md); overflow-x: auto; }
+    pre code { background: none; padding: 0; font-size: var(--text-sm); }
+    blockquote { margin: var(--space-4) 0; padding: var(--space-2) var(--space-4); border-left: 3px solid var(--color-accent); background: var(--color-surface); color: var(--color-muted); }
+
+    /* interactive widgets */
+    .widget {
+      font-family: var(--font-ui);
+      background: var(--color-surface);
+      border: 1px solid var(--color-border);
+      border-radius: var(--radius-lg);
+      padding: var(--space-4);
+      margin: var(--space-5) 0;
+      box-shadow: var(--shadow-sm);
+    }
+    .widget-title { font-weight: 600; font-size: var(--text-sm); margin: 0 0 var(--space-3); color: var(--color-muted); text-transform: uppercase; letter-spacing: 0.05em; }
+    .control { display: flex; align-items: center; gap: var(--space-3); margin: var(--space-2) 0; font-size: var(--text-sm); }
+    .control label { min-width: 9rem; }
+    .control input[type="range"] { flex: 1; accent-color: var(--color-accent); }
+    .control output { min-width: 4rem; text-align: right; font-family: var(--font-mono); font-size: var(--text-sm); }
+    .chart { width: 100%; height: auto; display: block; margin-top: var(--space-3); }
+    .chart .axis { stroke: var(--color-border); stroke-width: 1; }
+    .chart .axis-label { fill: var(--color-muted); font-family: var(--font-ui); font-size: 11px; }
+    .chart .series { fill: none; stroke: var(--color-accent); stroke-width: 2; }
+    .chart .series-2 { fill: none; stroke: var(--color-danger); stroke-width: 2; }
+    .chart .bar { fill: var(--color-accent); }
+    figure { margin: var(--space-5) 0; }
+    figcaption { font-family: var(--font-ui); font-size: var(--text-sm); color: var(--color-muted); margin-top: var(--space-2); }
+    details.derivation { margin: var(--space-4) 0; border: 1px solid var(--color-border); border-radius: var(--radius-md); padding: var(--space-3) var(--space-4); background: var(--color-surface); }
+    details.derivation summary { cursor: pointer; font-family: var(--font-ui); font-weight: 600; font-size: var(--text-sm); }
+
+    /* custom styles (after token markers) */
+    .readout { display: flex; gap: var(--space-4); font-family: var(--font-ui); margin-top: var(--space-3); flex-wrap: wrap; }
+    .readout .stat { background: var(--color-accent-soft); border-radius: var(--radius-md); padding: var(--space-2) var(--space-4); font-size: var(--text-sm); }
+    .readout .stat b { font-size: var(--text-lg); font-family: var(--font-mono); display: block; }
+    .scenarios { display: flex; gap: var(--space-2); flex-wrap: wrap; margin-bottom: var(--space-3); }
+    .scenarios button {
+      font-family: var(--font-ui); font-size: var(--text-sm);
+      background: var(--color-accent-soft); color: var(--color-fg);
+      border: 1px solid var(--color-border); border-radius: var(--radius-md);
+      padding: var(--space-2) var(--space-3); cursor: pointer;
+    }
+    .scenarios button:hover { border-color: var(--color-accent); }
+    .driver-table { font-family: var(--font-ui); font-size: var(--text-sm); border-collapse: collapse; width: 100%; margin: var(--space-4) 0; }
+    .driver-table th, .driver-table td { border: 1px solid var(--color-border); padding: var(--space-2) var(--space-3); text-align: left; vertical-align: top; }
+    .driver-table th { background: var(--color-code-bg); }
+    .up { color: var(--color-danger); font-weight: 600; }
+    .down { color: var(--color-accent); font-weight: 600; }
+    .series-nav { font-family: var(--font-ui); font-size: var(--text-sm); background: var(--color-surface); border: 1px solid var(--color-border); border-radius: var(--radius-md); padding: var(--space-3) var(--space-4); margin-top: var(--space-6); }
+  </style>
+</head>
+<body>
+  <main class="paper">
+    <h1>What Moves FTP</h1>
+    <p class="byline">NBB research · Companion to <a href="ftp-explained.html">part 3: FTP explained</a> · 2026</p>
+
+    <p><a href="ftp-explained.html">The main FTP doc</a> covers the machinery — how the curve splits margins and what to check before publishing it. This one answers a simpler, more fundamental question: <strong>where does the FTP number itself come from, what pushes it up and down, and what happens when it moves?</strong></p>
+
+    <h2>1. The bare bones: FTP is the price of money, for a time, in a place</h2>
+
+    <p>Strip everything away and the FTP rate is the answer to one question: <em>"what would it cost our bank, today, to borrow this money for this long?"</em> That cost has three layers, and every headline that moves FTP moves one of them:</p>
+
+    <blockquote>
+      FTP(tenor) ≈ <strong>risk-free rate</strong> (what money costs anyone)<br>
+      + <strong>country &amp; bank risk premium</strong> (what lenders charge for <em>us</em> specifically)<br>
+      + <strong>liquidity premium</strong> (the extra for locking money up for the tenor)
+    </blockquote>
+
+    <ul>
+      <li><strong>Layer 1 — the risk-free base.</strong> Anchored at the short end by the central bank's policy rate, and further out by where markets <em>expect</em> policy to go. This layer moves on inflation data, central bank meetings, and the economic cycle. It affects every bank in the country identically.</li>
+      <li><strong>Layer 2 — the risk premium.</strong> Lenders don't lend to "the market", they lend to a specific bank in a specific country. The riskier either looks, the more they charge. This layer moves on sovereign credit ratings, geopolitics, and the bank's own health — and it can move violently while layer 1 stands still.</li>
+      <li><strong>Layer 3 — the liquidity premium.</strong> Money locked up for 5 years must pay more than overnight money, and how much more depends on how nervous markets are. Calm markets: thin premium. Stressed markets: everyone wants their money reachable, so term money gets expensive.</li>
+    </ul>
+
+    <h2>2. The drivers: what pushes FTP up and down</h2>
+
+    <table class="driver-table">
+      <thead>
+        <tr><th>Event</th><th>FTP</th><th>Why</th></tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td>Central bank hikes (inflation fight)</td>
+          <td class="up">UP</td>
+          <td>The risk-free base rises directly; the whole curve lifts, short end first.</td>
+        </tr>
+        <tr>
+          <td>Central bank cuts (recession fight)</td>
+          <td class="down">DOWN</td>
+          <td>Mirror image — cheap money policy flows straight into the FTP base.</td>
+        </tr>
+        <tr>
+          <td>Country rating downgrade</td>
+          <td class="up">UP</td>
+          <td>Government bond yields jump, and a bank can rarely borrow cheaper than its own government (the "sovereign ceiling"). Every bank in the country pays more for wholesale money, so every FTP curve shifts up — even though the central bank did nothing.</td>
+        </tr>
+        <tr>
+          <td>War / geopolitical crisis (in or near the country)</td>
+          <td class="up">UP, sharply</td>
+          <td>Three channels at once: investors demand a bigger risk premium to hold the country's debt (layer 2); depositors and foreign investors pull money out, making funding scarce (layer 3); and the central bank may hike to defend the currency (layer 1). Long tenors rise most — nobody wants to lock money into a war zone for 5 years.</td>
+        </tr>
+        <tr>
+          <td>War far away (country is a safe haven)</td>
+          <td class="down">DOWN</td>
+          <td>The reverse flow: money flees the crisis region <em>into</em> safe markets, deposits flood in, funding is abundant, premia compress. The same war raises FTP in one country and lowers it in another.</td>
+        </tr>
+        <tr>
+          <td>Financial stress / credit crunch</td>
+          <td class="up">UP</td>
+          <td>Even with policy rates unchanged, banks stop trusting each other, interbank money dries up, and the liquidity premium (layer 3) explodes. 2008's signature: policy rates falling while banks' actual funding cost rose.</td>
+        </tr>
+        <tr>
+          <td>The bank's own trouble (losses, downgrade, deposit outflow)</td>
+          <td class="up">UP (that bank only)</td>
+          <td>FTP is bank-specific. A weakened bank pays more for funding than the bank across the street, and its FTP must say so — otherwise it prices loans it can't fund profitably.</td>
+        </tr>
+        <tr>
+          <td>Deposit glut (strong inflows, high savings)</td>
+          <td class="down">DOWN (gradually)</td>
+          <td>When cheap, stable funding is abundant, the bank's marginal cost of money falls and the FTP curve can be shaded down, making its loans more competitive.</td>
+        </tr>
+      </tbody>
+    </table>
+
+    <p>Notice the pattern: <strong>anything that makes lenders more nervous or money more scarce pushes FTP up; anything that makes money cheaper or more abundant pushes it down.</strong> FTP is simply the bank's internal thermometer for the temperature of the money around it.</p>
+
+    <h2>3. Try it: the FTP driver machine</h2>
+
+    <p>Each slider is one layer from section 1. The scenario buttons set all four at once — press them in order and watch what each story does to the curve shape, not just its level.</p>
+
+    <div class="widget">
+      <p class="widget-title">FTP driver machine</p>
+      <div class="scenarios">
+        <button id="sc-calm">Calm times</button>
+        <button id="sc-hike">Inflation fight</button>
+        <button id="sc-down">Rating downgrade</button>
+        <button id="sc-war">War nearby</button>
+        <button id="sc-cut">Deep recession</button>
+      </div>
+      <div class="control">
+        <label for="pol">Policy rate</label>
+        <input type="range" id="pol" min="0" max="10" step="0.25" value="3">
+        <output id="pol-out">3.00%</output>
+      </div>
+      <div class="control">
+        <label for="exp">Expected direction</label>
+        <input type="range" id="exp" min="-2" max="3" step="0.1" value="1">
+        <output id="exp-out">+1.0%</output>
+      </div>
+      <div class="control">
+        <label for="cty">Country/bank risk premium</label>
+        <input type="range" id="cty" min="0" max="5" step="0.1" value="0.5">
+        <output id="cty-out">0.5%</output>
+      </div>
+      <div class="control">
+        <label for="liq">Liquidity stress</label>
+        <input type="range" id="liq" min="0" max="3" step="0.1" value="0.3">
+        <output id="liq-out">0.3%</output>
+      </div>
+      <div class="readout">
+        <div class="stat">FTP @ 1y <b id="f1-out"></b></div>
+        <div class="stat">FTP @ 5y <b id="f5-out"></b></div>
+        <div class="stat">Typical 5y loan rate <b id="ln-out"></b></div>
+      </div>
+      <svg id="drv-chart" class="chart" viewBox="0 0 640 280" role="img" aria-label="Risk-free base vs full FTP curve"></svg>
+    </div>
+
+    <figure>
+      <figcaption><strong>Figure 1.</strong> Blue: the risk-free base curve (layer 1 — policy rate plus expectations). Red: the full FTP curve after adding the risk and liquidity layers. The gap between blue and red is what the country's and the bank's circumstances cost — press "Rating downgrade" and watch that gap, not the blue line, do all the moving. The loan-rate readout adds a fixed 3.5% business spread (credit + costs + margin, from <a href="deposit-and-loan-rates.html">part 2</a>) to FTP@5y.</figcaption>
+    </figure>
+
+    <h2>4. What FTP movements do inside the bank</h2>
+
+    <p>When the FTP curve moves, it propagates through the bank within days:</p>
+
+    <ul>
+      <li><strong>Loan pricing moves.</strong> FTP is the largest component of every loan quote (part 2's build-up). FTP up 1% → new loan offers up roughly 1%. Existing fixed-rate loans don't move — which is exactly the mismatch treasury carries and ALM manages.</li>
+      <li><strong>Deposits become more (or less) precious.</strong> FTP up means each deposit is credited more internally, so branches suddenly have budget to fight for deposits — you see this on the street as term-deposit campaigns appearing right after rate hikes.</li>
+      <li><strong>Business mix shifts.</strong> Products that looked profitable at 3% FTP may not clear their hurdle at 6%; long-tenor lending quietly shrinks when the liquidity premium spikes. FTP is how the bank's balance sheet "feels" the outside world and reshapes itself.</li>
+      <li><strong>Margins get squeezed or fattened with a lag.</strong> Funding cost reprices before the loan book does. A fast FTP rise compresses margins first (old loans, new funding costs), then restores them as the book re-prices.</li>
+    </ul>
+
+    <h2>5. What it does to the economy</h2>
+
+    <p>Zoom out and FTP is the <strong>transmission belt of monetary policy</strong>. A central bank can only set one overnight rate; it is each bank's FTP system that carries that decision to every car loan, mortgage, and business overdraft in the country:</p>
+
+    <ul>
+      <li><strong>Tightening:</strong> policy/risk pushes FTP up → loan rates rise → households and firms borrow less, save more → demand cools → inflation eases. The pain shows up as slower construction, fewer expansions, costlier mortgages.</li>
+      <li><strong>Easing:</strong> FTP falls → credit gets cheap → borrowing, investment, and asset prices pick up.</li>
+      <li><strong>The risk-premium channel is the cruel one:</strong> after a downgrade or during a conflict, FTP rises <em>without any policy decision</em> — the economy gets a de facto rate hike at the worst possible moment, which is why sovereign stress and credit crunches deepen recessions.</li>
+      <li><strong>Credit rationing:</strong> when FTP embeds a big risk premium, marginal borrowers (small firms, first-time buyers) are priced out first — the quantity of credit contracts, not just its price.</li>
+    </ul>
+
+    <p>So a single sentence to keep: <strong>FTP is how the outside world's price of money enters the bank, and how the bank's response exits into the economy.</strong> Everything else — the curves, the checklists, the governance in <a href="ftp-explained.html">the main FTP doc</a> — is machinery for doing that translation honestly.</p>
+
+    <h2>6. Steering the bank: the FTP slider</h2>
+
+    <p>This last section reproduces a hand-drawn treasury sketch (three number lines on an NBB pad, titled <em>"liquidity-based activity"</em>) that captures, better than any textbook, how FTP is actually <strong>used as a management lever</strong>. Picture the deposit rate and the loan rate as the two ends of a line, with FTP as a slider between them. The slider's position decides how the customer spread is divided between the two desks (<a href="ftp-explained.html">part 3</a>) — and therefore <em>which behavior the bank is rewarding</em>:</p>
+
+    <ul>
+      <li><strong>FTP in the middle ("FTP normal", 3% – 5% – 7% in the sketch):</strong> both desks earn a fair 2%. No side is favored; the balance sheet grows evenly.</li>
+      <li><strong>FTP pushed right / higher (4% – 6% – 8%):</strong> the gap between the deposit rate and FTP widens — every deposit now earns the branch a fat margin, so <em>deposits become more attractive to the bank</em> and branches chase them. Meanwhile lending desks buy their funding at a higher internal price, their margin thins, and <em>loans become less attractive to write</em>. Net effect: the bank <strong>gathers liquidity</strong>.</li>
+      <li><strong>FTP pushed left / lower (2% – 4% – 6%):</strong> the mirror image. Deposits barely pay the branch anything (<em>less attractive deposits</em>), while lending desks get cheap internal funding and quote aggressively (<em>more attractive loans</em>). Net effect: the bank <strong>deploys liquidity</strong> into assets.</li>
+    </ul>
+
+    <div class="widget">
+      <p class="widget-title">The FTP steering slider (redrawn from the sketch)</p>
+      <div class="scenarios">
+        <button id="st-left">FTP left — push loans</button>
+        <button id="st-norm">FTP normal</button>
+        <button id="st-right">FTP right — gather deposits</button>
+      </div>
+      <div class="control">
+        <label for="ftp2">FTP rate</label>
+        <input type="range" id="ftp2" min="3" max="7" step="0.1" value="5">
+        <output id="ftp2-out">5.0%</output>
+      </div>
+      <svg id="steer-chart" class="chart" viewBox="0 0 640 210" role="img" aria-label="FTP slider between deposit rate and loan rate"></svg>
+      <div class="readout">
+        <div class="stat">Deposit desk margin <b id="dm-out"></b></div>
+        <div class="stat">Lending desk margin <b id="lm-out"></b></div>
+        <div class="stat">Balance-sheet effect <b id="vd-out"></b></div>
+      </div>
+    </div>
+
+    <figure>
+      <figcaption><strong>Figure 2.</strong> The whiteboard diagram, live: deposit rate fixed at 3%, loan rate at 7%, FTP sliding between them. The blue bracket is what the deposit desk earns, the red bracket what the lending desk earns — slide FTP right and watch the incentive to gather deposits grow at lending's expense.</figcaption>
+    </figure>
+
+    <h3>How to use the lever — goal by goal</h3>
+
+    <ul>
+      <li><strong>Bank needs liquidity</strong> (loan growth outrunning deposits, LCR under pressure, wholesale markets expensive or shut): shift FTP <em>up</em>. Branches launch deposit campaigns within weeks; loan pricing drifts up and demand cools. This is exactly the "liquidity-based activity" of the sketch's title.</li>
+      <li><strong>Bank is drowning in liquidity</strong> (deposits pile up with nowhere to go, excess parked at the central bank at low rates): shift FTP <em>down</em>. Deposit-gathering stops being rewarded, lending desks get cheap funds and go hunting for assets.</li>
+      <li><strong>Bank needs a specific kind of funding</strong> — say long-term money for NSFR: don't move the whole curve, raise the FTP <em>credit at long tenors only</em>. Branches respond by pushing 12-month+ term deposits rather than more current accounts.</li>
+      <li><strong>Bank wants less of a specific product</strong> (long fixed-rate mortgages it can't hedge cheaply): raise the FTP <em>charge on that product's tenor</em>, and origination slows without any memo ordering it to.</li>
+    </ul>
+
+    <p>Two disciplines keep this honest. First, the lever works precisely <em>because</em> it leaks into customer pricing — branches pass their FTP economics on to real deposit and loan rates; that leak is the mechanism, not a side effect. Second, every deliberate tilt away from the market-based curve is a <strong>strategic overlay</strong> — checklist item 6 of <a href="ftp-explained.html">the main FTP doc</a>: it must be explicit, ALCO-approved, and temporary. A silently tilted FTP curve stops measuring reality, and after a while nobody — including treasury — knows which businesses are actually profitable.</p>
+
+    <div class="series-nav">
+      <strong>Related:</strong>
+      <a href="ftp-explained.html">FTP explained (mechanics + Bahrain)</a> ·
+      <a href="deposit-and-loan-rates.html">Deposit rates vs loan rates</a> ·
+      <a href="alm-fundamentals.html">ALM fundamentals</a>
+    </div>
+  </main>
+  <script>
+    // All JS inline. No external requests of any kind (page runs sandboxed & offline).
+    function bindSlider(id, outId, fmt, onChange) {
+      const el = document.getElementById(id), out = document.getElementById(outId);
+      const update = () => { out.textContent = fmt(el.valueAsNumber); onChange(el.valueAsNumber); };
+      el.addEventListener("input", update);
+      update();
+    }
+
+    function lineChart(svgId, seriesList, opts = {}) {
+      const svg = document.getElementById(svgId);
+      const W = 640, H = 280, m = { t: 12, r: 12, b: 28, l: 44 };
+      const pts = seriesList.flatMap(s => s.points);
+      const xs = pts.map(p => p[0]), ys = pts.map(p => p[1]);
+      const x0 = opts.xMin ?? Math.min(...xs), x1 = opts.xMax ?? Math.max(...xs);
+      const y0 = opts.yMin ?? Math.min(...ys), y1 = opts.yMax ?? Math.max(...ys);
+      const X = v => m.l + ((v - x0) / (x1 - x0 || 1)) * (W - m.l - m.r);
+      const Y = v => H - m.b - ((v - y0) / (y1 - y0 || 1)) * (H - m.t - m.b);
+      const tickFmt = v => Math.abs(v) >= 1000 ? v.toExponential(0) : +v.toFixed(2);
+      let out = `<line class="axis" x1="${m.l}" y1="${H - m.b}" x2="${W - m.r}" y2="${H - m.b}"/>` +
+                `<line class="axis" x1="${m.l}" y1="${m.t}" x2="${m.l}" y2="${H - m.b}"/>`;
+      for (let i = 0; i <= 4; i++) {
+        const xv = x0 + (i / 4) * (x1 - x0), yv = y0 + (i / 4) * (y1 - y0);
+        out += `<text class="axis-label" x="${X(xv)}" y="${H - m.b + 16}" text-anchor="middle">${tickFmt(xv)}</text>`;
+        out += `<text class="axis-label" x="${m.l - 6}" y="${Y(yv) + 4}" text-anchor="end">${tickFmt(yv)}</text>`;
+      }
+      seriesList.forEach((s, i) => {
+        const d = s.points.map((p, j) => `${j ? "L" : "M"}${X(p[0]).toFixed(1)},${Y(p[1]).toFixed(1)}`).join("");
+        out += `<path class="${i === 0 ? "series" : "series-2"}" d="${d}"/>`;
+      });
+      if (opts.xLabel) out += `<text class="axis-label" x="${(W + m.l) / 2}" y="${H - 4}" text-anchor="middle">${opts.xLabel}</text>`;
+      svg.innerHTML = out;
+    }
+
+    // layers: base(t) = policy + expectations shape; risk premium tilts up slightly with tenor;
+    // liquidity stress loads mostly onto long tenors.
+    const V = { pol: 3, exp: 1, cty: 0.5, liq: 0.3 };
+    function base(t) { return V.pol + V.exp * (1 - Math.exp(-t / 2)); }
+    function ftp(t) { return base(t) + V.cty * (0.7 + 0.3 * t / 10) + V.liq * (0.3 + 0.7 * t / 10); }
+
+    function redraw() {
+      const b = [], f = [];
+      for (let t = 0; t <= 10; t += 0.25) { b.push([t, base(t)]); f.push([t, ftp(t)]); }
+      document.getElementById("f1-out").textContent = ftp(1).toFixed(2) + "%";
+      document.getElementById("f5-out").textContent = ftp(5).toFixed(2) + "%";
+      document.getElementById("ln-out").textContent = (ftp(5) + 3.5).toFixed(2) + "%";
+      lineChart("drv-chart", [{ points: b }, { points: f }], { yMin: 0, yMax: 14, xLabel: "tenor (years)" });
+    }
+
+    bindSlider("pol", "pol-out", v => v.toFixed(2) + "%", v => { V.pol = v; redraw(); });
+    bindSlider("exp", "exp-out", v => (v >= 0 ? "+" : "") + v.toFixed(1) + "%", v => { V.exp = v; redraw(); });
+    bindSlider("cty", "cty-out", v => v.toFixed(1) + "%", v => { V.cty = v; redraw(); });
+    bindSlider("liq", "liq-out", v => v.toFixed(1) + "%", v => { V.liq = v; redraw(); });
+
+    // scenario presets: [policy, expectations, country risk, liquidity stress]
+    const SCEN = {
+      "sc-calm": [3, 1, 0.5, 0.3],
+      "sc-hike": [6.5, 0.8, 0.5, 0.4],
+      "sc-down": [3, 1, 2.5, 1.2],
+      "sc-war":  [4.5, 0.5, 3.5, 2.2],
+      "sc-cut":  [1, -0.8, 1.2, 0.8],
+    };
+    const IDS = ["pol", "exp", "cty", "liq"];
+    Object.entries(SCEN).forEach(([btnId, vals]) => {
+      document.getElementById(btnId).addEventListener("click", () => {
+        vals.forEach((v, i) => {
+          const el = document.getElementById(IDS[i]);
+          el.value = v;
+          el.dispatchEvent(new Event("input"));
+        });
+      });
+    });
+
+    // — Widget 2: FTP steering slider (redrawn whiteboard sketch) —
+    const T = { dep: 3, loan: 7, ftp: 5 };
+    function steerDraw() {
+      const svg = document.getElementById("steer-chart");
+      const L = 50, R = 590, yLine = 130;
+      const X = r => L + (r - 2) / 6 * (R - L);
+      let out = `<line class="axis" x1="${L}" y1="${yLine}" x2="${R}" y2="${yLine}"/>`;
+      for (let r = 2; r <= 8; r++) {
+        out += `<line class="axis" x1="${X(r)}" y1="${yLine - 4}" x2="${X(r)}" y2="${yLine + 4}"/>`;
+        out += `<text class="axis-label" x="${X(r)}" y="${yLine + 18}" text-anchor="middle">${r}%</text>`;
+      }
+      const xd = X(T.dep), xf = X(T.ftp), xl = X(T.loan);
+      const dm = T.ftp - T.dep, lm = T.loan - T.ftp;
+      // customer-rate markers
+      out += `<line x1="${xd}" y1="112" x2="${xd}" y2="${yLine}" stroke="var(--color-accent)" stroke-width="2"/>`;
+      out += `<text class="axis-label" x="${xd}" y="104" text-anchor="middle">deposits 3%</text>`;
+      out += `<line x1="${xl}" y1="112" x2="${xl}" y2="${yLine}" stroke="var(--color-danger)" stroke-width="2"/>`;
+      out += `<text class="axis-label" x="${xl}" y="104" text-anchor="middle">loans 7%</text>`;
+      // margin brackets
+      out += `<line x1="${xd}" y1="72" x2="${xf}" y2="72" stroke="var(--color-accent)" stroke-width="6" stroke-linecap="round" opacity="0.85"/>`;
+      out += `<text class="axis-label" x="${(xd + xf) / 2}" y="60" text-anchor="middle">deposit margin ${dm.toFixed(1)}%</text>`;
+      out += `<line x1="${xf}" y1="178" x2="${xl}" y2="178" stroke="var(--color-danger)" stroke-width="6" stroke-linecap="round" opacity="0.85"/>`;
+      out += `<text class="axis-label" x="${(xf + xl) / 2}" y="198" text-anchor="middle">lending margin ${lm.toFixed(1)}%</text>`;
+      // FTP handle
+      out += `<rect x="${(xf - 5).toFixed(1)}" y="114" width="10" height="32" rx="3" fill="var(--color-fg)"/>`;
+      out += `<text class="axis-label" x="${xf}" y="36" text-anchor="middle" font-weight="600">FTP ${T.ftp.toFixed(1)}%</text>`;
+      out += `<line x1="${xf}" y1="42" x2="${xf}" y2="56" class="axis"/>`;
+      svg.innerHTML = out;
+      document.getElementById("dm-out").textContent = dm.toFixed(1) + "%";
+      document.getElementById("lm-out").textContent = lm.toFixed(1) + "%";
+      const vd = document.getElementById("vd-out");
+      if (T.ftp > 5.3) vd.textContent = "gathering liquidity";
+      else if (T.ftp < 4.7) vd.textContent = "deploying liquidity";
+      else vd.textContent = "neutral";
+    }
+    bindSlider("ftp2", "ftp2-out", v => v.toFixed(1) + "%", v => { T.ftp = v; steerDraw(); });
+    [["st-left", 4], ["st-norm", 5], ["st-right", 6]].forEach(([id, v]) => {
+      document.getElementById(id).addEventListener("click", () => {
+        const el = document.getElementById("ftp2");
+        el.value = v;
+        el.dispatchEvent(new Event("input"));
+      });
+    });
+  </script>
+</body>
+</html>

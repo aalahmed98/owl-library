@@ -1,11 +1,11 @@
 ---
 name: research-ingest
-description: Ingest external research into theArchive — given a PDF file, URL, or pasted text, produce a summarized, tagged, correctly filed doc. Use when asked to "add this paper", "save this article", "ingest", or when handed a PDF/link destined for the archive.
+description: Ingest external research into owl-library — given a PDF file, URL, or pasted text, produce a summarized, tagged, correctly filed doc. Use when asked to "add this paper", "save this article", "ingest", or when handed a PDF/link destined for the archive.
 ---
 
 # Research Ingestion
 
-Turn external material (PDF / URL / pasted text) into properly filed archive content. Follow the **doc-conventions** skill for all naming, metadata, and folder rules, and use only **the-archive MCP tools** for writes.
+Turn external material (PDF / URL / pasted text) into properly filed archive content. Follow the **doc-conventions** skill for all naming, metadata, and folder rules, and use only **owl-library MCP tools** for writes.
 
 ## Workflow
 

@@ -1,11 +1,11 @@
 ---
 name: library-maintenance
-description: Maintain theArchive's health — triage the inbox, normalize tags, dedupe docs, re-sync design tokens in HTML papers, review trash. Use when asked to "clean up the archive", "organize the library", "fix tags", or on a periodic maintenance pass.
+description: Maintain owl-library's health — triage the inbox, normalize tags, dedupe docs, re-sync design tokens in HTML papers, review trash. Use when asked to "clean up the archive", "organize the library", "fix tags", or on a periodic maintenance pass.
 ---
 
 # Library Maintenance
 
-Periodic housekeeping for theArchive. Read the **doc-conventions** skill first; use only **the-archive MCP tools** for changes. Work through whichever of these passes the user asked for (or all, for a full sweep), and report findings before making bulk changes.
+Periodic housekeeping for owl-library. Read the **doc-conventions** skill first; use only **owl-library MCP tools** for changes. Work through whichever of these passes the user asked for (or all, for a full sweep), and report findings before making bulk changes.
 
 ## Passes
 

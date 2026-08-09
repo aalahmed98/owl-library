@@ -1,6 +1,6 @@
 ---
 name: html-paper-builder
-description: Build interactive HTML papers for theArchive — self-contained pages with sliders, live charts, and derivations that share the archive's design system. Use whenever creating or restyling an .html doc in theArchive (papers/ folder), or converting research into an interactive explainer.
+description: Build interactive HTML papers for owl-library — self-contained pages with sliders, live charts, and derivations that share the archive's design system. Use whenever creating or restyling an .html doc in owl-library (papers/ folder), or converting research into an interactive explainer.
 ---
 
 # Interactive HTML Paper Builder
@@ -13,7 +13,7 @@ Papers are single, fully self-contained `.html` files that render correctly in t
 2. **Start from `template.html`** (in this skill's folder). It carries the archive meta tags, the design-token block, base typography, and widget styles. Never hand-roll the boilerplate.
 3. **Don't edit inside the `/* ==tokens== */ … /* ==/tokens== */` markers.** That block is a synced copy of `design/tokens.css`; the library-maintenance skill refreshes it. Add custom styles *after* the markers.
 4. **Fill the archive meta tags** (`<title>`, `archive-tags`, `archive-summary`, `archive-created`, `archive-updated`, `archive-status`, plus `archive-source`/`archive-authors` when adapting external work) following the doc-conventions skill.
-5. **File into `papers/`** (topical subfolder when one exists) via the-archive `create_doc` with the complete HTML as `content`.
+5. **File into `papers/`** (topical subfolder when one exists) via owl-library `create_doc` with the complete HTML as `content`.
 
 ## Workflow
 

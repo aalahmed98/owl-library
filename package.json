@@ -1,5 +1,5 @@
 {
-  "name": "the-archive",
+  "name": "owl-library",
   "version": "0.1.0",
   "private": true,
   "type": "module",
@@ -13,6 +13,8 @@
     "postinstall": "node scripts/copy-katex.mjs"
   },
   "dependencies": {
+    "@fastify/cookie": "^11.1.2",
+    "@fastify/formbody": "^9.0.0",
     "@fastify/static": "^10.1.2",
     "@modelcontextprotocol/sdk": "^1.30.0",
     "@shikijs/rehype": "^4.4.1",

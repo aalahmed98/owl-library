@@ -1,0 +1,308 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>How a Bank Makes Money — Treasury Basics, Part 1</title>
+  <meta name="archive-tags" content="banking, treasury, fundamentals">
+  <meta name="archive-summary" content="A bank as a balance sheet: deposits fund loans, and net interest income is the spread. Includes a live toy-bank simulator.">
+  <meta name="archive-created" content="2026-08-04">
+  <meta name="archive-updated" content="2026-08-04">
+  <meta name="archive-status" content="final">
+  <style>
+    /* ==tokens== (synced from design/tokens.css — do not edit inside the markers) */
+    :root {
+      --color-bg: #faf9f7;
+      --color-surface: #ffffff;
+      --color-fg: #1a1a1e;
+      --color-muted: #6b6b76;
+      --color-border: #e4e2dd;
+      --color-accent: #2f6fed;
+      --color-accent-fg: #ffffff;
+      --color-accent-soft: #e8effd;
+      --color-danger: #c4483c;
+      --color-warn-bg: #fdf6e3;
+      --color-code-bg: #f2f1ee;
+      --color-mark: #fff3bf;
+      --font-body: "Charter", "Georgia", "Cambria", "Times New Roman", serif;
+      --font-ui: system-ui, -apple-system, "Segoe UI", sans-serif;
+      --font-mono: "SFMono-Regular", "Cascadia Code", "Consolas", "Menlo", monospace;
+      --text-xs: 0.75rem;
+      --text-sm: 0.875rem;
+      --text-base: 1.0625rem;
+      --text-lg: 1.25rem;
+      --text-xl: 1.5rem;
+      --text-2xl: 1.875rem;
+      --text-3xl: 2.375rem;
+      --leading-body: 1.65;
+      --leading-tight: 1.25;
+      --measure: 68ch;
+      --space-1: 0.25rem;
+      --space-2: 0.5rem;
+      --space-3: 0.75rem;
+      --space-4: 1rem;
+      --space-5: 1.5rem;
+      --space-6: 2rem;
+      --space-7: 3rem;
+      --space-8: 4rem;
+      --radius-sm: 4px;
+      --radius-md: 8px;
+      --radius-lg: 12px;
+      --shadow-sm: 0 1px 2px rgba(20, 20, 25, 0.06);
+      --shadow-md: 0 2px 8px rgba(20, 20, 25, 0.1);
+    }
+    [data-theme="dark"] {
+      --color-bg: #16161a;
+      --color-surface: #1e1e24;
+      --color-fg: #e8e6e3;
+      --color-muted: #9a98a0;
+      --color-border: #32323a;
+      --color-accent: #6b9bff;
+      --color-accent-fg: #10101c;
+      --color-accent-soft: #23304d;
+      --color-danger: #e0685c;
+      --color-warn-bg: #2e2a1e;
+      --color-code-bg: #24242b;
+      --color-mark: #4d4425;
+      --shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.4);
+      --shadow-md: 0 2px 8px rgba(0, 0, 0, 0.5);
+    }
+    /* ==/tokens== */
+
+    /* When opened standalone (not in the app frame), follow the OS theme. */
+    @media (prefers-color-scheme: dark) {
+      :root:not([data-theme]) {
+        --color-bg: #16161a;
+        --color-surface: #1e1e24;
+        --color-fg: #e8e6e3;
+        --color-muted: #9a98a0;
+        --color-border: #32323a;
+        --color-accent: #6b9bff;
+        --color-accent-fg: #10101c;
+        --color-accent-soft: #23304d;
+        --color-danger: #e0685c;
+        --color-warn-bg: #2e2a1e;
+        --color-code-bg: #24242b;
+        --color-mark: #4d4425;
+      }
+    }
+
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      background: var(--color-bg);
+      color: var(--color-fg);
+      font-family: var(--font-body);
+      font-size: var(--text-base);
+      line-height: var(--leading-body);
+    }
+    .paper {
+      max-width: var(--measure);
+      margin: 0 auto;
+      padding: var(--space-6) var(--space-4) var(--space-8);
+    }
+    h1 { font-size: var(--text-3xl); line-height: var(--leading-tight); margin: 0 0 var(--space-2); }
+    h2 { font-size: var(--text-xl); line-height: var(--leading-tight); margin: var(--space-6) 0 var(--space-3); border-bottom: 1px solid var(--color-border); padding-bottom: var(--space-2); }
+    h3 { font-size: var(--text-lg); margin: var(--space-5) 0 var(--space-2); }
+    .byline { color: var(--color-muted); font-family: var(--font-ui); font-size: var(--text-sm); margin-bottom: var(--space-6); }
+    a { color: var(--color-accent); }
+    code { font-family: var(--font-mono); font-size: 0.88em; background: var(--color-code-bg); padding: 1px 5px; border-radius: var(--radius-sm); }
+    pre { background: var(--color-code-bg); padding: var(--space-4); border-radius: var(--radius-md); overflow-x: auto; }
+    pre code { background: none; padding: 0; font-size: var(--text-sm); }
+    blockquote { margin: var(--space-4) 0; padding: var(--space-2) var(--space-4); border-left: 3px solid var(--color-accent); background: var(--color-surface); color: var(--color-muted); }
+
+    /* interactive widgets */
+    .widget {
+      font-family: var(--font-ui);
+      background: var(--color-surface);
+      border: 1px solid var(--color-border);
+      border-radius: var(--radius-lg);
+      padding: var(--space-4);
+      margin: var(--space-5) 0;
+      box-shadow: var(--shadow-sm);
+    }
+    .widget-title { font-weight: 600; font-size: var(--text-sm); margin: 0 0 var(--space-3); color: var(--color-muted); text-transform: uppercase; letter-spacing: 0.05em; }
+    .control { display: flex; align-items: center; gap: var(--space-3); margin: var(--space-2) 0; font-size: var(--text-sm); }
+    .control label { min-width: 9rem; }
+    .control input[type="range"] { flex: 1; accent-color: var(--color-accent); }
+    .control output { min-width: 4rem; text-align: right; font-family: var(--font-mono); font-size: var(--text-sm); }
+    .chart { width: 100%; height: auto; display: block; margin-top: var(--space-3); }
+    .chart .axis { stroke: var(--color-border); stroke-width: 1; }
+    .chart .axis-label { fill: var(--color-muted); font-family: var(--font-ui); font-size: 11px; }
+    .chart .series { fill: none; stroke: var(--color-accent); stroke-width: 2; }
+    .chart .series-2 { fill: none; stroke: var(--color-danger); stroke-width: 2; }
+    .chart .bar { fill: var(--color-accent); }
+    figure { margin: var(--space-5) 0; }
+    figcaption { font-family: var(--font-ui); font-size: var(--text-sm); color: var(--color-muted); margin-top: var(--space-2); }
+    details.derivation { margin: var(--space-4) 0; border: 1px solid var(--color-border); border-radius: var(--radius-md); padding: var(--space-3) var(--space-4); background: var(--color-surface); }
+    details.derivation summary { cursor: pointer; font-family: var(--font-ui); font-weight: 600; font-size: var(--text-sm); }
+
+    /* custom styles (after token markers) */
+    .chart .bar-exp { fill: var(--color-danger); }
+    .readout { display: flex; gap: var(--space-4); font-family: var(--font-ui); margin-top: var(--space-3); flex-wrap: wrap; }
+    .readout .stat { background: var(--color-accent-soft); border-radius: var(--radius-md); padding: var(--space-2) var(--space-4); font-size: var(--text-sm); }
+    .readout .stat b { font-size: var(--text-lg); font-family: var(--font-mono); display: block; }
+    .bs-line { font-family: var(--font-mono); font-size: var(--text-xs); color: var(--color-muted); margin-top: var(--space-3); }
+    .series-nav { font-family: var(--font-ui); font-size: var(--text-sm); background: var(--color-surface); border: 1px solid var(--color-border); border-radius: var(--radius-md); padding: var(--space-3) var(--space-4); margin-top: var(--space-6); }
+  </style>
+</head>
+<body>
+  <main class="paper">
+    <h1>How a Bank Makes Money</h1>
+    <p class="byline">NBB research · Bank treasury series, part 1 of 4 · 2026</p>
+
+    <p>Strip away the branches, the apps, and the marble lobbies, and a commercial bank is a surprisingly simple machine: it <strong>borrows money from people who don't need it right now</strong> (depositors) and <strong>lends it to people who do</strong> (borrowers), keeping the difference in interest as its income. Everything else in this series — deposit pricing, funds transfer pricing (FTP), asset–liability management (ALM) — exists to protect and divide up that difference.</p>
+
+    <p>This is part 1 of a four-part series: <em>(1) how a bank makes money · (2) deposit rates vs loan rates · (3) FTP · (4) ALM fundamentals</em>.</p>
+
+    <h2>1. A bank is a balance sheet</h2>
+
+    <p>The clearest way to see a bank is as a balance sheet with two sides that must always be equal:</p>
+
+    <ul>
+      <li><strong>Assets</strong> — what the bank owns and what earns it interest: loans to customers, securities (e.g. government bonds), and some cash held for safety.</li>
+      <li><strong>Liabilities &amp; equity</strong> — where the money came from: customer deposits, <em>wholesale funding</em> (money borrowed from other banks or markets), and the shareholders' own capital (equity).</li>
+    </ul>
+
+    <p>The balance is not an accounting nicety — it is physics. Every extra dirham/dollar of loans must be funded by an extra dirham/dollar of deposits, wholesale borrowing, or equity. When you play with the simulator below, watch how the machine automatically plugs the gap: surplus deposits get parked in securities, and a loan book bigger than the deposit base forces the bank to borrow expensively in the wholesale market.</p>
+
+    <h2>2. The spread: net interest income</h2>
+
+    <p>The bank pays a low rate on what it owes and charges a higher rate on what it owns. Two numbers summarize the whole business:</p>
+
+    <ul>
+      <li><strong>Net interest income (NII)</strong> = interest earned on assets − interest paid on liabilities. This is the raw profit engine, measured in currency.</li>
+      <li><strong>Net interest margin (NIM)</strong> = NII ÷ earning assets. This is the same thing as a percentage, so banks of different sizes can be compared. A typical commercial bank runs a NIM of roughly 1.5–3.5%.</li>
+    </ul>
+
+    <p>Banks also earn fees (cards, FX, advisory), but for a classic commercial bank the interest spread is the dominant source of income — which is why the rest of this series is about defending it.</p>
+
+    <h2>3. Try it: a toy bank</h2>
+
+    <p>This bank starts with <strong>10m of equity</strong> (fixed). You control the loan book, the deposit base, and three interest rates. Deposits + equity fund the loans; any surplus is invested in securities at the market rate, and any shortfall is borrowed wholesale at the market rate.</p>
+
+    <div class="widget">
+      <p class="widget-title">Toy bank simulator</p>
+      <div class="control">
+        <label for="loans">Loans (m)</label>
+        <input type="range" id="loans" min="0" max="140" step="5" value="90">
+        <output id="loans-out">90</output>
+      </div>
+      <div class="control">
+        <label for="rloan">Avg loan rate</label>
+        <input type="range" id="rloan" min="2" max="12" step="0.1" value="6.5">
+        <output id="rloan-out">6.5%</output>
+      </div>
+      <div class="control">
+        <label for="dep">Deposits (m)</label>
+        <input type="range" id="dep" min="0" max="140" step="5" value="100">
+        <output id="dep-out">100</output>
+      </div>
+      <div class="control">
+        <label for="rdep">Avg deposit rate</label>
+        <input type="range" id="rdep" min="0" max="6" step="0.1" value="1.5">
+        <output id="rdep-out">1.5%</output>
+      </div>
+      <div class="control">
+        <label for="rmkt">Market rate</label>
+        <input type="range" id="rmkt" min="0.5" max="8" step="0.1" value="3.5">
+        <output id="rmkt-out">3.5%</output>
+      </div>
+      <p class="bs-line" id="bs-line"></p>
+      <div class="readout">
+        <div class="stat">Net interest income <b id="nii-out"></b></div>
+        <div class="stat">Net interest margin <b id="nim-out"></b></div>
+      </div>
+      <svg id="bank-chart" class="chart" viewBox="0 0 640 280" role="img" aria-label="Interest income and expense components"></svg>
+    </div>
+
+    <figure>
+      <figcaption><strong>Figure 1.</strong> Blue bars are interest <em>earned</em> (loans, securities); red bars are interest <em>paid</em> (deposits, wholesale). NII is blue minus red.</figcaption>
+    </figure>
+
+    <p>Things worth trying:</p>
+    <ul>
+      <li><strong>Push loans to 140m</strong> while deposits stay at 100m. The bank must borrow 30m wholesale at the market rate — watch how much of the extra income the funding cost eats.</li>
+      <li><strong>Drop loans to 40m.</strong> Now 70m sits in securities earning only the market rate. Deposits are wasted on low-yield assets and NIM sags.</li>
+      <li><strong>Raise the market rate to 7%</strong> with deposits still at 1.5%. Cheap, stable deposits suddenly become enormously valuable — this is why banks fight for them. (Part 2 explains why deposit rates lag the market.)</li>
+    </ul>
+
+    <h2>4. The catch: the two sides don't behave the same</h2>
+
+    <p>If the story ended here, banking would be easy. The complication is that the two sides of the balance sheet are <em>different in kind</em>, not just in rate:</p>
+
+    <ul>
+      <li>Loans are for <strong>fixed terms</strong> (a 5-year car loan, a 20-year mortgage); most deposits can leave <strong>tomorrow</strong>.</li>
+      <li>Loan rates and deposit rates <strong>reprice at different speeds</strong> when the central bank moves.</li>
+      <li>The people who set loan prices (the lending business) and the people who gather deposits (the branches) are <strong>different teams</strong> — someone must split the margin between them fairly.</li>
+    </ul>
+
+    <p>Managing these mismatches is the job of the bank's <strong>treasury</strong>, through a discipline called <strong>asset–liability management (ALM)</strong>, and the tool it uses to split the margin is <strong>funds transfer pricing (FTP)</strong>. That's the rest of this series.</p>
+
+    <div class="series-nav">
+      <strong>Series:</strong> Part 1 of 4 ·
+      Next: <a href="deposit-and-loan-rates.html">Deposit rates vs loan rates →</a>
+    </div>
+  </main>
+  <script>
+    // All JS inline. No external requests of any kind (page runs sandboxed & offline).
+    function bindSlider(id, outId, fmt, onChange) {
+      const el = document.getElementById(id), out = document.getElementById(outId);
+      const update = () => { out.textContent = fmt(el.valueAsNumber); onChange(el.valueAsNumber); };
+      el.addEventListener("input", update);
+      update(); // draw initial state
+    }
+
+    function moneyBars(svgId, items) {
+      const svg = document.getElementById(svgId);
+      const W = 640, H = 280, m = { t: 20, r: 12, b: 40, l: 44 };
+      const max = Math.max(...items.map(i => i.v), 0.1);
+      const bw = (W - m.l - m.r) / items.length;
+      let out = `<line class="axis" x1="${m.l}" y1="${H - m.b}" x2="${W - m.r}" y2="${H - m.b}"/>`;
+      items.forEach((it, i) => {
+        const h = (it.v / max) * (H - m.t - m.b);
+        const x = m.l + i * bw + bw * 0.15, y = H - m.b - h;
+        out += `<rect class="${it.cls}" x="${x.toFixed(1)}" y="${y.toFixed(1)}" width="${(bw * 0.7).toFixed(1)}" height="${h.toFixed(1)}" rx="3"/>`;
+        out += `<text class="axis-label" x="${(m.l + (i + 0.5) * bw).toFixed(1)}" y="${H - m.b + 16}" text-anchor="middle">${it.label}</text>`;
+        out += `<text class="axis-label" x="${(m.l + (i + 0.5) * bw).toFixed(1)}" y="${(y - 5).toFixed(1)}" text-anchor="middle">${it.v.toFixed(1)}m</text>`;
+      });
+      svg.innerHTML = out;
+    }
+
+    const S = { loans: 90, rLoan: 6.5, dep: 100, rDep: 1.5, rMkt: 3.5 };
+    const EQUITY = 10;
+
+    function recompute() {
+      const funding = S.dep + EQUITY;
+      const sec = Math.max(0, funding - S.loans);
+      const whl = Math.max(0, S.loans - funding);
+      const incLoans = S.loans * S.rLoan / 100;
+      const incSec = sec * S.rMkt / 100;
+      const expDep = S.dep * S.rDep / 100;
+      const expWhl = whl * S.rMkt / 100;
+      const nii = incLoans + incSec - expDep - expWhl;
+      const earning = S.loans + sec;
+      const nim = earning ? (nii / earning) * 100 : 0;
+
+      document.getElementById("bs-line").textContent =
+        `Assets: loans ${S.loans.toFixed(0)}m + securities ${sec.toFixed(0)}m = ${earning.toFixed(0)}m · ` +
+        `Funding: deposits ${S.dep.toFixed(0)}m + wholesale ${whl.toFixed(0)}m + equity ${EQUITY}m`;
+      document.getElementById("nii-out").textContent = `${nii.toFixed(2)}m / yr`;
+      document.getElementById("nim-out").textContent = `${nim.toFixed(2)}%`;
+
+      moneyBars("bank-chart", [
+        { label: "Loan interest", v: incLoans, cls: "bar" },
+        { label: "Securities int.", v: incSec, cls: "bar" },
+        { label: "Deposit interest", v: expDep, cls: "bar-exp" },
+        { label: "Wholesale int.", v: expWhl, cls: "bar-exp" },
+      ]);
+    }
+
+    bindSlider("loans", "loans-out", v => v.toFixed(0), v => { S.loans = v; recompute(); });
+    bindSlider("rloan", "rloan-out", v => v.toFixed(1) + "%", v => { S.rLoan = v; recompute(); });
+    bindSlider("dep", "dep-out", v => v.toFixed(0), v => { S.dep = v; recompute(); });
+    bindSlider("rdep", "rdep-out", v => v.toFixed(1) + "%", v => { S.rDep = v; recompute(); });
+    bindSlider("rmkt", "rmkt-out", v => v.toFixed(1) + "%", v => { S.rMkt = v; recompute(); });
+  </script>
+</body>
+</html>

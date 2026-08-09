@@ -6,6 +6,8 @@ import { formatOf } from "./config.js";
 import { sidecarPathFor, resolveContentPath, toRelPath } from "./paths.js";
 
 export type DocStatus = "draft" | "final" | "archived";
+export type DocSpace = "haman" | "ali" | "shared";
+export const DEFAULT_SPACE: DocSpace = "haman";
 
 export interface DocMeta {
   title: string;
@@ -16,6 +18,8 @@ export interface DocMeta {
   status?: DocStatus;
   source?: string;
   authors?: string[];
+  /** Whose browsing tab this shows under: draft workspace (haman/ali) or the shared/published tab. Missing = treated as DEFAULT_SPACE. */
+  space?: DocSpace;
 }
 
 export interface ExtractedDoc {
@@ -25,7 +29,7 @@ export interface ExtractedDoc {
   headings: string[];
 }
 
-const HTML_META_KEYS = ["tags", "summary", "created", "updated", "status", "source", "authors"] as const;
+const HTML_META_KEYS = ["tags", "summary", "created", "updated", "status", "source", "authors", "space"] as const;
 
 function titleFromFilename(absPath: string): string {
   return path.basename(absPath).replace(/\.(md|html?|pdf)$/i, "").replace(/[-_]+/g, " ");
@@ -37,6 +41,7 @@ function normalizeMeta(raw: Record<string, unknown>, absPath: string): DocMeta {
   const asStr = (v: unknown): string | undefined =>
     typeof v === "string" && v.trim() ? v.trim() : v instanceof Date ? v.toISOString().slice(0, 10) : undefined;
   const status = asStr(raw.status);
+  const space = asStr(raw.space);
   return {
     title: asStr(raw.title) ?? titleFromFilename(absPath),
     tags: asArray(raw.tags).map((t) => t.toLowerCase()),
@@ -46,6 +51,7 @@ function normalizeMeta(raw: Record<string, unknown>, absPath: string): DocMeta {
     status: status === "draft" || status === "final" || status === "archived" ? status : undefined,
     source: asStr(raw.source),
     authors: asArray(raw.authors).length ? asArray(raw.authors) : undefined,
+    space: space === "haman" || space === "ali" || space === "shared" ? space : undefined,
   };
 }
 

@@ -1,7 +1,7 @@
 import fs from "node:fs/promises";
 import MiniSearch from "minisearch";
 import { resolveContentPath } from "./paths.js";
-import { extractDoc } from "./meta.js";
+import { extractDoc, DEFAULT_SPACE, DocSpace } from "./meta.js";
 import { listDocPaths } from "./tree.js";
 import { formatOf } from "./config.js";
 
@@ -13,6 +13,7 @@ interface IndexedDoc {
   body: string;
   format: string;
   summary: string;
+  space: DocSpace;
 }
 
 export interface SearchHit {
@@ -22,11 +23,13 @@ export interface SearchHit {
   format: string;
   score: number;
   snippet: string;
+  space: DocSpace;
 }
 
 export interface SearchOptions {
   tags?: string[];
   folder?: string;
+  space?: DocSpace;
   limit?: number;
 }
 
@@ -84,6 +87,7 @@ export class ArchiveIndex {
         body: bodyText,
         format: formatOf(rel)!,
         summary: meta.summary ?? "",
+        space: meta.space ?? DEFAULT_SPACE,
       };
       if (this.mini.has(rel)) this.mini.discard(rel);
       this.mini.add(doc);
@@ -125,6 +129,7 @@ export class ArchiveIndex {
       const docTags = doc.tags ? doc.tags.split(" ") : [];
       if (opts.tags?.length && !opts.tags.every((t) => docTags.includes(t.toLowerCase()))) continue;
       if (opts.folder && !(r.id as string).startsWith(opts.folder.replace(/^\/+|\/+$/g, "") + "/")) continue;
+      if (opts.space && doc.space !== opts.space) continue;
       hits.push({
         path: r.id as string,
         title: doc.title,
@@ -132,6 +137,7 @@ export class ArchiveIndex {
         format: doc.format,
         score: r.score,
         snippet: doc.summary || makeSnippet(doc.body, q),
+        space: doc.space,
       });
       if (hits.length >= limit) break;
     }

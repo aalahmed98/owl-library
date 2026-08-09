@@ -8,14 +8,17 @@ import { watchContent } from "../core/watch.js";
 import { registerPageRoutes } from "./routes/pages.js";
 import { registerApiRoutes } from "./routes/api.js";
 import { registerRawRoutes } from "./routes/raw.js";
+import { registerMcpRoutes } from "./routes/mcp.js";
+import { registerAuth } from "./auth.js";
 
 async function main(): Promise<void> {
   fs.mkdirSync(CONTENT_DIR, { recursive: true });
 
-  const app = Fastify({ logger: { level: "warn" } });
+  const app = Fastify({ logger: { level: "warn" }, bodyLimit: 20 * 1024 * 1024 });
 
   await app.register(fastifyStatic, { root: PUBLIC_DIR, prefix: "/assets/" });
   await app.register(fastifyStatic, { root: DESIGN_DIR, prefix: "/assets/design/", decorateReply: false });
+  await registerAuth(app);
 
   const index = new ArchiveIndex();
   const count = await index.buildFromDisk();
@@ -31,6 +34,7 @@ async function main(): Promise<void> {
   registerPageRoutes(app, index);
   registerApiRoutes(app, index);
   registerRawRoutes(app);
+  registerMcpRoutes(app, index);
 
   await app.listen({ port: PORT, host: "127.0.0.1" });
   console.log(`[archive] http://localhost:${PORT}`);

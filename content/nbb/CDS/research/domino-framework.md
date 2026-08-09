@@ -2351,6 +2351,74 @@ another can average a real effect to nothing. If the pooled result is null while
 per-country results disagree sharply, that heterogeneity is itself the finding
 and must be reported as such — not resolved by picking the favourable subset.
 
+### X-R1 RESULTS (single run, 2026-08-09; reproducible via `scripts/research/xr1-evaluate.mjs`) — **NO POOLED SKILL DEMONSTRATED**
+
+121 pooled curve-tier episodes across three sovereigns — by far the largest
+sample this project has ever tested. Statistic per spec: observed hits ÷ Σ(each
+episode's own country/era base rate).
+
+**PRIMARY, per rule — all three include 1×:**
+
+| Rule | Episodes | Hits | Expected | Lift | 90% CI | Verdict |
+|---|---|---|---|---|---|---|
+| `inversion` | 34 | 9 | 5.5 | 1.65× | 0.91×–2.45× | no skill shown |
+| `level_pct` | 26 | 8 | 4.2 | 1.89× | 0.96×–2.83× | no skill shown |
+| `slope_20d` | 61 | 14 | 9.8 | 1.43× | 0.91×–1.98× | no skill shown |
+| **ALL CURVE combined** | **121** | **31** | **19.5** | **1.59×** | **1.18×–1.99×** | **excludes 1×** |
+
+**The combined line is the only positive result — and it FAILS the spec's
+mandatory sensitivity.** Leave-one-sovereign-out on the combined population:
+
+| Dropped | n | Lift | 90% CI | |
+|---|---|---|---|---|
+| bahrain | 79 | 1.67× | 1.19×–2.20× | excludes 1× |
+| **oman** | **87** | **1.42×** | **0.97×–1.88×** | **INCLUDES 1× — verdict flips** |
+| jordan | 76 | 1.68× | 1.22×–2.20× | excludes 1× |
+
+X-R1 pre-committed: *"if any single country's removal flips the verdict, the
+result is reported as driven by that country and NOT as a pooled finding."*
+Removing Oman flips it. **The combined result is therefore NOT reported as a
+pooled finding.** The rule fired as written, on the run it was written for.
+
+**Disclosure of a spec ambiguity, and why it does not matter.** X-R1's PRIMARY
+was written as "the pooled lift" over a population defined as all three curve
+rules, but the multiplicity clause spoke of "three rules tested" — so the spec
+is genuinely ambiguous about whether the primary was per-rule or whole-population.
+That ambiguity is MOOT here: the per-rule reading yields three nulls, and the
+whole-population reading yields a result that fails its own mandatory LOSO.
+Both readings reach the same verdict. Recorded rather than silently resolved.
+
+**Per-sovereign, all curve rules pooled within each country:**
+
+| Country | n | Lift | 90% CI | |
+|---|---|---|---|---|
+| bahrain | 42 | 1.43× | 0.86×–2.13× | includes 1× |
+| **oman** | **34** | **1.97×** | **1.15×–2.79×** | **excludes 1×** |
+| jordan | 45 | 1.40× | 0.78×–2.17× | includes 1× |
+
+**Two findings worth carrying forward:**
+
+1. **Oman remains the only sovereign whose curve rules collectively clear the
+   bar**, and it is now clear that every pooled positive result in this run
+   traces to it. Combined with J-R1 (inversion failed to transfer to Jordan),
+   the standing position is: **the curve tier's apparent skill is an Oman
+   result, not a property of the rules.** It may be real and Oman-specific, or
+   it may be a favourable draw at n=34; this run cannot distinguish them.
+2. **Bahrain's own curve rules do NOT demonstrate skill (1.43×, CI 0.86–2.13).**
+   This is not new information so much as confirmation at proper power: the
+   framework has said since 2026-08-08 that per-rule alert tables are AUDIT
+   TRAIL, not signals, and that C-R4 — the composite regime flag — is the
+   system's alarm. That division of labour is now measured rather than asserted.
+
+**What this does NOT do.** It does not weaken C-R4. The regime flag is a
+different object from the curve rules that feed it, it was separately
+base-rate-matched on 2026-08-09 at 2.83×–2.92×, and it is untouched by this run.
+The pooled test asked whether the CURVE RULES generalize; the answer is no, and
+the system never claimed they did.
+
+**Nothing changed.** No bar re-solved, no threshold, weight, composition or
+record touched — as X-R1 pre-committed. The pooled analysis is a measurement.
+
 ## Phase 2 — the four lenses (2026-08-08→)
 
 Executed per `cds-phase-2-plan.md` under the frozen v1 protocol. Every lens gets

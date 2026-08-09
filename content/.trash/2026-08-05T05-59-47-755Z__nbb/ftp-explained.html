@@ -1,0 +1,417 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Funds Transfer Pricing (FTP) — Treasury Basics, Part 3</title>
+  <meta name="archive-tags" content="banking, ftp, treasury, alm, bahrain">
+  <meta name="archive-summary" content="How FTP splits the bank's margin between lending, deposit-gathering, and treasury; the considerations ALM must settle before publishing FTP rates to branches; and how FTP works in Bahrain (USD peg, CBB, Islamic profit-rate FTP). With a live margin-split calculator and FTP curve builder.">
+  <meta name="archive-created" content="2026-08-04">
+  <meta name="archive-updated" content="2026-08-04">
+  <meta name="archive-status" content="final">
+  <style>
+    /* ==tokens== (synced from design/tokens.css — do not edit inside the markers) */
+    :root {
+      --color-bg: #faf9f7;
+      --color-surface: #ffffff;
+      --color-fg: #1a1a1e;
+      --color-muted: #6b6b76;
+      --color-border: #e4e2dd;
+      --color-accent: #2f6fed;
+      --color-accent-fg: #ffffff;
+      --color-accent-soft: #e8effd;
+      --color-danger: #c4483c;
+      --color-warn-bg: #fdf6e3;
+      --color-code-bg: #f2f1ee;
+      --color-mark: #fff3bf;
+      --font-body: "Charter", "Georgia", "Cambria", "Times New Roman", serif;
+      --font-ui: system-ui, -apple-system, "Segoe UI", sans-serif;
+      --font-mono: "SFMono-Regular", "Cascadia Code", "Consolas", "Menlo", monospace;
+      --text-xs: 0.75rem;
+      --text-sm: 0.875rem;
+      --text-base: 1.0625rem;
+      --text-lg: 1.25rem;
+      --text-xl: 1.5rem;
+      --text-2xl: 1.875rem;
+      --text-3xl: 2.375rem;
+      --leading-body: 1.65;
+      --leading-tight: 1.25;
+      --measure: 68ch;
+      --space-1: 0.25rem;
+      --space-2: 0.5rem;
+      --space-3: 0.75rem;
+      --space-4: 1rem;
+      --space-5: 1.5rem;
+      --space-6: 2rem;
+      --space-7: 3rem;
+      --space-8: 4rem;
+      --radius-sm: 4px;
+      --radius-md: 8px;
+      --radius-lg: 12px;
+      --shadow-sm: 0 1px 2px rgba(20, 20, 25, 0.06);
+      --shadow-md: 0 2px 8px rgba(20, 20, 25, 0.1);
+    }
+    [data-theme="dark"] {
+      --color-bg: #16161a;
+      --color-surface: #1e1e24;
+      --color-fg: #e8e6e3;
+      --color-muted: #9a98a0;
+      --color-border: #32323a;
+      --color-accent: #6b9bff;
+      --color-accent-fg: #10101c;
+      --color-accent-soft: #23304d;
+      --color-danger: #e0685c;
+      --color-warn-bg: #2e2a1e;
+      --color-code-bg: #24242b;
+      --color-mark: #4d4425;
+      --shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.4);
+      --shadow-md: 0 2px 8px rgba(0, 0, 0, 0.5);
+    }
+    /* ==/tokens== */
+
+    /* When opened standalone (not in the app frame), follow the OS theme. */
+    @media (prefers-color-scheme: dark) {
+      :root:not([data-theme]) {
+        --color-bg: #16161a;
+        --color-surface: #1e1e24;
+        --color-fg: #e8e6e3;
+        --color-muted: #9a98a0;
+        --color-border: #32323a;
+        --color-accent: #6b9bff;
+        --color-accent-fg: #10101c;
+        --color-accent-soft: #23304d;
+        --color-danger: #e0685c;
+        --color-warn-bg: #2e2a1e;
+        --color-code-bg: #24242b;
+        --color-mark: #4d4425;
+      }
+    }
+
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      background: var(--color-bg);
+      color: var(--color-fg);
+      font-family: var(--font-body);
+      font-size: var(--text-base);
+      line-height: var(--leading-body);
+    }
+    .paper {
+      max-width: var(--measure);
+      margin: 0 auto;
+      padding: var(--space-6) var(--space-4) var(--space-8);
+    }
+    h1 { font-size: var(--text-3xl); line-height: var(--leading-tight); margin: 0 0 var(--space-2); }
+    h2 { font-size: var(--text-xl); line-height: var(--leading-tight); margin: var(--space-6) 0 var(--space-3); border-bottom: 1px solid var(--color-border); padding-bottom: var(--space-2); }
+    h3 { font-size: var(--text-lg); margin: var(--space-5) 0 var(--space-2); }
+    .byline { color: var(--color-muted); font-family: var(--font-ui); font-size: var(--text-sm); margin-bottom: var(--space-6); }
+    a { color: var(--color-accent); }
+    code { font-family: var(--font-mono); font-size: 0.88em; background: var(--color-code-bg); padding: 1px 5px; border-radius: var(--radius-sm); }
+    pre { background: var(--color-code-bg); padding: var(--space-4); border-radius: var(--radius-md); overflow-x: auto; }
+    pre code { background: none; padding: 0; font-size: var(--text-sm); }
+    blockquote { margin: var(--space-4) 0; padding: var(--space-2) var(--space-4); border-left: 3px solid var(--color-accent); background: var(--color-surface); color: var(--color-muted); }
+
+    /* interactive widgets */
+    .widget {
+      font-family: var(--font-ui);
+      background: var(--color-surface);
+      border: 1px solid var(--color-border);
+      border-radius: var(--radius-lg);
+      padding: var(--space-4);
+      margin: var(--space-5) 0;
+      box-shadow: var(--shadow-sm);
+    }
+    .widget-title { font-weight: 600; font-size: var(--text-sm); margin: 0 0 var(--space-3); color: var(--color-muted); text-transform: uppercase; letter-spacing: 0.05em; }
+    .control { display: flex; align-items: center; gap: var(--space-3); margin: var(--space-2) 0; font-size: var(--text-sm); }
+    .control label { min-width: 9rem; }
+    .control input[type="range"] { flex: 1; accent-color: var(--color-accent); }
+    .control output { min-width: 4rem; text-align: right; font-family: var(--font-mono); font-size: var(--text-sm); }
+    .chart { width: 100%; height: auto; display: block; margin-top: var(--space-3); }
+    .chart .axis { stroke: var(--color-border); stroke-width: 1; }
+    .chart .axis-label { fill: var(--color-muted); font-family: var(--font-ui); font-size: 11px; }
+    .chart .series { fill: none; stroke: var(--color-accent); stroke-width: 2; }
+    .chart .series-2 { fill: none; stroke: var(--color-danger); stroke-width: 2; }
+    .chart .bar { fill: var(--color-accent); }
+    figure { margin: var(--space-5) 0; }
+    figcaption { font-family: var(--font-ui); font-size: var(--text-sm); color: var(--color-muted); margin-top: var(--space-2); }
+    details.derivation { margin: var(--space-4) 0; border: 1px solid var(--color-border); border-radius: var(--radius-md); padding: var(--space-3) var(--space-4); background: var(--color-surface); }
+    details.derivation summary { cursor: pointer; font-family: var(--font-ui); font-weight: 600; font-size: var(--text-sm); }
+
+    /* custom styles (after token markers) */
+    .chart .bar-neg { fill: var(--color-danger); }
+    .chart .bar-total { fill: var(--color-muted); }
+    .readout { display: flex; gap: var(--space-4); font-family: var(--font-ui); margin-top: var(--space-3); flex-wrap: wrap; }
+    .readout .stat { background: var(--color-accent-soft); border-radius: var(--radius-md); padding: var(--space-2) var(--space-4); font-size: var(--text-sm); }
+    .readout .stat b { font-size: var(--text-lg); font-family: var(--font-mono); display: block; }
+    .series-nav { font-family: var(--font-ui); font-size: var(--text-sm); background: var(--color-surface); border: 1px solid var(--color-border); border-radius: var(--radius-md); padding: var(--space-3) var(--space-4); margin-top: var(--space-6); }
+    .checklist { font-family: var(--font-ui); font-size: var(--text-sm); }
+    .checklist dt { font-weight: 600; margin-top: var(--space-3); }
+    .checklist dd { margin: var(--space-1) 0 0 0; color: var(--color-muted); }
+  </style>
+</head>
+<body>
+  <main class="paper">
+    <h1>Funds Transfer Pricing (FTP)</h1>
+    <p class="byline">NBB research · Bank treasury series, part 3 of 4 · 2026</p>
+
+    <p>A branch takes a deposit at 1.5%. A corporate banking team writes a loan at 7%. The bank as a whole earns the 5.5% spread — but <em>who</em> earned it? If you can't answer that, you can't tell which branches create value, which products to grow, or who should be blamed when margins shrink. <strong>Funds transfer pricing</strong> is the internal accounting system that answers it, and it is the connective tissue between the businesses and the treasury.</p>
+
+    <h2>1. The idea: an internal bank</h2>
+
+    <p>FTP inserts the treasury between every deposit and every loan, as an internal counterparty:</p>
+
+    <ul>
+      <li>When a branch gathers a deposit, it immediately <strong>sells the money to treasury</strong> and gets paid the <strong>FTP rate</strong> for that deposit's term. The branch's profit = FTP rate − rate paid to the customer.</li>
+      <li>When a lending unit writes a loan, it <strong>buys the money from treasury</strong> at the FTP rate for the loan's term. Its profit = customer rate − FTP rate.</li>
+      <li>Treasury sits in the middle, earning (or paying) the difference between the FTP rates on the two sides — which is exactly the <strong>maturity mismatch</strong> of the bank.</li>
+    </ul>
+
+    <p>The crucial refinement is <strong>matched-maturity</strong> pricing: the FTP rate for each product comes from the point on the FTP curve matching that product's term. A 5-year loan is charged the 5-year rate; an overnight-ish savings deposit is credited a short rate (adjusted for how "sticky" it really is — more below). This does two things at once: it makes each business's margin <em>insensitive to interest-rate moves</em>, and it sweeps all the rate risk into treasury where ALM can see and manage it in one place.</p>
+
+    <h2>2. The margin split, live</h2>
+
+    <p>Four rates fully determine the split. Try moving them:</p>
+
+    <div class="widget">
+      <p class="widget-title">FTP margin-split calculator</p>
+      <div class="control">
+        <label for="rl">Customer loan rate</label>
+        <input type="range" id="rl" min="0" max="12" step="0.1" value="7">
+        <output id="rl-out">7.0%</output>
+      </div>
+      <div class="control">
+        <label for="fl">FTP @ loan tenor (5y)</label>
+        <input type="range" id="fl" min="0" max="10" step="0.1" value="4">
+        <output id="fl-out">4.0%</output>
+      </div>
+      <div class="control">
+        <label for="fd">FTP @ deposit tenor (3m)</label>
+        <input type="range" id="fd" min="0" max="10" step="0.1" value="3.5">
+        <output id="fd-out">3.5%</output>
+      </div>
+      <div class="control">
+        <label for="rd">Customer deposit rate</label>
+        <input type="range" id="rd" min="0" max="6" step="0.1" value="1.5">
+        <output id="rd-out">1.5%</output>
+      </div>
+      <svg id="split-chart" class="chart" viewBox="0 0 640 280" role="img" aria-label="Margin split between lending, deposits and treasury"></svg>
+    </div>
+
+    <figure>
+      <figcaption><strong>Figure 1.</strong> The three internal margins always sum to the customer spread (grey bar). Note the deposit desk earns a real margin <em>even though it pays customers interest</em> — its product is cheap, stable funding, and FTP finally makes that visible.</figcaption>
+    </figure>
+
+    <details class="derivation">
+      <summary>Why the three margins always sum to the customer spread</summary>
+      <p>Lending margin + funding margin + treasury margin<br>
+      = (loanRate − ftpLoan) + (ftpDep − depRate) + (ftpLoan − ftpDep)<br>
+      = loanRate − depRate.</p>
+      <p>The FTP terms cancel — FTP never creates or destroys income, it only <em>attributes</em> it. If your FTP system's margins don't reconcile back to actual NII, something is mis-specified.</p>
+    </details>
+
+    <h3>What each slider does to the others</h3>
+
+    <p>The four sliders split into two very different kinds. The two <strong>customer rates</strong> (outer sliders) change how big the total pie is; the two <strong>FTP rates</strong> (inner sliders) only change how the pie is cut. Concretely:</p>
+
+    <ul>
+      <li><strong>Customer loan rate ↑</strong> → only the <em>lending margin</em> grows, 1-for-1, and the grey total grows with it. Deposit and treasury margins don't move at all — the lending desk negotiated a better price, so the lending desk keeps all of it. That's the fairness FTP exists to enforce.</li>
+      <li><strong>Customer deposit rate ↑</strong> → only the <em>deposit margin</em> shrinks, 1-for-1, and the total shrinks with it. If a branch overpays for deposits, the loss lands on that branch alone — treasury and lending are insulated.</li>
+      <li><strong>FTP @ loan tenor ↑</strong> → the <em>lending margin shrinks</em> and the <em>treasury margin grows by exactly the same amount</em>. The grey total does not move. Treasury is now "selling" 5-year money to the lending desk at a higher internal price — income moves from one desk to the other, but the bank as a whole earns the same.</li>
+      <li><strong>FTP @ deposit tenor ↑</strong> → the mirror image: the <em>deposit margin grows</em> (branches are credited more for the funding they bring in) and the <em>treasury margin shrinks</em> equally. Again the total is untouched.</li>
+    </ul>
+
+    <p>Watch the grey "customer spread" bar while you move the two FTP sliders: it never moves. That is the single most important property of the system — <strong>FTP is internal bookkeeping, not income</strong>. It decides who gets credit for the spread, never how much spread exists. Only the customer-facing sliders — real prices agreed with real people — change the bank's actual income. (The derivation above is the two-line proof.)</p>
+
+    <p>One subtlety: the two FTP sliders are quoted off the <em>same curve</em> at different tenors — 5-year money for the loan, 3-month money for the deposit. Their difference (FTP@5y − FTP@3m) is the treasury margin, and it is exactly the slope of the curve between those two points. A steep curve pays treasury for carrying the maturity mismatch; a flat one pays it nothing; an inverted one charges it. Which leads to the experiments:</p>
+
+    <p>Two experiments worth doing above:</p>
+    <ul>
+      <li><strong>Invert the curve</strong>: drag the 3m FTP above the 5y FTP. Treasury's margin goes negative — the bank is paying more for short money than it earns lending long. The business units are untouched; the pain lands where it can be hedged.</li>
+      <li><strong>Deposit war</strong>: push the customer deposit rate up toward the deposit-tenor FTP. The funding margin vanishes — this is what "buying deposits" looks like, and FTP is what stops branches doing it invisibly.</li>
+    </ul>
+
+    <h2>3. Building the FTP curve</h2>
+
+    <p>The FTP curve is <em>not</em> simply the market yield curve. It is the bank's own <strong>marginal cost of term funding</strong>, typically assembled as: a base market curve (interbank/swap curve), <strong>plus a term liquidity premium</strong> — the extra spread the bank must pay to borrow for longer terms, which grows with tenor.</p>
+
+    <div class="widget">
+      <p class="widget-title">FTP curve builder</p>
+      <div class="control">
+        <label for="sr">Short rate</label>
+        <input type="range" id="sr" min="0" max="8" step="0.1" value="3">
+        <output id="sr-out">3.0%</output>
+      </div>
+      <div class="control">
+        <label for="sl">Curve slope</label>
+        <input type="range" id="sl" min="-2" max="3" step="0.1" value="1.5">
+        <output id="sl-out">1.5%</output>
+      </div>
+      <div class="control">
+        <label for="lq">Liquidity premium @10y</label>
+        <input type="range" id="lq" min="0" max="2" step="0.05" value="0.8">
+        <output id="lq-out">0.80%</output>
+      </div>
+      <div class="readout">
+        <div class="stat">FTP @ 1y <b id="ftp1-out"></b></div>
+        <div class="stat">FTP @ 5y <b id="ftp5-out"></b></div>
+      </div>
+      <svg id="curve-chart" class="chart" viewBox="0 0 640 280" role="img" aria-label="Market curve vs FTP curve"></svg>
+    </div>
+
+    <figure>
+      <figcaption><strong>Figure 2.</strong> Blue: base market curve. Red: the published FTP curve after adding the term liquidity premium. Set the slope negative to see an inverted curve — the shape branch pricing lives or dies by.</figcaption>
+    </figure>
+
+    <h2>4. Before ALM publishes the FTP curve to branches</h2>
+
+    <p>Publishing FTP rates is a policy act, not a data feed. Every number in that grid changes how thousands of loans and deposits will be priced tomorrow. Before ALM/treasury releases an FTP update to the network, these are the considerations that must be settled:</p>
+
+    <dl class="checklist">
+      <dt>1. Base curve choice — is it defensible?</dt>
+      <dd>The reference curve (interbank/swap curve, or the bank's own wholesale funding curve) must reflect rates at which the bank could <em>actually</em> transact, be observable and hard to manipulate, and stay consistent period to period. Changing the base curve mid-year silently rewrites every business's P&amp;L.</dd>
+
+      <dt>2. Term liquidity premium — priced in, and separated</dt>
+      <dd>Long-term funding costs more than the swap curve implies. If the premium is missing, lending units get long money too cheap and the bank over-originates illiquid long assets. Best practice is to show it as a separate, visible component rather than burying it in one number.</dd>
+
+      <dt>3. Cost of the liquidity buffer and regulation</dt>
+      <dd>Regulation (LCR, NSFR) forces the bank to hold low-yield liquid assets against runnable funding and to term-fund long assets. That cost must be charged to the products that cause it — e.g. a volatile corporate deposit that requires a 40% liquidity buffer is worth far less than its balance suggests.</dd>
+
+      <dt>4. Behavioral assumptions — the hardest part</dt>
+      <dd>Contractual terms lie. Current accounts are contractually overnight but behave like multi-year funding ("core" balances); mortgages have 20-year terms but prepay early. ALM must decide the <em>behavioral</em> tenor of each product (from historical decay/prepayment studies) because that decides which point of the curve it gets. Crediting sticky deposits too short a rate starves branches; too long a rate overpays for hot money.</dd>
+
+      <dt>5. Optionality charges</dt>
+      <dd>Customer options — prepaying a loan, breaking a term deposit early — have real hedging costs. Publish explicit charges/penalty rules for them, or business units will sell free options all day.</dd>
+
+      <dt>6. Strategic overlays must be explicit and temporary</dt>
+      <dd>Management may deliberately skew FTP to steer the balance sheet — e.g. add an incentive premium on deposit FTP during a funding push. Legitimate, but it must be a labeled, ALCO-approved adjustment with an expiry, not a silent tweak — otherwise FTP stops being trusted as a measure of true economics.</dd>
+
+      <dt>7. Symmetry and no-arbitrage</dt>
+      <dd>The same curve logic must apply to both sides. If deposits are credited off a curve higher than loans are charged, a branch can manufacture "profit" by round-tripping. Check the published grid for internal arbitrage before release.</dd>
+
+      <dt>8. Repricing frequency and stability</dt>
+      <dd>Update often enough to track the market (monthly is common, with intra-period updates on big moves), but avoid whipsawing branches with noise. Decide and communicate the rules: which balances get the new rate (new business only vs. repricing stock), effective dates, and cut-offs.</dd>
+
+      <dt>9. Governance and sign-off</dt>
+      <dd>The methodology and each material change should be documented and approved by ALCO (the asset–liability committee), with treasury unable to unilaterally set rates that flatter its own book — treasury is a counterparty to the businesses <em>and</em> the operator of the system, a conflict that governance must manage. Regulators explicitly examine FTP frameworks post-2008.</dd>
+
+      <dt>10. Communication and reconciliation</dt>
+      <dd>Branches must be able to understand and reproduce the rate they're given — an FTP curve nobody trusts gets negotiated around. And every period, the sum of all attributed margins must reconcile to actual NII; publish the attribution so the system stays credible.</dd>
+    </dl>
+
+    <h2>5. FTP in a Bahraini bank</h2>
+
+    <p>Everything above is generic; here is how it lands in Bahrain specifically. The defining facts: the Bahraini dinar is <strong>pegged to the US dollar</strong> (BHD 0.376 per USD), the local capital market is small, and Bahrain is a global hub for <strong>Islamic banking</strong> — AAOIFI, the Islamic finance standards body, is headquartered in Manama. Each fact bends the FTP framework in a specific way:</p>
+
+    <ul>
+      <li><strong>The peg imports US monetary policy.</strong> To defend the peg, the Central Bank of Bahrain (CBB) moves its policy rates in near-lockstep with the US Fed. So the short end of any BHD FTP curve is effectively set in Washington: when the Fed hikes, Bahraini treasury desks reprice their FTP grids, and branch deposit/loan pricing follows. ALCO meeting calendars in the Gulf quietly orbit the FOMC's.</li>
+      <li><strong>Curve construction is judgment-heavy.</strong> There is no deep BHD interest-rate swap market to read a curve from. Banks assemble the FTP base curve from CBB standing facilities and T-bill auction yields at the short end, interbank/BIBOR-style quotes in the belly, and longer government development bond and sukuk yields — or the USD swap curve adjusted by BHD/USD forward points — at the long end. That makes checklist items 1 and 9 (defensible base curve, governance) far more demanding than in a G10 bank, because more of the curve is model rather than market.</li>
+      <li><strong>Two currencies, two curves.</strong> Bahraini balance sheets run heavily in both BHD and USD. The peg tempts banks to treat them as interchangeable, but term liquidity premia differ and, in stress, forward points widen as markets price peg risk. A sound framework publishes separate BHD and USD FTP curves and charges cross-currency use explicitly.</li>
+      <li><strong>The liquidity buffer has a sovereign flavor.</strong> Local HQLA is dominated by CBB and Government of Bahrain paper (T-bills, ijara/salam sukuk), which carries a sovereign credit premium relative to larger GCC peers. The CBB rulebook's liquidity module implements LCR/NSFR; the cost of holding those buffers — and the concentration in one sovereign — is exactly what checklist item 3 says must be charged back through FTP to the products that create the need.</li>
+      <li><strong>Islamic FTP runs on profit rates, not interest.</strong> Islamic retail banks and the Islamic windows of conventional banks cannot reference an interest-based curve. Their equivalent framework uses <em>expected profit rates</em>, benchmarked off Sharia-compliant interbank instruments (commodity murabaha and wakala placements). A conventional group with an Islamic window therefore maintains a parallel, Sharia-board-approved FTP grid alongside the conventional one — economically aligned so neither book can arbitrage the other, which is checklist item 7 with an extra governance layer.</li>
+      <li><strong>Deposit behavior is bimodal.</strong> The retail market is small and concentrated: a large, loyal stock of salary-linked current and savings accounts (very low beta, genuinely core) sits alongside chunky, rate-sensitive deposits from government-related entities and large corporates that can move in size on short notice. The behavioral split in checklist item 4 — which balances get credited a long tenor and which get treated as hot money — is largely a story about these two poles.</li>
+    </ul>
+
+    <h2>6. What FTP hands to ALM</h2>
+
+    <p>Once FTP is in place, the business units are hedged (their margins are locked at origination) and the whole bank's interest-rate and liquidity mismatch is concentrated in one book: treasury's. Measuring that mismatch and deciding what to do about it is <strong>asset–liability management</strong> — the final part of this series.</p>
+
+    <div class="series-nav">
+      <strong>Series:</strong> Part 3 of 4 ·
+      <a href="deposit-and-loan-rates.html">← Part 2: Deposit rates vs loan rates</a> ·
+      Next: <a href="alm-fundamentals.html">ALM fundamentals →</a><br>
+      <strong>Companion:</strong> <a href="what-moves-ftp.html">What moves FTP — drivers and consequences</a>
+    </div>
+  </main>
+  <script>
+    // All JS inline. No external requests of any kind (page runs sandboxed & offline).
+    function bindSlider(id, outId, fmt, onChange) {
+      const el = document.getElementById(id), out = document.getElementById(outId);
+      const update = () => { out.textContent = fmt(el.valueAsNumber); onChange(el.valueAsNumber); };
+      el.addEventListener("input", update);
+      update();
+    }
+
+    // signed bar chart: bars can go below the zero line
+    function signedBars(svgId, items) {
+      const svg = document.getElementById(svgId);
+      const W = 640, H = 280, m = { t: 20, r: 12, b: 40, l: 44 };
+      const lo = Math.min(0, ...items.map(i => i.v));
+      const hi = Math.max(0.5, ...items.map(i => i.v));
+      const Y = v => m.t + (hi - v) / (hi - lo || 1) * (H - m.t - m.b);
+      const bw = (W - m.l - m.r) / items.length;
+      let out = `<line class="axis" x1="${m.l}" y1="${Y(0)}" x2="${W - m.r}" y2="${Y(0)}"/>`;
+      items.forEach((it, i) => {
+        const y0 = Y(Math.max(0, it.v)), y1 = Y(Math.min(0, it.v));
+        const x = m.l + i * bw + bw * 0.15;
+        const cls = it.cls || (it.v < 0 ? "bar-neg" : "bar");
+        out += `<rect class="${cls}" x="${x.toFixed(1)}" y="${y0.toFixed(1)}" width="${(bw * 0.7).toFixed(1)}" height="${Math.max(1, y1 - y0).toFixed(1)}" rx="3"/>`;
+        out += `<text class="axis-label" x="${(m.l + (i + 0.5) * bw).toFixed(1)}" y="${H - m.b + 30}" text-anchor="middle">${it.label}</text>`;
+        const ty = it.v >= 0 ? y0 - 5 : y1 + 14;
+        out += `<text class="axis-label" x="${(m.l + (i + 0.5) * bw).toFixed(1)}" y="${ty.toFixed(1)}" text-anchor="middle">${it.v.toFixed(1)}%</text>`;
+      });
+      svg.innerHTML = out;
+    }
+
+    function lineChart(svgId, seriesList, opts = {}) {
+      const svg = document.getElementById(svgId);
+      const W = 640, H = 280, m = { t: 12, r: 12, b: 28, l: 44 };
+      const pts = seriesList.flatMap(s => s.points);
+      const xs = pts.map(p => p[0]), ys = pts.map(p => p[1]);
+      const x0 = opts.xMin ?? Math.min(...xs), x1 = opts.xMax ?? Math.max(...xs);
+      const y0 = opts.yMin ?? Math.min(...ys), y1 = opts.yMax ?? Math.max(...ys);
+      const X = v => m.l + ((v - x0) / (x1 - x0 || 1)) * (W - m.l - m.r);
+      const Y = v => H - m.b - ((v - y0) / (y1 - y0 || 1)) * (H - m.t - m.b);
+      const tickFmt = v => Math.abs(v) >= 1000 ? v.toExponential(0) : +v.toFixed(3);
+      let out = `<line class="axis" x1="${m.l}" y1="${H - m.b}" x2="${W - m.r}" y2="${H - m.b}"/>` +
+                `<line class="axis" x1="${m.l}" y1="${m.t}" x2="${m.l}" y2="${H - m.b}"/>`;
+      for (let i = 0; i <= 4; i++) {
+        const xv = x0 + (i / 4) * (x1 - x0), yv = y0 + (i / 4) * (y1 - y0);
+        out += `<text class="axis-label" x="${X(xv)}" y="${H - m.b + 16}" text-anchor="middle">${tickFmt(xv)}</text>`;
+        out += `<text class="axis-label" x="${m.l - 6}" y="${Y(yv) + 4}" text-anchor="end">${tickFmt(yv)}</text>`;
+      }
+      seriesList.forEach((s, i) => {
+        const d = s.points.map((p, j) => `${j ? "L" : "M"}${X(p[0]).toFixed(1)},${Y(p[1]).toFixed(1)}`).join("");
+        out += `<path class="${i === 0 ? "series" : "series-2"}" d="${d}"/>`;
+      });
+      if (opts.xLabel) out += `<text class="axis-label" x="${(W + m.l) / 2}" y="${H - 4}" text-anchor="middle">${opts.xLabel}</text>`;
+      svg.innerHTML = out;
+    }
+
+    // — Widget 1: margin split —
+    const F = { rl: 7, fl: 4, fd: 3.5, rd: 1.5 };
+    function drawSplit() {
+      const lend = F.rl - F.fl;
+      const fund = F.fd - F.rd;
+      const trea = F.fl - F.fd;
+      signedBars("split-chart", [
+        { label: "Lending margin", v: lend },
+        { label: "Deposit margin", v: fund },
+        { label: "Treasury margin", v: trea },
+        { label: "= Customer spread", v: lend + fund + trea, cls: "bar-total" },
+      ]);
+    }
+    bindSlider("rl", "rl-out", v => v.toFixed(1) + "%", v => { F.rl = v; drawSplit(); });
+    bindSlider("fl", "fl-out", v => v.toFixed(1) + "%", v => { F.fl = v; drawSplit(); });
+    bindSlider("fd", "fd-out", v => v.toFixed(1) + "%", v => { F.fd = v; drawSplit(); });
+    bindSlider("rd", "rd-out", v => v.toFixed(1) + "%", v => { F.rd = v; drawSplit(); });
+
+    // — Widget 2: FTP curve builder —
+    const C = { sr: 3, sl: 1.5, lq: 0.8 };
+    function baseRate(t) { return C.sr + C.sl * (1 - Math.exp(-t / 2)); }
+    function ftpRate(t) { return baseRate(t) + C.lq * (t / 10); }
+    function drawCurve() {
+      const mkt = [], ftp = [];
+      for (let t = 0; t <= 10; t += 0.25) {
+        mkt.push([t, baseRate(t)]);
+        ftp.push([t, ftpRate(t)]);
+      }
+      document.getElementById("ftp1-out").textContent = ftpRate(1).toFixed(2) + "%";
+      document.getElementById("ftp5-out").textContent = ftpRate(5).toFixed(2) + "%";
+      lineChart("curve-chart", [{ points: mkt }, { points: ftp }], { yMin: 0, yMax: 9, xLabel: "tenor (years)" });
+    }
+    bindSlider("sr", "sr-out", v => v.toFixed(1) + "%", v => { C.sr = v; drawCurve(); });
+    bindSlider("sl", "sl-out", v => v.toFixed(1) + "%", v => { C.sl = v; drawCurve(); });
+    bindSlider("lq", "lq-out", v => v.toFixed(2) + "%", v => { C.lq = v; drawCurve(); });
+  </script>
+</body>
+</html>
