@@ -2,7 +2,7 @@ import fs from "node:fs/promises";
 import path from "node:path";
 import { CONTENT_DIR, TRASH_DIR_NAME, formatOf, DocFormat } from "./config.js";
 import { resolveContentPath, toRelPath, isSidecar } from "./paths.js";
-import { extractDoc, DEFAULT_SPACE, DocSpace } from "./meta.js";
+import { extractDoc, DEFAULT_SPACE, DocSpace, Identity, visibleTo } from "./meta.js";
 
 export interface DocNode {
   kind: "doc";
@@ -81,6 +81,20 @@ export async function buildTree(rel = "", depth = Infinity): Promise<FolderNode>
     }
   }
   return node;
+}
+
+/**
+ * Prune docs this person cannot see. Folders are shared structure and always
+ * remain visible (one containing only the other person's private docs shows as empty).
+ */
+export function filterTreeVisible(root: FolderNode, identity: Identity): FolderNode {
+  return {
+    ...root,
+    children: root.children.flatMap((c): TreeNode[] => {
+      if (c.kind === "folder") return [filterTreeVisible(c, identity)];
+      return visibleTo(c.space, identity) ? [c] : [];
+    }),
+  };
 }
 
 /** All docs in a built tree, flattened. */

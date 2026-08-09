@@ -3,4 +3,5 @@ dist/
 public/js/
 public/vendor/
 public/downloads/
+.auth.json
 *.log

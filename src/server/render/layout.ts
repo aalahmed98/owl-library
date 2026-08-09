@@ -6,6 +6,9 @@ export function esc(s: string): string {
     .replace(/"/g, "&quot;");
 }
 
+/** The owl mark: brow chevron over two ring eyes. Geometric, single color. */
+export const owlMark = `<svg class="owl" viewBox="0 0 32 32" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4.5 19 16 6l11.5 13"/><circle cx="10.5" cy="20" r="5"/><circle cx="21.5" cy="20" r="5"/><circle cx="10.5" cy="20" r="1.4" fill="currentColor" stroke="none"/><circle cx="21.5" cy="20" r="1.4" fill="currentColor" stroke="none"/></svg>`;
+
 export interface LayoutOptions {
   title: string;
   sidebar: string;
@@ -14,12 +17,12 @@ export interface LayoutOptions {
   scripts?: string;
   /** Right rail (e.g. TOC); omitted = two-column layout. */
   rail?: string;
-  /** Who's currently browsing — attribution lens only, not an access boundary. */
-  identity?: "haman" | "ali";
+  /** The signed-in person; identity is fixed per session (switching = logout). */
+  identity: "haman" | "ali";
 }
 
 export function layout(o: LayoutOptions): string {
-  const identity = o.identity ?? "haman";
+  const label = o.identity === "ali" ? "Ali" : "Haman";
   return `<!doctype html>
 <html lang="en">
 <head>
@@ -40,23 +43,18 @@ export function layout(o: LayoutOptions): string {
 </head>
 <body>
 <header class="topbar">
-  <a class="brand" href="/">Owl<strong>Library</strong></a>
+  <a class="brand" href="/">${owlMark}<span>Owl Library</span></a>
   <div class="searchbox">
-    <input id="search-input" type="search" placeholder="Search the archive…" autocomplete="off">
+    <input id="search-input" type="search" placeholder="Search the library…" autocomplete="off">
     <div id="search-results" class="search-results" hidden></div>
   </div>
-  <form class="identity-switch" method="post" action="/identity">
-    <label for="identity-select">Browsing as</label>
-    <select id="identity-select" name="identity" onchange="this.form.submit()">
-      <option value="haman"${identity === "haman" ? " selected" : ""}>Haman</option>
-      <option value="ali"${identity === "ali" ? " selected" : ""}>Ali</option>
-    </select>
-  </form>
+  <span class="whoami" title="Switch person by logging out">${label}</span>
   <button id="theme-toggle" class="icon-btn" title="Toggle theme" aria-label="Toggle theme">◐</button>
-  <form method="post" action="/logout"><button class="icon-btn" title="Log out" aria-label="Log out">⏻</button></form>
+  <form class="logout-form" method="post" action="/logout"><button class="icon-btn" type="submit">Log out</button></form>
 </header>
 <div class="shell${o.rail ? " has-rail" : ""}">
   <nav class="sidebar" id="sidebar">
+  <p class="side-label">Library</p>
 ${o.sidebar}
   </nav>
   <main class="content">

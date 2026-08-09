@@ -61,7 +61,7 @@ Claude Desktop runs on Windows; this repo lives in WSL. The bridge is `bin/mcp.s
 
 ## Remote access (second user, own machine)
 
-Site is hosted at `https://archive.owl-library.com`, behind Cloudflare Access (email login gate). See **[SETUP.md](SETUP.md)** for the connect-your-own-Claude walkthrough.
+Site is hosted at `https://archive.owl-library.com` behind two-stage auth: a shared library password (`ARCHIVE_PASSWORD` env var, default `nbb123`), then a per-person identity (Haman/Ali) with a personal password stored only as a scrypt hash in the gitignored `.auth.json`. Identity is an access boundary — each person's private docs (`space` field in doc metadata) are invisible to the other across the site and the MCP endpoint. See **[SETUP.md](SETUP.md)** for the walkthrough and `src/server/auth.ts` for the mechanics.
 
 ## Troubleshooting
 

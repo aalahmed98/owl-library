@@ -1,13 +1,10 @@
 import { FolderNode, TreeNode } from "../../core/tree.js";
 import { esc } from "./layout.js";
 
-const FORMAT_ICON: Record<string, string> = { md: "📝", html: "📊", pdf: "📄" };
-
 function renderNode(node: TreeNode, activePath: string): string {
   if (node.kind === "doc") {
     const active = node.path === activePath ? " active" : "";
-    return `<a class="tree-doc${active}" href="/doc/${encodeURI(node.path)}" title="${esc(node.title)}">` +
-      `<span class="tree-icon">${FORMAT_ICON[node.format] ?? "📄"}</span>${esc(node.title)}</a>`;
+    return `<a class="tree-doc fmt-${node.format}${active}" href="/doc/${encodeURI(node.path)}" title="${esc(node.title)}">${esc(node.title)}</a>`;
   }
   const inner = node.children.map((c) => renderNode(c, activePath)).join("\n");
   const containsActive = activePath.startsWith(node.path + "/") || node.path === "";

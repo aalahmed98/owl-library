@@ -6,6 +6,7 @@ summary: >-
 created: '2026-08-09'
 updated: '2026-08-09'
 status: draft
+space: haman
 ---
 
 ## Acronyms & terms

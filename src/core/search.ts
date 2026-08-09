@@ -29,7 +29,8 @@ export interface SearchHit {
 export interface SearchOptions {
   tags?: string[];
   folder?: string;
-  space?: DocSpace;
+  /** Only return docs whose space is in this set (visibility filter). Omit = no filtering. */
+  spaces?: DocSpace[];
   limit?: number;
 }
 
@@ -129,7 +130,7 @@ export class ArchiveIndex {
       const docTags = doc.tags ? doc.tags.split(" ") : [];
       if (opts.tags?.length && !opts.tags.every((t) => docTags.includes(t.toLowerCase()))) continue;
       if (opts.folder && !(r.id as string).startsWith(opts.folder.replace(/^\/+|\/+$/g, "") + "/")) continue;
-      if (opts.space && doc.space !== opts.space) continue;
+      if (opts.spaces && !opts.spaces.includes(doc.space)) continue;
       hits.push({
         path: r.id as string,
         title: doc.title,
@@ -144,9 +145,10 @@ export class ArchiveIndex {
     return hits;
   }
 
-  listTags(): { tag: string; count: number }[] {
+  listTags(spaces?: DocSpace[]): { tag: string; count: number }[] {
     const counts = new Map<string, number>();
     for (const doc of this.docs.values()) {
+      if (spaces && !spaces.includes(doc.space)) continue;
       for (const t of doc.tags.split(" ")) {
         if (t) counts.set(t, (counts.get(t) ?? 0) + 1);
       }

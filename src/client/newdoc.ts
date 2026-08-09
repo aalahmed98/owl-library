@@ -12,6 +12,7 @@ if (host) {
   const titleEl = $<HTMLInputElement>("nd-title");
   const fileEl = $<HTMLInputElement>("nd-filename");
   const folderEl = $<HTMLSelectElement>("nd-folder");
+  const spaceEl = $<HTMLSelectElement>("nd-space");
   const tagsEl = $<HTMLInputElement>("nd-tags");
   const situationEl = $<HTMLTextAreaElement>("nd-situation");
   const notesEl = $<HTMLTextAreaElement>("nd-notes");
@@ -37,8 +38,8 @@ if (host) {
       const notes = mode() === "notes";
       notesFields.hidden = !notes;
       hintEl.textContent = notes
-        ? "Describe the situation, dump your raw bullets, and the AI organizes them — acronyms up top, logical flow, unclear fragments become open questions. Your raw notes are kept verbatim in an appendix."
-        : "A plain markdown document — you'll land in the editor.";
+        ? "Describe the situation, dump your raw bullets, and the AI organizes them: acronyms up top, logical flow, unclear fragments become open questions. Your raw notes are kept verbatim in an appendix."
+        : "A plain markdown document; you'll land in the editor.";
     });
   }
 
@@ -65,7 +66,7 @@ if (host) {
     createBtn.disabled = true;
     statusEl.textContent = "Creating…";
     try {
-      await api("/api/create", { path, content, meta: { title, tags, status: "draft" } });
+      await api("/api/create", { path, content, meta: { title, tags, status: "draft", space: spaceEl.value } });
     } catch (err) {
       createBtn.disabled = false;
       statusEl.textContent = "";
@@ -77,14 +78,14 @@ if (host) {
       return;
     }
 
-    statusEl.textContent = "Raw notes saved ✓ — organizing with Claude… (~1 min)";
+    statusEl.textContent = "Raw notes saved. Organizing with Claude… (~1 min)";
     try {
       await api("/api/organize", { path });
       location.href = `/doc/${encodeURI(path)}`;
     } catch (err) {
       statusEl.innerHTML =
         `Organizing failed (${escText(err instanceof Error ? err.message : String(err))}). ` +
-        `Your raw notes are saved — <a href="/doc/${encodeURI(path)}">open the doc</a> and hit ✨ Organize to retry.`;
+        `Your raw notes are saved; <a href="/doc/${encodeURI(path)}">open the doc</a> and hit Organize to retry.`;
       createBtn.disabled = false;
     }
   });

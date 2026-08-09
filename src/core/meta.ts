@@ -7,7 +7,15 @@ import { sidecarPathFor, resolveContentPath, toRelPath } from "./paths.js";
 
 export type DocStatus = "draft" | "final" | "archived";
 export type DocSpace = "haman" | "ali" | "shared";
+export type Identity = "haman" | "ali";
+/** Untagged docs (everything predating the visibility system) are Haman's private docs. */
 export const DEFAULT_SPACE: DocSpace = "haman";
+
+/** Whether a doc with this space is visible to this person. Private docs are only visible to their owner. */
+export function visibleTo(space: DocSpace | undefined, identity: Identity): boolean {
+  const s = space ?? DEFAULT_SPACE;
+  return s === "shared" || s === identity;
+}
 
 export interface DocMeta {
   title: string;
@@ -18,7 +26,7 @@ export interface DocMeta {
   status?: DocStatus;
   source?: string;
   authors?: string[];
-  /** Whose browsing tab this shows under: draft workspace (haman/ali) or the shared/published tab. Missing = treated as DEFAULT_SPACE. */
+  /** Visibility: "haman"/"ali" = that person's private doc (invisible to the other), "shared" = both. Missing = DEFAULT_SPACE. */
   space?: DocSpace;
 }
 

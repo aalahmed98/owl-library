@@ -1,36 +1,43 @@
 /* owl-library design tokens — single source of truth for the site AND papers.
    Papers inline this file between their marked tokens region; the
-   library-maintenance skill re-syncs that region when this file changes. */
+   library-maintenance skill re-syncs that region when this file changes.
+
+   System: "catalog of record" — warm ink on paper, one burnt-ochre accent,
+   Schibsted Grotesk for UI, Literata for document prose. All color in OKLCH;
+   webfont @font-face rules live in the site stylesheet (papers fall back to
+   the system stacks below and stay self-contained). */
 
 :root {
-  /* color — light */
-  --color-bg: #faf9f7;
-  --color-surface: #ffffff;
-  --color-fg: #1a1a1e;
-  --color-muted: #6b6b76;
-  --color-border: #e4e2dd;
-  --color-accent: #2f6fed;
-  --color-accent-fg: #ffffff;
-  --color-accent-soft: #e8effd;
-  --color-danger: #c4483c;
-  --color-warn-bg: #fdf6e3;
-  --color-code-bg: #f2f1ee;
-  --color-mark: #fff3bf;
+  /* color — light (warm paper) */
+  --color-bg: oklch(0.977 0.004 85);
+  --color-surface: oklch(0.993 0.002 85);
+  --color-fg: oklch(0.245 0.012 75);
+  --color-muted: oklch(0.5 0.014 75);
+  --color-border: oklch(0.895 0.008 80);
+  --color-accent: oklch(0.53 0.105 66);
+  --color-accent-fg: oklch(0.985 0.004 85);
+  --color-accent-soft: oklch(0.945 0.026 78);
+  --color-danger: oklch(0.52 0.14 29);
+  --color-warn-bg: oklch(0.96 0.035 90);
+  --color-code-bg: oklch(0.943 0.006 85);
+  --color-mark: oklch(0.92 0.07 90);
 
   /* typography */
-  --font-body: "Charter", "Georgia", "Cambria", "Times New Roman", serif;
-  --font-ui: system-ui, -apple-system, "Segoe UI", sans-serif;
+  --font-body: "Literata", "Charter", "Georgia", "Cambria", serif;
+  --font-ui: "Schibsted Grotesk", system-ui, -apple-system, "Segoe UI", sans-serif;
   --font-mono: "SFMono-Regular", "Cascadia Code", "Consolas", "Menlo", monospace;
   --text-xs: 0.75rem;
   --text-sm: 0.875rem;
   --text-base: 1.0625rem;
   --text-lg: 1.25rem;
-  --text-xl: 1.5rem;
-  --text-2xl: 1.875rem;
-  --text-3xl: 2.375rem;
+  --text-xl: 1.5625rem;
+  --text-2xl: 1.953rem;
+  --text-3xl: 2.441rem;
   --leading-body: 1.65;
-  --leading-tight: 1.25;
+  --leading-tight: 1.2;
   --measure: 68ch;
+  --track-tight: -0.015em;
+  --track-caps: 0.08em;
 
   /* spacing */
   --space-1: 0.25rem;
@@ -43,26 +50,29 @@
   --space-8: 4rem;
 
   /* misc */
-  --radius-sm: 4px;
-  --radius-md: 8px;
-  --radius-lg: 12px;
-  --shadow-sm: 0 1px 2px rgba(20, 20, 25, 0.06);
-  --shadow-md: 0 2px 8px rgba(20, 20, 25, 0.1);
+  --radius-sm: 3px;
+  --radius-md: 6px;
+  --radius-lg: 10px;
+  --shadow-sm: 0 1px 2px oklch(0.25 0.01 75 / 0.06);
+  --shadow-md: 0 2px 10px oklch(0.25 0.01 75 / 0.09);
+  /* the catalog rule: double hairline used under page titles and the auth wordmark */
+  --rule-double: linear-gradient(var(--color-fg), var(--color-fg)) 0 0 / 100% 1px no-repeat,
+                 linear-gradient(var(--color-border), var(--color-border)) 0 4px / 100% 1px no-repeat;
 }
 
 [data-theme="dark"] {
-  --color-bg: #16161a;
-  --color-surface: #1e1e24;
-  --color-fg: #e8e6e3;
-  --color-muted: #9a98a0;
-  --color-border: #32323a;
-  --color-accent: #6b9bff;
-  --color-accent-fg: #10101c;
-  --color-accent-soft: #23304d;
-  --color-danger: #e0685c;
-  --color-warn-bg: #2e2a1e;
-  --color-code-bg: #24242b;
-  --color-mark: #4d4425;
-  --shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.4);
-  --shadow-md: 0 2px 8px rgba(0, 0, 0, 0.5);
+  --color-bg: oklch(0.205 0.008 75);
+  --color-surface: oklch(0.243 0.009 75);
+  --color-fg: oklch(0.9 0.008 80);
+  --color-muted: oklch(0.66 0.012 75);
+  --color-border: oklch(0.318 0.01 75);
+  --color-accent: oklch(0.78 0.105 75);
+  --color-accent-fg: oklch(0.2 0.03 75);
+  --color-accent-soft: oklch(0.3 0.035 75);
+  --color-danger: oklch(0.68 0.13 29);
+  --color-warn-bg: oklch(0.27 0.03 90);
+  --color-code-bg: oklch(0.258 0.008 75);
+  --color-mark: oklch(0.42 0.07 90);
+  --shadow-sm: 0 1px 2px oklch(0 0 0 / 0.4);
+  --shadow-md: 0 2px 10px oklch(0 0 0 / 0.5);
 }

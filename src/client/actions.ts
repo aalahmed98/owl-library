@@ -51,7 +51,7 @@ async function openMoveDialog(from: string, kind: string): Promise<void> {
   const dlg = document.createElement("dialog");
   dlg.className = "move-dialog";
   dlg.innerHTML = `<h3>Move <code>${escHtml(from)}</code> to…</h3>
-<div class="move-list">${dests.map((f) => `<button class="btn move-dest" data-dest="${escHtml(f)}">📁 ${f === "" ? "(root)" : escHtml(f)}</button>`).join("")}</div>
+<div class="move-list">${dests.map((f) => `<button class="btn move-dest" data-dest="${escHtml(f)}">${f === "" ? "(root)" : escHtml(f)}</button>`).join("")}</div>
 <form method="dialog"><button class="btn">Cancel</button></form>`;
   document.body.append(dlg);
   dlg.addEventListener("close", () => dlg.remove());
@@ -101,16 +101,29 @@ async function newFolder(parent: string): Promise<void> {
   }
 }
 
+async function toggleSpace(btn: HTMLButtonElement): Promise<void> {
+  const path = btn.dataset.path ?? "";
+  const next = btn.dataset.next ?? "shared";
+  btn.disabled = true;
+  try {
+    await api("/api/space", { path, space: next });
+    location.reload();
+  } catch (err) {
+    alert(`Change failed: ${err instanceof Error ? err.message : err}`);
+    btn.disabled = false;
+  }
+}
+
 async function organize(btn: HTMLButtonElement): Promise<void> {
   const path = btn.dataset.path ?? "";
   const original = btn.textContent;
   btn.disabled = true;
-  btn.textContent = "✨ Organizing… (~1 min)";
+  btn.textContent = "Organizing… (~1 min)";
   try {
     await api("/api/organize", { path });
     location.reload();
   } catch (err) {
-    alert(`Organize failed: ${err instanceof Error ? err.message : err}\nYour raw notes are untouched — you can retry.`);
+    alert(`Organize failed: ${err instanceof Error ? err.message : err}\nYour raw notes are untouched; you can retry.`);
     btn.disabled = false;
     btn.textContent = original;
   }
@@ -123,4 +136,5 @@ document.addEventListener("click", (e) => {
   else if (btn.classList.contains("js-rename")) void renameNode(btn.dataset.path ?? "", btn.dataset.kind ?? "doc");
   else if (btn.classList.contains("js-newfolder")) void newFolder(btn.dataset.parent ?? "");
   else if (btn.classList.contains("js-organize")) void organize(btn as HTMLButtonElement);
+  else if (btn.classList.contains("js-space")) void toggleSpace(btn as HTMLButtonElement);
 });

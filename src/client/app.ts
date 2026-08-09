@@ -120,7 +120,7 @@ async function toggleFullscreen(): Promise<void> {
 
 fsBtn?.addEventListener("click", () => void toggleFullscreen());
 document.addEventListener("fullscreenchange", () => {
-  if (fsBtn) fsBtn.textContent = document.fullscreenElement ? "⛶ Exit fullscreen" : "⛶ Fullscreen";
+  if (fsBtn) fsBtn.textContent = document.fullscreenElement ? "Exit fullscreen" : "Fullscreen";
 });
 
 // "f" toggles fullscreen when not typing
