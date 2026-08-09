@@ -403,14 +403,69 @@ margin the cheapest cross-sovereign dataset found this session.
 
 ---
 
+## 6d. Bond universe — and a flag on a live watch item
+
+The `bhrain cds` search returned Bahrain's bond curve alongside the CDS, with
+prices (end-of-day; `1 Day Chg .000`):
+
+| Bond | Price | Yield |
+|---|---|---|
+| BHRAIN 7½ 09/20/2047 | 95.07 | 7.986 |
+| BHRAIN 6 09/19/2044 | 82.60 | 7.810 |
+| BHRAIN 7⅛ 06/10/2036 | 97.41 | 7.500 |
+| BHRAIN 6¾ 09/20/2029 | 98.89 | 7.150 |
+| BHRAIN 7 10/12/2028 | 99.94 | 7.024 |
+| CBB Sukuk 3.95 09/16/2027 | 97.44 | 6.397 |
+
+**None of these are the five ISINs in `BONDS`.** Bahrain's curve is materially
+fuller than the one the benchmark prices off. The 2036 / 2044 / 2047 maturities
+are direct candidates for handover item 6 — the **forward data cliff**, where
+after 2030-03-29 no mid/short leg survives the pull-to-par trim and `slope_20d`
+dies unless newer bonds are added.
+
+### ⚠ FLAG — XS2384406612 did not resolve
+
+`XS2384406612` — the **$500mn maturity dated 2026-09-08**, live on `/domino2`
+with a countdown — returned **"information currently unavailable"** on the
+terminal.
+
+That is **not proof the bond does not exist**; the message also appears for
+recognised securities with no accessible data. But it is a flag, and it lands on
+a bond whose size is *already* marked LOW CONFIDENCE in `HANDOVER.md` because it
+is cbonds-derived rather than primary-sourced.
+
+**Resolve before anyone acts on the countdown.** The clean test is enumerating
+Bahrain's bonds (`SRCH <GO>` filtered by country, or the `Fixed Income` tab of
+the security search) and checking whether *any* September-2026 maturity appears.
+If none does, both the ISIN and the $500mn figure need re-sourcing, and the
+`/domino2` countdown should be suspended until they are.
+
+### 52-week range cross-check
+
+Search panel reports `52 Wk Hi/Lo 355.8759 / 147.8508` with the high in
+**March 2026** — immediately after Fitch's 2026-02-23 downgrade, matching the
++86bp 30-day follow-through measured on that event in §6c. Independent
+confirmation that the transcribed series tracks reality.
+
+### Still unresolved: EUR CDS and bank CDS
+
+Guessed ticker strings (`BHRAIN CDS EUR SR 5Y D14 Curncy`,
+`NBB BI CDS USD SR 5Y D14 Curncy`) both returned nothing, but **guessed strings
+are not evidence** — the USD ticker would not have been found that way either.
+The `bhrain cds` search surfaced only the USD 5Y in Top Results; the
+`Fixed Income (132)` tab was not yet opened. **Both remain genuinely untested.**
+
+---
+
 ## 7. Still outstanding
 
 | Item | Status | Cost |
 |---|---|---|
 | ~~Rating action history~~ | **DONE — exported, 2008-2026** | — |
-| `BHRAIN CDS EUR SR 5Y` exists? | **unverified** | 30 sec |
-| Bahraini bank CDS (NBB/BBK/AUB) exists? | **unverified** | 30 sec |
-| Bond prices via BDH (`XS… Corp`) | untested — **RATC exported, so likely works** | 2 min |
+| `BHRAIN CDS EUR SR 5Y` exists? | **unverified — guessed ticker failed, search tab not opened** | 1 min |
+| Bahraini bank CDS (NBB/BBK/AUB) exists? | **unverified — same** | 1 min |
+| Bond prices via BDH | **XS2384406612 did not resolve — see 6d flag** | — |
+| Verify a Sep-2026 Bahrain maturity exists | **BLOCKING for /domino2 countdown** | 2 min |
 | Equities via BDH (`BHSEASI Index`) | untested — **likely works** | 2 min |
 | CDS term structure history (2Y, 10Y) | not captured | ~36 pp for 3 crisis years |
 | 2024–2026 from CMAN (removes source join) | not captured | ~15 pp |
