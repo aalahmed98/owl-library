@@ -315,15 +315,103 @@ the same thing the EUR quanto basis would price directly.
 
 ---
 
+## 6c. RATC — full Bahrain rating action history, 2008-2026
+
+**Route:** `CRPR <GO>` → `View Changes` opens `RATC` (global, ~18,000 rows for
+the last 30 days). Filter with the orange box under **Company Name** or
+**Ctry/Reg = BH**, widen the date range, then **`Export to Excel`**.
+
+**It exported.** File: `bloomberg-2026-08-09/Bahrain_ratings.xlsx` — 2,225 rows,
+**2008-02-22 → 2026-04-22**, all `BH`, eight agencies (Moody's 848, Fitch 566,
+S&P 474, CI 223, AMBest 79, RAM 17, S&P Natl 13, Dagong 5), covering sovereign,
+banks, and corporates.
+
+### The export succeeding is itself the finding
+
+RATC is Bloomberg-aggregated data and it exported without resistance. **The
+entitlement block is therefore narrowly scoped to CMA pricing, not to the seat.**
+Bonds, equities, indices and rating data should all be obtainable by formula or
+export rather than by screen capture. Test before committing to any further
+page-by-page transcription.
+
+### Bahrain is mid-downgrade-cycle, and this is not in the framework
+
+| Date | Agency | Action |
+|---|---|---|
+| 2025-04-11 | CI | outlook → NEG |
+| **2025-11-21** | **S&P** | **B+ → B** |
+| **2026-02-23** | **Fitch** | **B+ → B**, country ceiling BB+ → BB |
+| **2026-04-03** | **CI** | **B+ → B** |
+| **2026-04-18** | **Moody's** | B2u affirmed, **outlook → NEGATIVE** |
+
+**Three agencies downgraded Bahrain by one notch in the five months to April
+2026, and the fourth has signalled.** Neither `domino-framework.md` nor
+`HANDOVER.md` carries this. It is live context for a system with grading windows
+closing 2026-08-31/09-01 and a $500mn maturity on 2026-09-08.
+
+### The sovereign→bank doom loop, dated
+
+The 2026 sequence propagates cleanly and fast:
+
+```
+Fitch   sovereign 02-23  →  Mumtalakat, Bapco 02-26 (+3d)
+                         →  AUB, BBK, NBB    03-02 (+7d)
+                         →  Beyon            03-09 (+14d)
+CI      sovereign 04-03  →  NBB, Al Baraka   04-08 (+5d)
+Moody's sovereign 04-18  →  BBK, NBB         04-22 (+4d)
+```
+
+Across the full 2008–2026 history: **134 of 270 bank rating changes (49.6%) fall
+within 45 days after a sovereign change**, while those windows cover only 24.7%
+of the period — a **2.01× lift**, median lag **7 days**.
+
+**But note the direction.** Sovereign moves first; banks follow within a week.
+That makes bank rating actions a *confirming* indicator, not a leading one, so
+they cannot serve as early warning for the sovereign. N3's doom-loop channel is
+real and now dated, but this particular instrument points the wrong way. Whether
+bank actions ever *precede* sovereign ones is untested.
+
+### Rating actions and CDS — DESCRIPTIVE, not a test
+
+CDS behaviour around the eleven sovereign rating actions with CDS coverage:
+
+| | Median | Mean | Widened |
+|---|---|---|---|
+| 30d run-up **before** action | **+3.4bp** | +11.1bp | 6 / 11 |
+| 30d move **after** action | **−1.3bp** | +4.9bp | 5 / 11 |
+
+Coin flips on both sides. Individual events swing wildly in both directions
+(2020-04-03 CI: +300bp run-up; 2026-04-18 Moody's: −91bp run-up).
+
+**This confirms a call the framework already made.** The signal registry records
+agency ratings as *"deliberately not an input — ratings lag the market by weeks"*.
+That was asserted from the 2018 episode; it is now consistent with eleven events.
+
+**Protocol status: this is DESCRIPTIVE and cannot be cited as a result.** It was
+computed on the same data any rating-based rule would be tested against, so
+designing a rule from it and then evaluating it here would be circular. What it
+legitimately supports is a *resource decision* — do not spend a pre-registration
+on a rating-based signal — which is a choice about where to spend effort, not a
+finding about Bahrain.
+
+### What this dataset is actually good for
+
+RATC covers **every sovereign**, not just Bahrain, in one filtered export. If a
+rating-conditioned signal is ever pre-registered, the cross-sovereign panel for
+it costs one export rather than ~52 screen pages per country. It is by a wide
+margin the cheapest cross-sovereign dataset found this session.
+
+---
+
 ## 7. Still outstanding
 
 | Item | Status | Cost |
 |---|---|---|
-| Rating action *history* (`CRPR` → `View Changes`) | snapshot captured, history not | 1 screen |
+| ~~Rating action history~~ | **DONE — exported, 2008-2026** | — |
 | `BHRAIN CDS EUR SR 5Y` exists? | **unverified** | 30 sec |
 | Bahraini bank CDS (NBB/BBK/AUB) exists? | **unverified** | 30 sec |
-| Bond prices via BDH (`XS… Corp`) | untested — Bloomberg-owned, may export | 2 min |
-| Equities via BDH (`BHSEASI Index`) | untested — may export | 2 min |
+| Bond prices via BDH (`XS… Corp`) | untested — **RATC exported, so likely works** | 2 min |
+| Equities via BDH (`BHSEASI Index`) | untested — **likely works** | 2 min |
 | CDS term structure history (2Y, 10Y) | not captured | ~36 pp for 3 crisis years |
 | 2024–2026 from CMAN (removes source join) | not captured | ~15 pp |
 | GCC peer CDS | deliberately deferred | ~5 × 52 pp |
