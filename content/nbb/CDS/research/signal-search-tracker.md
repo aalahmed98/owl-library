@@ -396,6 +396,69 @@ cds.bh.5y,2016-03-01,284.5,"Bloomberg <TICKER> PX_LAST, pulled 2026-xx-xx"
 Use `cds.bh.5y` for the Bahrain mid series — that is the name the engine already
 reads for the real-CDS era, so an extended history slots straight in.
 
+### Access route — a ONE-OFF EXPORT is all this needs
+
+**This is a backtest, so no live feed and no API contract is required.** That
+matters, because the entitlement tiers differ sharply:
+
+| Tier | Scripting? | Needed here? |
+|---|---|---|
+| Terminal seat (~$28–32k/yr) | Excel `BDH`/`BDP` only, tied to your logged-in session | **YES — this is sufficient** |
+| Desktop API (`blpapi`, bundled) | Only while logged in at that machine; no redistribution | not needed |
+| Server API / B-PIPE | Yes | **NO — do not pursue** |
+| Data License / Per-Security | Yes, bulk historical | only if NBB already holds one |
+
+So the ask is: **one person, one terminal, one hour in Excel, one CSV.** Not an
+integration project. Worth asking whether NBB's market-data team already holds a
+Data License feed — if so that is the cleaner route and sidesteps the seat
+licence entirely.
+
+**Compliance first, not after.** Bloomberg's redistribution terms are strict and
+"exported to CSV for an internal model" is exactly the case that gets scrutinised
+at a bank. Clear it before the pull.
+
+### The wrinkle: a one-off export creates a NEW era boundary
+
+The export is historical, so the LIVE series after the export date remains the
+Ariva proxy. The reference series therefore becomes:
+
+```
+real CDS (2008 → export date)  |  Ariva proxy (export date → )
+```
+
+This is not a new problem — it is the CURRENT problem improved. Today the split
+is real CDS 2015–2019 then proxy 2019→; after an export it would be real CDS for
+almost the entire history with only forward flags on the proxy. **The
+architecture already handles it**: C-R1/C-R3 era-stratified bars exist precisely
+for this, and the boundary date simply moves. A refresh export every year or two
+keeps the proxy window short.
+
+### Additional pulls, beyond the tiers above
+
+**Add to Tier 1:**
+- **Bahrain CDS recovery-rate assumption.** The whole benchmark is a Merrick fit
+  ESTIMATING recovery from bond prices, with a 15pt gate that rejects 2,206 of
+  2,631 days. Bloomberg carries the market's quoted assumption directly — this
+  replaces the system's single largest modelling construct with an observation.
+- **Sovereign issuance history with launch spread vs secondary.** That is N6
+  (new-issue concession) delivered complete, rather than reconstructed one press
+  release at a time.
+
+**Add to Tier 2:**
+- **EMBI / CEMBI Bahrain sub-index spread.** The residual lens regresses on the
+  EMB *ETF* only because FRED truncates the proper ICE indices to a rolling 3y
+  window. The real index is the correct regressor and improves every phase-2
+  lens graded on the residual.
+- **Bahrain equity index + bank equity prices** — daily, versus the CBB's
+  monthly-and-lagged banking tables; a much faster read on the doom loop (N3).
+- **Rating actions with dates, plus outlook/watch changes.** S1.3 stalled because
+  historical SCHEDULED review dates are not archived anywhere free; the action
+  history at least fixes the backtest arm.
+
+**Deliberately NOT on the list:** macro forecasts, analyst estimates, news
+sentiment. All available, all tempting, and all backward-looking or survey-based
+— the exact category that has failed 4-for-4 in this project.
+
 ### What must happen when it lands — do NOT skip this
 
 Replacing the grading reference re-derives **every historical grade in the
