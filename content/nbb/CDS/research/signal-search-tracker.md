@@ -55,7 +55,7 @@ Result: — not yet · **ADOPTED** · **REJECTED** · **BLOCKED** (data unavaila
 |---|---|---|---|---|---|
 | S0.1a | **Jordan** — Ariva history check | power | ☑ | **VIABLE (D3/D4 only)** | Curve computable from 2017-10. Oil-importer caveat below. |
 | S0.1b | **Egypt** — Ariva history check | power | ☑ | **DEAD as swept** | All 5 recon ISINs are 2025 issues — zero history. Needs an older-vintage re-sweep. |
-| S0.2 | Seed Qatar + Saudi (Ariva) | power | ☐ | — | Not in any recon yet — needs an ISIN sweep first |
+| S0.2 | Qatar + Saudi — ISIN sweep | power | ☑ | **BOTH VIABLE** | Curves computable from 2017-10 (Saudi) / 2018-04 (Qatar). Details below. |
 | S0.3 | Re-run frozen thresholds on each — out-of-sample test | validation | ☐ | — | needs its own O-R1-style bar spec per country |
 | **S0.0** | **Resolve: which dominoes transfer to a non-oil-exporter?** | design | ☐ | — | **BLOCKS S0.1a — see below** |
 
@@ -289,6 +289,56 @@ does. But this is a methodology decision, not an implementation detail, and it
 belongs to the owner.
 
 **Nothing was seeded, no config was touched, no threshold or grade changed.**
+
+## S0.2 — Qatar & Saudi ISIN sweep (2026-08-09)
+
+Motivated by the J-R1 failure: Jordan (oil importer, no peg) did not reproduce
+Oman's inversion result. Qatar and Saudi are **oil exporters with USD pegs** —
+matching Bahrain and Oman on both structural counts where Jordan matched on
+neither — so they directly test interpretation (i) of the J-R1 result.
+
+**All candidates verified present on Ariva with live prints (23 in Jul-2026).**
+
+### Saudi Arabia — VIABLE, slope from 2017-10
+
+| ISIN | Bond | Leg | First print | Sources |
+|---|---|---|---|---|
+| XS1694217495 | 3.625% 2028-03-04 | mid | **2017-10-02** | cbonds + Ariva (`3,625% Saudi-Arabien, Königreich`) |
+| XS1508675508 | 4.50% 2046-10-26 | long | **2016-10-25** | cbonds + Ariva (`4,5% Saudi-Arabien 16/46`) |
+| XS1599284202 | 3.628% 2027-04-20 | — | 2017-04-18 | **HELD OUT — it is a SUKUK** (`KSA SUKUK 17/27`) |
+
+The sukuk exclusion follows the standing rule: sukuk stay out of the curve until
+a basis treatment is pre-registered (Bahrain's XS2408002769 precedent).
+
+### Qatar — VIABLE, slope from 2018-04
+
+| ISIN | Bond | Leg | First print | Sources |
+|---|---|---|---|---|
+| XS1807174393 | 4.50% 2028-04-23 | mid | **2018-04-16** | cbonds + Deutsche Börse (`Katar, Staat 4,5% 18/28`) + Ariva — three sources |
+| XS1405781854 | 4.625% 2046-06-02 | long | **2016-06-01** | cbonds + Ariva (`KATAR 16/46 REGS`) |
+| XS1807174559 | 5.103% 2048-04-23 | long (alt) | 2018-04-16 | cbonds + Ariva |
+| XS1959337749 | 4.817% 2049-03-14 | long (alt) | 2019-03-12 | cbonds + Ariva |
+
+### Two limitations, recorded before any seeding
+
+1. **Both mid legs mature in 2028, so both slopes die imminently.** At the
+   frozen 550-day pull-to-par trim, Saudi's slope ends ~**2026-09** and Qatar's
+   ~**2026-10** — i.e. within weeks. That is fine for a BACKTEST (8.9 and 8.5
+   years of history respectively, covering the 2016 oil crash, COVID and 2022)
+   but neither would be a live monitor without a newer verified mid leg.
+2. **These are AA-rated credits, and the inversion rule may simply never fire
+   on them.** Bahrain (B+), Oman (BB+) and Jordan (BB−) are all speculative or
+   near-speculative; Qatar and Saudi trade an order of magnitude tighter. If the
+   curve never inverts, the run produces no flags and the test is uninformative
+   about interpretation (i) — though "the rule is regime-dependent, not
+   sovereign-dependent" would itself be a finding worth recording.
+
+**Design consequence, stated now:** whichever way it goes, the J-R1 lesson
+applies — a per-country bar must be solved outcome-blind from that country's own
+history, and a spec must pre-commit to how a zero-flag outcome is reported, so
+that "no flags fired" cannot later be presented as either success or failure.
+
+**Nothing seeded. No config, threshold, grade or record touched by this sweep.**
 
 ## Expanded — the reasoning behind each item
 
