@@ -789,7 +789,7 @@ regime, oil-stress composite, alarm families, alert grading rules) are frozen as
 of today as **v1**. From here on:
 
 0. **Version-control choreography (adopted 2026-08-08, audit A1).** This doc is
-   git-tracked in theArchive; its history is the pre-registration audit trail.
+   git-tracked in owl-library (renamed from theArchive 2026-08-09); its history is the pre-registration audit trail.
    Every spec change is TWO commits: a **spec-commit** (the registered spec,
    before any evaluation runs) and a **results-commit** (the recorded outcome,
    after the single run). A spec whose evaluation cannot point at an earlier
@@ -2230,6 +2230,55 @@ downgraded from "generalizes" to "generalized once."**
   bond's life. In that window the 2027 leg had 73–109 months to run and the
   slope oscillated about zero, so it is retained — but the boundary is recorded
   here rather than discovered later.
+
+### J-R1 RESULTS (single run, 2026-08-09; reproducible via `scripts/research/jr1-evaluate.mjs`) — **THE INVERSION RULE DID NOT TRANSFER**
+
+**Outcome-blind solve, run and printed before any grade was read:** Jordan proxy
+history 2,474 days (2016-11-03→2026-08-07). Curve bar = **40bp / 60d**, achieved
+exceedance **14.32%** on n=2,430 trials against the ≤17.76% target; neighbor
+30bp → 21.93%, so 40bp is the against-us rounding. Stored as
+`jor:backtest_rules`, which armed grading. 136 alerts graded (24 hit / 112 FP).
+
+| Rule | Flags | Flag-level | Episodes | First-flag | Any-hit | 90% lift CI vs 14.32% |
+|---|---|---|---|---|---|---|
+| `inversion` | 56 | 11/45 = 20% | 13 | **2/13 = 15%** | 31% | **0.00×–2.15×** |
+| `level_pct` | 34 | 4/30 = 12% | 9 | 2/9 = 22% | 22% | 0.00×–3.10× |
+| `slope_20d` | 46 | 9/37 = 20% | 23 | 5/23 = 22% | 22% | 0.61×–2.43× |
+
+Regime escalations (C-R4 method, Jordan's THREE-component flag): all **3/24 =
+12.5%**, lift 0.29×–1.75×; →watch 1/14 = 7.1%; →distress 2/10 = 20.0%.
+
+**THE HEADLINE, per the reading pre-committed in J-R1:** Jordan's inversion
+episodes are **2/13 = 15%** against a 14.32% base — a point-estimate lift of
+**≈1.05×**, and the CI does not exclude 1×. **The inversion rule did NOT
+transfer to Jordan.**
+
+**Consequence, executed as pre-committed:** the Oman inversion result is
+**downgraded from "the rule generalizes" to "the rule generalized once."** Oman's
+own numbers are untouched and remain as measured (5/9 = 55.6%, CI 1.86×–4.34×,
+audit-robust) — what changes is the CLAIM built on top of them. The defensible
+phrasing is now: *"the inversion rule transferred to Oman and failed to transfer
+to Jordan; on the evidence it is not a general property of the rule."*
+
+**Also recorded: Jordan's regime flag is at or below its own base rate**
+(12.5% vs 14.32%, lift point estimate 0.87×). Bahrain's C-R4 escalation result
+is therefore NOT a general property of the composite flag either — it is a
+Bahrain result. This is the second time in one run that a claim of generality
+failed, and both are recorded rather than explained away.
+
+**Interpretations available, none adopted (each would need its own spec):**
+(i) the mechanism may be specific to oil-exporting pegged sovereigns — Oman
+matches Bahrain on both counts, Jordan on neither; (ii) Jordan's three-component
+flag is structurally weaker than the four-component version, which J-R1 flagged
+in advance as making escalations non-comparable; (iii) Oman's result may simply
+have been a favourable draw at n=9. **The run cannot distinguish these**, and
+choosing between them post hoc would be exactly the outcome-fitting the protocol
+forbids.
+
+**Nothing was re-solved, re-tuned or suppressed.** Per J-R1, no Jordan result
+could have caused the bars to be re-derived, and none did. Bahrain and Oman
+records are untouched (verified: bahrain 74 hit / 248 FP / 3 pending / 6
+unresolvable; oman 27 hit / 83 FP — both unchanged).
 
 ## Phase 2 — the four lenses (2026-08-08→)
 
