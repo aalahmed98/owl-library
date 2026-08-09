@@ -3239,6 +3239,89 @@ re-grades + peak moves to DB · regenerate `derived.residual_bp` + re-solve
 `residual_bars` per frozen P2-L1 · re-derive C-R4/C-R4v2, P2-P1, action/watch
 outcome columns · regression snapshots before/after, every diff classified.
 
+### G-R1 RESULTS — COMPONENT 2 (app integration + full re-derivation, run 2026-08-10; migration `scripts/migrate/gr1-regrade.ts`, snapshots `scratch/regression-gr1/`)
+
+**Acceptance passed:** the migration re-graded all 255 Bahrain alerts through
+the app's own grader; the 24 curve/fundamental flips reproduced component 1
+exactly (dates and peaks identical). Tests 100/100 after updating invariant (b)
+to pin the NEW frozen structure (bbg boundary 2019-07-01 ≥, ariva boundary
+2026-08-11 ≥, bars 50/90, null-bbg = two-era behavior — a deliberate,
+classified diff). Oman and Jordan verified untouched by construction (their
+stored two-era rules parse unchanged; invariant-tested).
+
+**Scope split implemented as specified:** signals keep firing from the
+walk-forward venue-proxy composite; only grading reads the new
+`gradingRef` (seed → Bloomberg real → live-proxy tail). The residual lens got
+the same split: firing/display residual stays proxy-based, grading reads a new
+`derived.residual_gref_bp` computed by the identical regression on the grading
+reference.
+
+**Residual bbg bars (frozen P2-L1 procedure, era 2019-07-01→2026-08-10):**
+
+| Bar | Ariva (old) | bbg (solved) | Achieved |
+|---|---|---|---|
+| widen 180d | 170 | **80** | 18.60% (n=1,726) |
+| widen 60d | 110 | **50** | 14.69% |
+| tighten 180d | 150 | **80** | 17.84% |
+| tighten 60d | 90 | **50** | 13.86% |
+
+The proxy-noise finding repeats on the residual: bars collapse to roughly half.
+
+**Recovery tier: 12 flips, 6 up / 6 down** — hit total unchanged at 12, but a
+different twelve. Notable: 2019-09-30 market_access FP→HIT (−121bp real
+tightening the proxy hid); the 2025-07/09 recovery "hits" were proxy artifacts
+(real residual moves 13–19bp).
+
+### The headline consequence, stated first because it is the biggest
+
+**C-R4 — the regime flag, the project's flagship claim — did not survive the
+real reference.**
+
+| | Pre-G-R1 (proxy) | Post-G-R1 (real) |
+|---|---|---|
+| Escalations | 8/17 = **47.1%** | **5/18 = 27.8%** |
+| 90% lift CI | 1.66×–3.64× (excluded 1×, audit-robust) | **0.63×–2.50× — INCLUDES 1×** |
+| watch→distress | — | 4/11 = 36.4% |
+| calm→watch | — | 1/7 = 14.3% |
+
+Point lift is 1.56× vs the 17.76% target (1.96× vs the era's 14.14% achieved
+base) — directionally positive, statistically unproven. **No Bahrain-graded CI
+excludes no-skill anymore.** The honest claim inventory after G-R1:
+
+- **Oman inversion (out-of-sample)** — 5/9, CI 1.86×–4.34× — now the ONLY
+  graded result in the system that excludes no-skill. Unaffected by G-R1.
+- **Bahrain inversion** — the strongest Bahrain curve rule (24.4% = 1.73× flag
+  level; episodes 20%), CI status at episode level unchanged (does not exclude
+  1× at n=10).
+- Tier ladder ordering (10/15/29/39%) — monotone, flattened, descriptive.
+- The 12-day oil→credit lead — mechanism finding, unaffected.
+- **The live 2026-07-03 watch→distress escalation resolved HIT** (+55.8bp vs
+  the 50bp bar) — the current warning was correct on real data.
+
+**P2-P1 desk composite, era-split (served live):** seed 12/39 = 30.8% · bbg
+17/89 = **19.1%** (vs 14.14% matched base = 1.35×) · live-proxy era empty
+(begins 2026-08-11). Confluence ladder after: 10.0 / 14.9 / **28.9 / 39.1%** —
+ordering intact, gradient flattened from 10/21/34/43.
+
+### What was said before the run, checked after it
+
+The spec's prediction 3 said the C-R4 record "moves"; my repeatedly stated
+prior said headlines drift down. Both held. What nobody predicted: the
+**strongest claim in the project inverting into the weakest** while the
+unfashionable inversion rule became the survivor. The record was not curated in
+either direction: every flip is listed, the migration is re-runnable, and the
+DB backup preserves the pre-G-R1 state.
+
+**Consequences queued (not yet done):** `hedging-economics.md` must be
+rewritten against real-CDS P&L (its trades and its "43%" framing are
+proxy-based); the presentation narrative must lead with the Oman inversion +
+mechanism story rather than C-R4; C-R4v2's side-by-side re-derives live and
+needs its numbers re-read before anyone cites v2.
+
+**G-R1 is COMPLETE.** Spec 6961b2f → gate → component 1 (5fa0f78) →
+component 2 (this section). Adoption was unconditional and stands. The site
+serves post-G-R1 grades as of 2026-08-10.
+
 ## APIs & data sources in use
 
 | Source | What | URL / notes |
