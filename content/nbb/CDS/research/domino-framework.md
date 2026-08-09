@@ -1532,6 +1532,126 @@ refinement derivable from this population. The binding verdict on P2-C7 is
 the prospective action-list scoreboard (currently 0/0 resolved, 2 windows
 open).
 
+## Registered spec P2-C8 — balance-sheet & oil-level conditioners (2026-08-09, BEFORE any evaluation)
+
+Owner request: fold in the remaining free-data candidates and report whether
+combinations raise the desk hit rate. Registered here first, per the two-commit
+rule; nothing below may change after the single run except the recorded results.
+
+### Why these two candidates, and the design filter they come from
+
+Sorting every conditioner this project has tested by WHAT IT MEASURES produces a
+clean split, and it is the only pattern in the record with four independent
+confirmations:
+
+| Adopted / effective | Measures |
+|---|---|
+| price compression (P2-C1) — 53% vs 22% | current structural STATE |
+| wall proximity (P2-L3) — 33% vs 7% | forward CALENDAR fact |
+| oil precursor (P2-C5 component) | an upstream domino demonstrably fired |
+
+| Failed | Measures |
+|---|---|
+| attribution (P2-C4) — CI leaned NEGATIVE | trailing CHANGE (whose move was it) |
+| gcc_decoupling (P2-C2) | trailing CHANGE relative to peers |
+| reserves_drain (Domino 2) — 0.84× | trailing CHANGE (12m drawdown) |
+| liquidity_dry (P2-C3) | the Frankfurt holiday calendar |
+
+**Forward-looking state/calendar facts work; backward-looking change measures
+fail.** Both candidates below are state/calendar measures by construction. The
+peer-basket variant of gcc_decoupling was considered and DROPPED before
+registration: it is a trailing change measure, structurally identical to P2-C4,
+whose recorded failure diagnosis ("the window measures the move that ALREADY
+happened... looks backward while the grade looks forward") applies to it
+unchanged. Widening the basket measures a spent move more precisely; it does
+not make it forward-looking.
+
+### Mandatory disclosure (not softened)
+
+1. A DIAGNOSTIC pass was run on 2026-08-09 before this spec was written. It
+   examined, against outcomes: false-positive near-miss distribution, hit rate
+   by calendar year, regime-at-fire, regime-SCORE-at-fire, and rule co-firing
+   within ±5/10/20 days. Those five measures are therefore outcome-informed and
+   are **excluded from this spec** — none may be registered as a conditioner
+   without fresh out-of-sample data. The two candidates below were NOT examined
+   against outcomes in that pass.
+2. This is the **FIFTH and SIXTH conditioner tested on the same ~126-item
+   P2-P1 population.** Multiplicity is real and accumulating.
+3. **Exhaustion clause honored:** neither candidate, if adopted, enters the
+   P2-C5 confluence COUNT or the P2-P2/P2-C7 placement rule. Desk composition
+   is untouched by this spec — adoption means a display badge only. Changing
+   what reaches the desk still requires live out-of-sample data.
+
+### N1 — rollover cover MAGNITUDE (balance-sheet adequacy state)
+
+**Mechanism:** wall PROXIMITY is already the strongest conditioner found (33%
+vs 7%), but it is binary — within 6 months or not. A flag firing while reserves
+cover 1.2× the next 12 months of maturities is not the same object as one at
+3.0×. The magnitude is unused. This is the adequacy STATE, not a change.
+
+**Measure (frozen):** `cover = reservesAsOf(published) ÷ maturing_12m
+(issued-gated)` — the existing `rolloverAt` in `src/engine/domino2.ts`, reused
+verbatim, both gates already frozen (publication-gated reserves, issued-gated
+wall). Walk-forward by construction. Null when reserves are unpublished or the
+wall is empty (reported separately as unknown; unknown = INACTIVE, the
+conservative direction, committed now).
+
+**State direction, committed in advance:** LOW cover = stressed = the state
+that should be associated with a HIGHER hit rate. State active ⟺ `cover ≤ C`.
+
+**Threshold solve (outcome-blind, before grading):** C = the LARGEST 0.1-grid
+cover level whose unconditional state share over all Bahrain proxy trading days
+is ≤ **19.9%** (the frozen C-R1 target), rounded DOWN = against us (rarer
+firing). Same procedure as P2-C1's dispersion solve. Neighbors recorded.
+
+### N2 — oil-stress SCORE LEVEL (upstream-domino intensity)
+
+**Mechanism:** the existing oil-precursor conditioner is binary — did any
+oil-tier flag fire in the prior 45 days. The composite's continuous score is
+discarded. A desk item firing while Domino Zero reads 62/100 is a different
+object from one at 12/100, and the score is a current-state reading, not a
+trailing change.
+
+**Measure (frozen):** `derived.oil_stress` as-of the item's date, ≤7d stale
+(the house staleness convention). Null = unknown = INACTIVE.
+
+**State direction, committed in advance:** HIGH score = stressed = HIGHER hit
+rate. State active ⟺ `oil_stress ≥ S`.
+
+**Threshold solve (outcome-blind, before grading):** S = the SMALLEST whole
+point whose unconditional share of scored days is ≤ **19.9%**, rounded UP =
+against us. Neighbors recorded. Note in advance: S will land ABOVE the frozen
+`alertAt = 50` firing level or below it purely as the distribution dictates —
+the solve is not tuned to the alert threshold and no oil threshold moves.
+
+### Evaluation — ONE run, both candidates, in the P2-C1/C4/C5 frame
+
+**Population:** the P2-P1 gradable desk items (escalations + episode
+first-flags, closed windows only). Open windows reported separately, never
+scored.
+
+**PRIMARY (the only analysis adoption rides on), per candidate:** hit rate of
+confirmed vs unconfirmed items; seeded bootstrap (10,000 draws, seed 42) 90% CI
+on the hit-rate DIFFERENCE; era-split shown.
+
+**Acceptance — pre-committed:** a candidate is ADOPTED as a display badge iff
+its pooled difference CI **excludes 0 in the direction stated above**. A CI
+excluding 0 in the OPPOSITE direction is recorded as an honest negative and NOT
+flipped into a reverse signal (the P2-C4 precedent — that would be
+outcome-peeking). Adoption price is ZERO suppression, no grade re-touched, and
+**no entry into the confluence count.**
+
+**SECONDARY — EXPLORATORY, so labeled:** the additive count ladder over all
+SIX conditioners (the four registered plus these two), and the pairwise
+combination table. **With 6 conditioners there are 64 combination cells; at 90%
+CIs roughly 6 spurious standouts are EXPECTED.** Nothing in the secondary
+analysis may become a badge, a placement rule, or a quoted number without fresh
+out-of-sample validation under a future spec. The owner's "does combining them
+raise accuracy" is answered from this table with that framing permanently
+attached.
+
+**Published whatever it says, including rejections.**
+
 ## External code review & remediation (2026-08-07)
 
 An independent reviewer audited the engine, grading code, and this doc's claims.
