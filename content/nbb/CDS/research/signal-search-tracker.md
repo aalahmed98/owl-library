@@ -340,142 +340,27 @@ that "no flags fired" cannot later be presented as either success or failure.
 
 **Nothing seeded. No config, threshold, grade or record touched by this sweep.**
 
-## Terminal extraction list — what to pull if Bloomberg access arrives
+## Terminal data — moved to its own doc
 
-**Read this first: pull the FOUNDATIONS before any new indicator.** Every
-candidate rejected in this project failed for one of four reasons, and none of
-them is a shortage of signals — n is tiny (10 tradeable episodes in 8.7 years),
-base rates swing further than the signals do (13%→46%), graded peaks diverge
-from traded exits, and execution cost is roughly the size of the whole edge.
-Adding a fifteenth indicator to that structure buys a fifteenth rejection. The
-items in Tier 1 attack all four; the items in Tier 2 are only worth pulling
-afterwards.
+The Bloomberg pull list, access/entitlement notes, save format, and the
+ground-truth validation plan now live in **`data-acquisition-plan.md`** (same
+folder) so it can be carried to a terminal on its own.
 
-### Tier 1 — the foundations (pull these even if you get 20 minutes)
+Headline points, so this tracker stands alone:
 
-| # | What | What it unlocks |
-|---|---|---|
-| T1.1 | **Bahrain 5Y USD senior CDS — daily MID, 2008→today** | Retires the Ariva proxy outright. No venue gap, no borrowed ratio, no CDS-era/Ariva-era split, and ~7 extra years of history. Every grade in the system re-derives against the real instrument. |
-| T1.2 | **Bahrain 5Y CDS — daily BID and ASK, 2008→today** | **The single most valuable series on this page.** Whether the strategy makes money currently hinges on an *assumed* 10.9bp break-even round-trip. This turns the central question from a guess into a measurement. Bid/ask is rarely exported — ask for it explicitly. |
-| T1.3 | **Peer CDS 5Y mid, 15–20 EM sovereigns, 2008→today** | The real fix for statistical power. Testing frozen rules across twenty sovereigns with REAL CDS is the properly-powered version of what X-R1 attempted with three proxies. Suggested set: Oman, Qatar, Saudi, Kuwait, Abu Dhabi, Jordan, Egypt, Turkey, South Africa, Brazil, Mexico, Indonesia, Colombia, Nigeria, Angola, Morocco, Tunisia. |
-
-### Tier 2 — signals genuinely unobtainable free
-
-| # | What | What it unlocks |
-|---|---|---|
-| T2.1 | **Bahrain CDS term structure — 1Y / 3Y / 7Y / 10Y mid, daily** | Real curve inversion. Our Domino 3 slope is a two-bond *reconstruction*; this is the instrument itself, and it would show how much of the slope signal was bond-specific artifact (cf. the Jordan roll-down failure, J-R0 amendment). |
-| T2.2 | **Bahrain CDS quoted in EUR (quanto basis vs USD)** | A direct market price of devaluation / redenomination risk. **This is the peg-stress measure P2-L2 tried to build out of BHIBOR and failed** — right question, wrong instrument. S1.2 marked BHD forwards BLOCKED; this is the better substitute and needs no forwards market. |
-| T2.3 | **CDS–bond basis** (5Y CDS vs asset-swap spread on the benchmark bond) | Dislocation and funding stress. Also quantifies retrospectively how much of our proxy error was basis rather than noise. |
-| T2.4 | **Bahraini bank CDS** — NBB, BBK, Ahli United, where quoted | The sovereign–bank doom loop (N3) **directly and daily**, without the CBB bulletin's monthly publication lag that makes the free version slow. |
-
-### How to pull it
-
-Excel API is the practical route — `BDH` returns a date-indexed history that
-drops straight into a CSV:
-
-```
-=BDH("<ticker>","PX_LAST","1/1/2008","today")      ' mid
-=BDH("<ticker>","PX_BID","1/1/2008","today")       ' bid   ← ask for this
-=BDH("<ticker>","PX_ASK","1/1/2008","today")       ' ask   ← and this
-```
-
-**Do not trust ticker strings from memory — confirm them on the terminal.**
-Sovereign CDS tickers follow a `C<COUNTRY><SENIORITY><TENOR> <SOURCE> Curncy`
-convention, but the source suffix and seniority code vary. Use `SOVR <GO>` (the
-sovereign risk monitor) or `WCDS <GO>` to find the correct identifier for each
-name, then `CDSW <GO>` for curve/term-structure work.
-
-**Save in this repo's existing manual-series format** so it drops into the
-pipeline with no new parser (`data/manual/README.md`):
-
-```csv
-series,obs_date,value,source_note
-cds.bh.5y,2016-03-01,284.5,"Bloomberg <TICKER> PX_LAST, pulled 2026-xx-xx"
-```
-
-Use `cds.bh.5y` for the Bahrain mid series — that is the name the engine already
-reads for the real-CDS era, so an extended history slots straight in.
-
-### Access route — a ONE-OFF EXPORT is all this needs
-
-**This is a backtest, so no live feed and no API contract is required.** That
-matters, because the entitlement tiers differ sharply:
-
-| Tier | Scripting? | Needed here? |
-|---|---|---|
-| Terminal seat (~$28–32k/yr) | Excel `BDH`/`BDP` only, tied to your logged-in session | **YES — this is sufficient** |
-| Desktop API (`blpapi`, bundled) | Only while logged in at that machine; no redistribution | not needed |
-| Server API / B-PIPE | Yes | **NO — do not pursue** |
-| Data License / Per-Security | Yes, bulk historical | only if NBB already holds one |
-
-So the ask is: **one person, one terminal, one hour in Excel, one CSV.** Not an
-integration project. Worth asking whether NBB's market-data team already holds a
-Data License feed — if so that is the cleaner route and sidesteps the seat
-licence entirely.
-
-**Compliance first, not after.** Bloomberg's redistribution terms are strict and
-"exported to CSV for an internal model" is exactly the case that gets scrutinised
-at a bank. Clear it before the pull.
-
-### The wrinkle: a one-off export creates a NEW era boundary
-
-The export is historical, so the LIVE series after the export date remains the
-Ariva proxy. The reference series therefore becomes:
-
-```
-real CDS (2008 → export date)  |  Ariva proxy (export date → )
-```
-
-This is not a new problem — it is the CURRENT problem improved. Today the split
-is real CDS 2015–2019 then proxy 2019→; after an export it would be real CDS for
-almost the entire history with only forward flags on the proxy. **The
-architecture already handles it**: C-R1/C-R3 era-stratified bars exist precisely
-for this, and the boundary date simply moves. A refresh export every year or two
-keeps the proxy window short.
-
-### Additional pulls, beyond the tiers above
-
-**Add to Tier 1:**
-- **Bahrain CDS recovery-rate assumption.** The whole benchmark is a Merrick fit
-  ESTIMATING recovery from bond prices, with a 15pt gate that rejects 2,206 of
-  2,631 days. Bloomberg carries the market's quoted assumption directly — this
-  replaces the system's single largest modelling construct with an observation.
-- **Sovereign issuance history with launch spread vs secondary.** That is N6
-  (new-issue concession) delivered complete, rather than reconstructed one press
-  release at a time.
-
-**Add to Tier 2:**
-- **EMBI / CEMBI Bahrain sub-index spread.** The residual lens regresses on the
-  EMB *ETF* only because FRED truncates the proper ICE indices to a rolling 3y
-  window. The real index is the correct regressor and improves every phase-2
-  lens graded on the residual.
-- **Bahrain equity index + bank equity prices** — daily, versus the CBB's
-  monthly-and-lagged banking tables; a much faster read on the doom loop (N3).
-- **Rating actions with dates, plus outlook/watch changes.** S1.3 stalled because
-  historical SCHEDULED review dates are not archived anywhere free; the action
-  history at least fixes the backtest arm.
-
-**Deliberately NOT on the list:** macro forecasts, analyst estimates, news
-sentiment. All available, all tempting, and all backward-looking or survey-based
-— the exact category that has failed 4-for-4 in this project.
-
-### What must happen when it lands — do NOT skip this
-
-Replacing the grading reference re-derives **every historical grade in the
-system.** Per hard rule 3 that is a threshold-class change and needs a
-pre-registered spec BEFORE the re-run, with the full before/after diff published
-whatever it shows.
-
-**Stated in advance, so it cannot be spun afterwards: better data may make the
-record look WORSE.** The Ariva proxy is noisy, and noise inflates apparent
-moves; real CDS is cleaner, so base-rate-matched bars will land differently and
-some current hits may not survive. The C-R4 47% is measured against a proxy.
-**Expectation recorded now: the lift claims will likely shrink, and the decision
-framing ("don't spend premium on unfiltered warnings") will likely strengthen,
-because the latter is robust to measurement quality and the former is not.**
-
-Priority if access is brief: **T1.2 (bid/ask) first**, then T1.1, then T1.3.
-Bid/ask decides whether anything else is worth doing.
+- **A one-off CSV export is all this needs** — it is a backtest, not a live
+  feed. An ordinary terminal seat with Excel `BDH` is sufficient; B-PIPE and
+  Data License are unnecessary. Clear it with compliance BEFORE the pull.
+- **Pull bid/ask FIRST.** Whether the strategy makes money hinges on an
+  *assumed* 10.9bp round-trip cost; that one series turns the central question
+  into a measurement.
+- **Bahrain's ACTUAL haircut does not exist and never will** until a default —
+  no vendor sells it. But the benchmark METHOD can be validated against the ~20
+  sovereigns that DID default, by running our construction on their pre-default
+  prices and comparing to the ISDA auction outcome. That is the only route from
+  "modelled" to "measured", and it has never been attempted.
+- **Better data may make the record look WORSE**, and that expectation is
+  recorded in advance in the plan doc so it cannot be reinterpreted later.
 
 ## Expanded — the reasoning behind each item
 

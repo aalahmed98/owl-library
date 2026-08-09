@@ -795,6 +795,14 @@ of today as **v1**. From here on:
    after the single run). A spec whose evaluation cannot point at an earlier
    spec-commit is self-attestation and does not count as pre-registered.
 
+   **Known exception (2026-08-09):** commit `f208e75` ("Results-commit X-R1")
+   also contains an unrelated batch of owl-library hosting/auth infrastructure
+   changes (website password gate, remote MCP endpoint, repo rename artifacts),
+   swept in by a broad `git add -A` from a concurrent session. The X-R1 findings
+   in that commit's message are unaffected and stand as recorded; the commit
+   boundary itself is not clean. Left as-is (owner decision) rather than rewriting
+   pushed history — noted here so it doesn't read as a silent irregularity.
+
 1. **Any proposed change must be specified before it is evaluated** — write the
    rule down first, then test it. No browsing history for what "would have worked".
 2. **Leave-one-episode-out**: improvements motivated by one episode (e.g. 2018-Q4)
