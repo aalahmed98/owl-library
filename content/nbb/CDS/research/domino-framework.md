@@ -2176,6 +2176,61 @@ a single Jordan flag is graded. **Seeding changes no threshold, no grade and no
 existing record**, and Bahrain/Oman byte-identity is verified as part of the
 change.
 
+### Pre-registered spec J-R1 (2026-08-09): Jordan grading bars — written BEFORE any Jordan flag is graded
+
+Jordan is seeded and its 107 curve-tier alerts are ungraded (`jor:backtest_rules`
+absent, arming gate refusing). This spec sets the bars. Procedure is C-R1 /
+C-R3 / O-R1 verbatim, with the post-audit rounding convention applied.
+
+**Scope (from J-R0):** CURVE tier only. No fundamental bar is solved, because
+`breakeven_gap`, `rollover_wall` and `reserves_drain` cannot fire for Jordan by
+construction. There is no real-CDS era, so Jordan is **single-era**
+(`arivaEraFrom = 1900-01-01`, the Oman mechanism).
+
+**Solve, outcome-blind, run before any grade is read:** the curve bar is the
+smallest 10bp-grid level whose unconditional forward-widening exceedance over
+Jordan's own proxy history, at a **60-day** window, is **≤ 17.76%** — the frozen
+curve-tier target inherited unchanged from C-R3. **Rounded AGAINST us** (toward
+a harder exam), per the convention unified at the 2026-08-08 audit, which
+explicitly superseded O-R1's nearest-match fork. Neighbors recorded.
+
+**No threshold, weight or window is new or tunable here.** Every number is
+inherited frozen; only the bar is re-derived, because a bar must match the
+country's own base rate or the exam is not comparable.
+
+**Evaluation — ONE run, published either way:**
+- Flag-level and episode-level records per C-R2 (cluster window = grading
+  window, first-flag grade, any-hit as the labeled sensitivity, seeded 10k
+  bootstrap 90% CI) for `inversion`, `level_pct`, `slope_20d`.
+- Regime escalations by the C-R4 method against the same solved bar.
+- Base rate = the achieved exceedance from the solve, not the 17.76% target.
+
+**Acceptance language, stated in advance:** this is an out-of-sample TEST of
+frozen thresholds on a third sovereign, not an adopt/reject on the thresholds
+themselves. **There is no result that would cause the bars to be re-solved.**
+Poor Jordan results are a finding about transferability, not a bug.
+
+**Pre-committed reading of the headline question:** Oman's inversion rule
+produced the system's only out-of-sample CI excluding no-skill (5/9,
+1.86×–4.34×). If Jordan's inversion record also excludes 1×, the claim "the
+inversion rule transfers across sovereigns" gains a second independent
+confirmation. **If it does not, that is recorded plainly and the Oman result is
+downgraded from "generalizes" to "generalized once."**
+
+**Interpretation caveats fixed now, before the numbers exist:**
+- Jordan's regime score runs on THREE components (level, trend, curve), not
+  four — the breakeven gap is disabled by J-R0. Its escalations are therefore
+  not strictly comparable to Bahrain's or Oman's four-component flag, and any
+  cross-country comparison must say so.
+- The proxy level carries the borrowed venue-gap ratio (J-R0). Slope and
+  `level_pct` are scale-invariant to it; the band is not, and no Jordan band
+  claim will be made.
+- The 2017-10→2020-09 stretch uses the short-vs-long leg pair (no mid leg
+  existed then), which the J-R0 amendment showed is roll-down-prone late in a
+  bond's life. In that window the 2027 leg had 73–109 months to run and the
+  slope oscillated about zero, so it is retained — but the boundary is recorded
+  here rather than discovered later.
+
 ## Phase 2 — the four lenses (2026-08-08→)
 
 Executed per `cds-phase-2-plan.md` under the frozen v1 protocol. Every lens gets
