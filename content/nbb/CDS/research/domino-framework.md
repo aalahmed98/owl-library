@@ -3132,6 +3132,113 @@ answer is precisely what the protocol forbids.
   deliberate (grade changes) or bug.
 - Single evaluation. Results-commit follows, including rejections of any part.
 
+### G-R1 RESULTS — COMPONENT 1 (single run, 2026-08-09; scripts `gr1-evaluate.py` + `gr1-annexb.py`, read-only, DB untouched)
+
+**QA gate (Annex A): PASS.** Seed vs CMAN on 274 overlap days: median |Δ|
+**4.98bp** (≤ 25bp stop rule), mean −2.74bp, p90 17.65bp. The 12 days >25bp all
+sit in the June-2018 crisis — the seed missed the 609bp panic peak by 124bp,
+i.e. the old data undershot exactly the days that decide grades.
+
+**Harness validation: 178/178** stored outcomes reproduced when grading against
+the OLD reference with the old bars. The diff below is measurement, not harness
+drift.
+
+**Era-2 bar solve (outcome-blind, frozen targets):**
+
+| Tier | Target | Solved bar | Achieved | One step lower |
+|---|---|---|---|---|
+| curve | 17.76%/60d | **50bp** (n=1,811) | 14.14% | 40bp → 20.60% (overshoots) |
+| fundamental | 19.9%/180d | **90bp** (n=1,726) | 17.84% | 80bp → 20.05% (overshoots) |
+
+**Prediction 1 is FALSIFIED, in the informative direction.** The bars did not
+land between the era-1 bars (50/100) and the Ariva bars (90/180) — they landed
+**at or below era-1** (curve 50 = 50; fundamental 90 < 100). The Ariva-era bar
+elevation was therefore **entirely proxy noise, none of it era volatility** —
+despite era 2 containing COVID and 2022. C-R1's attribution caveat ("cause mix
+unattributed") now has its answer: it was the venue, not the era.
+
+**Annex B — the proxy vs reality, 2019-07 → 2026-08 (1,803 common days):**
+
+| Year | median (P−R) | median \|P−R\| | p90 \|P−R\| |
+|---|---|---|---|
+| 2019 | −90.9bp | 90.9 | 112.6 |
+| 2020 | +6.2bp | 50.1 | 93.4 |
+| 2021 | +81.6bp | 81.6 | 125.1 |
+| 2022 | **−185.8bp** | 185.8 | 297.7 |
+| 2023 | −102.0bp | 102.0 | 165.6 |
+| 2024 | −117.1bp | 117.1 | 182.2 |
+| 2025 | −17.1bp | 52.2 | 205.6 |
+| 2026 | +16.2bp | 19.2 | 72.2 |
+| **ALL** | | **84.5bp** | |
+
+The error is not a stable basis — it flips sign year to year (+82 in 2021,
+−186 in 2022). The bond-derived proxy carries rate-duration and venue effects
+the CDS does not; P2-V1's change-series validation could never see this level
+divergence. **Seven years of grading ran against a series that was wrong by a
+median 84.5bp.**
+
+**Re-grade: 24 of 178 grades changed** (19 hit→FP, 3 FP→hit, 2 pending→hit;
+era-1 record: zero changes, including boundary-crossing windows). Era-2
+flag-level records, old → new (new matched base: curve 14.14%, fund 17.84%):
+
+| Rule | Old | New | Old rate | New rate | vs new base |
+|---|---|---|---|---|---|
+| inversion | 10/31 | 10/31 | 24.4% | **24.4%** | **1.73×** |
+| level_pct | 10/18 | 5/23 | 35.7% | **17.9%** | 1.27× |
+| slope_20d | 13/48/1p | 5/57 | 21.3% | **8.1%** | **0.57× — BELOW base** |
+| breakeven_gap | 1/6/1p | 1/7 | 14.3% | 12.5% | 0.70× |
+| rollover_wall | 1/2 | 0/3 | 33.3% | **0%** | — |
+
+C-R2 episodes (era-2, first-flag): inversion 10%→**20%** · level_pct 33%→33% ·
+slope_20d 18%→**6%** · breakeven_gap 0%→**33%** · rollover_wall 50%→**0%**.
+
+**Notable individual flips (full list in `gr1-output.txt`):**
+
+- **2025-01-27 rollover_wall: hit → FALSE POSITIVE.** Proxy peak +325bp; real
+  peak **+77.6bp** vs the 90bp bar. The flag whose "+325bp" anchored both the
+  attribution-tail-marker argument and one of the two profitable hedging trades
+  was three-quarters proxy artifact.
+- 2023-09-19 / 09-25 inversion: FP → **HIT** (+62.9, +52.3). The Sept-2023
+  stress was real in CDS; the proxy hid it. Inversion is the one curve rule the
+  real data treats BETTER.
+- **2026-06-15 breakeven_gap: pending → HIT** (+102.8 ≥ 90) — the live open
+  flag resolves as a hit on real data.
+- 2026-01-26 slope_20d: FP → HIT (+143.0 — the post-Fitch-downgrade widening).
+- The 2025-12 cluster (4 level_pct/slope hits → FP): the late-2025 "blowout"
+  was materially smaller in real CDS than the proxy showed.
+
+**Honest readings, stated plainly:**
+
+1. **slope_20d is dead on real data** — 8.1% against a 14.1% base (0.57×).
+   Jordan indicted the two-bond slope construction as roll-down artifact; the
+   real reference convicts it at home. Its 21.3% record was proxy noise.
+2. **level_pct loses its "best-graded rule" title** — 35.7% was half
+   bar-easiness (C-R3) and half proxy noise; what remains is 17.9% vs 14.1%.
+3. **inversion is the survivor** — flag-level unchanged at 1.73× the matched
+   base, episode rate doubled to 20%. On real CDS it is now the strongest curve
+   rule, reversing the C-R3-era ordering.
+4. **The hedging backtest's P&L is itself proxy-measured.** Its +$0.44m gross
+   was computed on proxy moves; the real-CDS moves on its two winning trades
+   are smaller (2025-01-27: +325 → +78). The already-negative net after
+   execution costs becomes more negative. `hedging-economics.md` must carry
+   this before it is shown again.
+5. Prediction scorecard: P1 falsified (bars at/below era-1), P2 confirmed
+   (flips both directions, 19 down / 5 up), P3 confirmed for slope/level and
+   C-R4-pending, **refuted for inversion episodes**, which improved.
+
+**Adoption: per spec, UNCONDITIONAL — the new reference and era-2 bars (curve
+50bp, fundamental 90bp) are adopted.** DB and app still serve the old grades
+until component 2 lands; until then the site's numbers are stale and this
+section is authoritative.
+
+**Component 2 (same single evaluation, implementation outstanding):** ingest
+composite into `cds.bh.5y` (untracked local CSV, hashes in spec) · third-era
+params (`bbgEraFrom` 2019-07-01, bars 50/90; `arivaEraFrom` → 2026-08-11) ·
+era selection in `backfill.ts` / `apiTransitions.ts` / `apiDomino4.ts` · write
+re-grades + peak moves to DB · regenerate `derived.residual_bp` + re-solve
+`residual_bars` per frozen P2-L1 · re-derive C-R4/C-R4v2, P2-P1, action/watch
+outcome columns · regression snapshots before/after, every diff classified.
+
 ## APIs & data sources in use
 
 | Source | What | URL / notes |
