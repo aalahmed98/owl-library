@@ -2280,6 +2280,77 @@ could have caused the bars to be re-derived, and none did. Bahrain and Oman
 records are untouched (verified: bahrain 74 hit / 248 FP / 3 pending / 6
 unresolvable; oman 27 hit / 83 FP — both unchanged).
 
+### Pre-registered spec X-R1 (2026-08-09): POOLED cross-sovereign evaluation — written BEFORE the run
+
+**The problem this exists to solve.** Every candidate rejected in this project
+died on a confidence interval that was too wide, and the cause is always the
+same: n. Bahrain's curve rules see 41–61 flags each; Oman's and Jordan's fewer.
+Three underpowered answers that disagree are not three findings — they are one
+unanswered question. Three sovereigns are now instrumented on the SAME frozen
+rules, so the rules can be tested once, properly, on the pooled sample.
+
+**Why this is not barred by the exhaustion clause.** That clause forbids further
+composition refinements derived from re-slicing BAHRAIN's ~126 desk items. This
+spec re-slices nothing: it ADDS Oman's and Jordan's independently-graded
+populations. Nothing about Bahrain's record, bars, composition or placement is
+touched, and no new rule or conditioner is created.
+
+**Population (frozen):** every graded curve-tier flag for bahrain, oman and
+jordan — rules `inversion`, `level_pct`, `slope_20d`. **The oil tier is
+EXCLUDED**: Domino Zero is computed once and served to all countries, so pooling
+it would count the same events three times. Fundamental and recovery tiers are
+excluded because Jordan has none by construction (J-R0), so pooling them would
+silently weight Bahrain.
+
+**Unit (frozen): EPISODES, per C-R2** — maximal chains of same-country,
+same-rule flags within the rule's own 60-day grading window, graded by the FIRST
+flag. Flag-level counts are reported alongside as the labeled sensitivity, never
+the headline, exactly as C-R2 requires.
+
+**Handling the different bars — the load-bearing method.** Each country's bar was
+solved outcome-blind to the same ~17.76% target but ACHIEVED slightly different
+rates (Bahrain 17.76% CDS era / 16.23% Ariva era; Oman 17.93%; Jordan 14.32%).
+A pooled hit RATE would therefore be meaningless. The statistic is instead:
+
+```
+    expected_hits_under_null = Σ over episodes of (that episode's own country/era base rate)
+    pooled lift              = observed_hits ÷ expected_hits_under_null
+```
+
+This is what makes pooling legitimate: every episode is compared to the bar it
+actually sat, and only then aggregated.
+
+**Uncertainty (frozen):**
+- PRIMARY: seeded bootstrap (10,000 draws, seed 42) resampling **episodes**, 90%
+  CI on the pooled lift.
+- MANDATORY SENSITIVITY: **leave-one-sovereign-out** — recompute dropping each
+  country in turn. A 3-cluster bootstrap is uninformative with three clusters,
+  so LOSO is the honest cluster check here. **If any single country's removal
+  flips the verdict, the result is reported as driven by that country and NOT as
+  a pooled finding.**
+
+**Multiplicity, disclosed:** three rules are tested. All three results are
+published; there is no cherry-picking of the best. This is the FIRST pooled
+analysis, so no prior pooled test contributes multiplicity.
+
+**Acceptance language, fixed in advance:** no threshold, bar, weight or
+composition changes as a result of this run, whatever it says. This is a
+MEASUREMENT of rules already frozen. Specifically pre-committed:
+- A pooled lift CI excluding 1× means **the rule has demonstrated
+  cross-sovereign skill** — and does NOT retroactively validate any individual
+  country's record, which stands as separately measured.
+- A pooled CI including 1× means **the rule has no demonstrated skill at the
+  only sample size large enough to ask**, and the per-country records
+  (including Oman's inversion result) must thereafter be quoted as
+  underpowered single-country observations rather than evidence of a working
+  rule.
+- **There is no result that would cause any bar to be re-solved.**
+
+**Stated risk of a null result:** pooling a rule that works in one regime and not
+another can average a real effect to nothing. If the pooled result is null while
+per-country results disagree sharply, that heterogeneity is itself the finding
+and must be reported as such — not resolved by picking the favourable subset.
+
 ## Phase 2 — the four lenses (2026-08-08→)
 
 Executed per `cds-phase-2-plan.md` under the frozen v1 protocol. Every lens gets
