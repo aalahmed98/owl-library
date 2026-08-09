@@ -53,9 +53,11 @@ Result: — not yet · **ADOPTED** · **REJECTED** · **BLOCKED** (data unavaila
 
 | # | Candidate | Job | Tried | Result | Notes |
 |---|---|---|---|---|---|
-| S0.1 | Seed Jordan + Egypt (ISINs already verified in recon) | power | ☐ | — | |
-| S0.2 | Seed Qatar + Saudi (Ariva) | power | ☐ | — | |
+| S0.1a | **Jordan** — Ariva history check | power | ☑ | **VIABLE (D3/D4 only)** | Curve computable from 2017-10. Oil-importer caveat below. |
+| S0.1b | **Egypt** — Ariva history check | power | ☑ | **DEAD as swept** | All 5 recon ISINs are 2025 issues — zero history. Needs an older-vintage re-sweep. |
+| S0.2 | Seed Qatar + Saudi (Ariva) | power | ☐ | — | Not in any recon yet — needs an ISIN sweep first |
 | S0.3 | Re-run frozen thresholds on each — out-of-sample test | validation | ☐ | — | needs its own O-R1-style bar spec per country |
+| **S0.0** | **Resolve: which dominoes transfer to a non-oil-exporter?** | design | ☐ | — | **BLOCKS S0.1a — see below** |
 
 ### Stage 1 — Recon only (no specs, read-only, costs nothing) — **DONE 2026-08-09**
 
@@ -208,6 +210,85 @@ reading — closer to how the wall countdown is used than how a graded rule is.
 Order of work is unchanged: **Stage 0 (more sovereigns) still comes first**,
 because N3 evaluated on 126 items and 10 trades will be as underpowered as
 everything before it.
+
+## Stage 0 recon findings (2026-08-09)
+
+### Ariva price-history depth, measured
+
+| Country | ISIN | Bond | First print | History |
+|---|---|---|---|---|
+| Jordan | XS1405770220 | 5.75% 2027 | **2016-11-03** | 9.8y — short leg |
+| Jordan | XS1577950311 | 7.375% 2047 | **2017-10-06** | 8.8y — long leg |
+| Jordan | XS2199272662 | 5.85% 2030 | 2020-09-07 | 5.9y — mid leg |
+| Jordan | XS2602742285 | 7.50% 2029 | 2023-04-17 | 3.3y |
+| Jordan | XS3218674136 | 5.75% 2032 | 2025-11-06 | 0.8y — too new |
+| Egypt | all 5 recon ISINs | 2025 issues | 2025-02 onward | **none usable** |
+
+**Jordan has a short leg from 2016-11 and a long leg from 2017-10, so a curve
+slope is computable from 2017-10** — almost exactly the window Bahrain
+(2017-09-18) and Oman (2017-03) start from. That makes Jordan a genuine third
+out-of-sample test of the inversion rule, the one signal that generalized.
+
+**Egypt is dead as swept.** Every ISIN in `peer_instruments.csv` is from Egypt's
+2025 return to the eurobond market. The recon README itself notes older
+2031/2047/2048/2050-vintage Egypt bonds exist but were not swept — a future
+re-sweep could revive Egypt, but nothing in hand is usable.
+
+**Qatar / Saudi** appear in no recon file. An ISIN sweep is required before they
+can even be probed.
+
+### Ariva behaviour discovered — a trap and a tool
+
+**When asked for a month that predates a bond's first print, Ariva returns the
+bond's EARLIEST available month rather than an empty table.** A naive
+"how many prints in month X" probe therefore reports full history for a bond
+issued years later.
+
+- Verified against a control: Bahrain's 2047 requested at 2017-06 returns
+  2017-09-18 — exactly the issue date already in the database.
+- **The existing Bahrain and Oman seeds are unaffected.** Rows are upserted by
+  `(series, obs_date)`, so a repeated earliest-month payload rewrites identical
+  rows. No corruption, verified.
+- **As a tool:** requesting an absurdly early month (e.g. 2008-01) is a free
+  "first print" oracle — that is how the table above was built without
+  crawling every month.
+
+Record this wherever a future seeding run is written; it will otherwise be
+rediscovered as a data bug.
+
+### S0.0 — The design problem that blocks seeding Jordan
+
+**Jordan is an oil importer.** The chain's first two dominoes — oil stress
+(D0) and oil below the fiscal breakeven (D1) — encode an oil-EXPORTER
+mechanism. For Jordan, cheap oil is *good news*. Domino 2's rollover wall is
+generic, but the breakeven gap is meaningless and the sign on oil may invert.
+
+So Jordan cannot be a whole-chain out-of-sample test the way Oman was. It can
+only test **D3 (curve) and D4 (regime)** — the market-priced dominoes. That is
+still worth having, since inversion is the rule that generalized, but it must be
+registered as a *partial* transfer, and the regime score's composition would
+need a documented treatment of its breakeven-gap component (which contributes
+20 of 100 points and would be structurally unavailable or wrong-signed).
+
+**Options, stated neutrally — none chosen:**
+
+1. **Jordan as a D3/D4-only country.** Register the restriction up front; the
+   regime score renormalizes over available components exactly as it already
+   does for missing inputs. Cheapest, and honest.
+2. **Sweep Qatar and Saudi instead.** Both are oil exporters with USD pegs —
+   structurally much closer to Bahrain. But both are AA-rated, so their spreads
+   are an order of magnitude tighter and their curves may never invert; the
+   thresholds may simply never fire, which is itself a finding but a thin one.
+3. **Re-sweep Egypt for older vintages** to get a second speculative-grade
+   importer with real history.
+
+**Recommendation: option 1, with the restriction pre-registered.** Rating class
+matters more than oil exposure for a market-microstructure signal like
+inversion — Jordan at B+/BB- sits far closer to Bahrain (B+) than Qatar (AA)
+does. But this is a methodology decision, not an implementation detail, and it
+belongs to the owner.
+
+**Nothing was seeded, no config was touched, no threshold or grade changed.**
 
 ## Expanded — the reasoning behind each item
 
