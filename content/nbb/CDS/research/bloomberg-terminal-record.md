@@ -208,12 +208,52 @@ Spread DV01 of 3,838.80 on $10mm = **RPV01 = 3.84**. Every figure in
 `hedging-economics.md` used an assumed 4.0, so all of it is overstated by ~4%.
 Small, and in the same direction as everything else found this session.
 
-**Open:** RPV01 falls as spreads widen, and the backtest spans entries at 166bp
-through exits above 490bp. A fixed duration across that range is wrong. Spread
-DV01 at 166 / 250 / 370 / 490 / 610bp was requested but the values returned were
-IR DV01 (−65.87, −144.35, −264.71, −338.50, −420.63 — these interpolate to ≈−181
-at 287bp, matching the IR DV01 reading). **Re-read Spread DV01 at those five
-spreads if terminal access allows.**
+### The duration curve — measured, and it is not flat
+
+RPV01 falls as spreads widen, and the backtest spans entries at 166bp through
+exits above 490bp. Spread DV01 read directly off CDSW by overtyping
+`Trd Sprd (bp)`, $10mm notional, curve date 2026-08-09:
+
+| Spread | Spread DV01 | RPV01 | Upfront PV on $10m |
+|---|---|---|---|
+| 166bp | 4,140.80 | **4.14** | $273k |
+| 250bp | 3,929.27 | 3.93 | $589k |
+| 287bp | 3,838.80 | 3.84 | $719k (screen: $763k) |
+| 370bp | 3,646.11 | 3.65 | $984k |
+| 490bp | 3,383.80 | 3.38 | $1,320k |
+| 610bp | 3,140.82 | **3.14** | $1,602k |
+
+**RPV01 declines 24.1% across the traded range.** The payoff is therefore
+sub-linear in spread — you exit at a wide level where each basis point is worth
+less — so a fixed duration overstates gains, and overstates them *most* on the
+largest moves:
+
+| Trade | Duration-correct | At fixed 4.0 | Overstated |
+|---|---|---|---|
+| 2020 contango_flip, 166 → 492bp | $1.05m | $1.30m | **24%** |
+| 2018 crisis, 227 → 609bp | $1.09m | $1.53m | **40%** |
+| Typical, 250 → 370bp | $0.40m | $0.48m | 22% |
+
+This makes the concentration finding in `hedging-economics.md` **worse**: the two
+trades carrying the entire backtest (2020-02-03 contango_flip, 2025-01-27
+rollover_wall) are exactly the ones that exit widest and therefore shrink most,
+while the eight small losers barely move.
+
+`PV = (S − C) × RPV01(S)` reproduces $719k against the screen's actual $763k at
+287bp, so **ISDA convexity adds ~6%** on top of the linear form. The correction
+above is if anything conservative.
+
+**Limitation, stated plainly.** RPV01 depends on the discount curve as well as
+the spread, and these are readings on the 2026-08-09 curve. Rates in 2020 were
+near zero, implying a *higher* RPV01 then than measured here — partially
+offsetting the correction for the COVID trade specifically. Sizing that needs
+historical swap-curve data we do not have. **Direction certain, magnitude
+approximate, and the approximation degrades the further back the trade sits.**
+
+*(First attempt returned IR DV01 by mistake — −65.87, −144.35, −264.71, −338.50,
+−420.63, which interpolate to ≈−181bp at 287bp and match the IR DV01 field.
+Recorded so the slip is not repeated: Spread DV01 sits one row ABOVE IR DV01 in
+the right-hand Calculator column.)*
 
 ### Trade mechanics we have been modelling wrong
 
@@ -236,12 +276,50 @@ roll-down artifact rather than a signal. Real tenor history would settle it.
 
 ---
 
+## 6b. CRPR — rating profile as at 2026-08-09
+
+Screen: `CRPR <GO>`. **This is a snapshot with last-change dates, not a full
+action history** — each row shows the current rating and when it last moved. The
+`View Changes` tab is the route to actual history and has not yet been captured.
+
+| Agency | Rating | Outlook | Last change |
+|---|---|---|---|
+| **Moody's** | B2u long term | **NEGATIVE** | **2026-04-18** |
+| Moody's | Ba3u FC debt ceiling | — | 2024-05-13 |
+| **S&P** | B (FC & LC LT) | STABLE | 2025-11-21 |
+| **Fitch** | B (LT IDR) | STABLE | 2026-02-23 |
+| Fitch | BB sovereign country ceiling | — | 2026-02-23 |
+| Capital Intelligence | B | STABLE | 2026-04-03 |
+| Dagong | BBB | NEG | 2016-06-07 (stale) |
+| Thomson BankWatch | WR | — | 2000-12-01 (withdrawn) |
+
+Bloomberg alternative risk measures: issuer category **HY**, contributor count 9,
+level of agreement **High**, issuer rating assessment not shown (premium field).
+
+### The live divergence
+
+**Moody's went to NEGATIVE outlook on 2026-04-18 while S&P (Nov-2025) and Fitch
+(Feb-2026) both sit at STABLE.** All three agree on the letter — single-B — but
+disagree on direction, and Moody's is the most recent to have moved.
+
+This is a live, current-state observation about a sovereign the system is
+actively monitoring, and it is **not** an input to any existing domino. Whether
+agency-outlook divergence has any predictive content is untested here and would
+need its own pre-registered spec before it could be claimed either way. Recorded
+as an observation, not a signal.
+
+Note the two-notch gap between Fitch's **BB** country ceiling and its **B**
+issuer rating — the ceiling is where the peg and transfer-and-convertibility risk
+show up in the rating framework, which is the same territory Domino 6 covers and
+the same thing the EUR quanto basis would price directly.
+
+---
+
 ## 7. Still outstanding
 
 | Item | Status | Cost |
 |---|---|---|
-| Spread DV01 vs spread level | **wrong field read — retry** | 1 min |
-| Rating action history (`CRPR`) | not captured | 1 screen |
+| Rating action *history* (`CRPR` → `View Changes`) | snapshot captured, history not | 1 screen |
 | `BHRAIN CDS EUR SR 5Y` exists? | **unverified** | 30 sec |
 | Bahraini bank CDS (NBB/BBK/AUB) exists? | **unverified** | 30 sec |
 | Bond prices via BDH (`XS… Corp`) | untested — Bloomberg-owned, may export | 2 min |
