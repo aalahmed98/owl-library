@@ -568,6 +568,59 @@ how much it can be made to forecast.**
 
 ---
 
+## 6g. Formula test round 2 — BDH works, primary sizes in hand, and the $500mn flag hardens
+
+`formula-tests-2.xlsx`, calculated on the terminal PC 2026-08-09 (round 1 used a
+wrong ISIN list; this round reads `config.ts` exactly).
+
+### Every config ISIN resolves and confirms config — plus primary sizes
+
+| Bond | Maturity (BBG) | AMT_OUTSTANDING | PX_LAST / PX_BID |
+|---|---|---|---|
+| XS1324931895 (7% 2026, dead leg) | **1/26/2026** | 0 (matured) | — |
+| XS1405766541 (7% 2028) | 10/12/2028 | **$1,600mn** | 99.94 / 99.79 |
+| XS1675862012 (6.75% 2029) | 9/20/2029 | **$1,250mn** | 98.89 / 98.78 |
+| XS2058948451 (5.625% 2031) | 9/30/2031 | **$1,000mn** | 93.26 / 93.11 |
+| XS1675862103 (7.5% 2047) | 9/20/2047 | **$900mn** | 95.07 / 94.87 |
+| XS3282969008 (7.1% 2038, fitOnly) | 2/3/2038 | **$1,300mn** | 95.61 / 95.49 |
+| XS1110833123 (6% 2044, fitOnly) | 9/19/2044 | **$1,250mn** | 82.60 / 82.42 |
+
+Oman and Jordan legs all resolve too. Three consequences:
+
+1. **The deferred maturity fix is confirmed by a primary source**: Bloomberg says
+   XS1324931895 matured **2026-01-26**, not the 01-12 in config (handover item 3).
+2. **Primary-sourced issue sizes now exist** for every live leg — the
+   `AMT_OUTSTANDING` column can replace cbonds-derived LOW CONFIDENCE figures in
+   the maturity wall wherever the ISINs overlap.
+3. **Bond PX_LAST *and* PX_BID export via BDH** — bond-level execution cost is
+   measurable, and Ariva's prices can be cross-checked against Bloomberg's.
+   Depth limit: bond history via BDH reaches back only to **2025-02-11**
+   (~18 months); equities go back to 2018+.
+
+### ⚠⚠ XS2384406612 — the flag is now strong evidence, not a hint
+
+In a sheet where **thirteen sibling ISINs in the identical `<ISIN> Corp` format
+all resolved**, XS2384406612 returned `#N/A Invalid Security` on every field —
+second independent failure, different day, different method from the terminal
+lookup.
+
+The control case removes the innocent explanation: **XS1324931895 already
+matured and still resolves** (with AMT_OUTSTANDING 0). So "it matured/was
+retired" does not produce `Invalid Security`. A live $500mn bond one month from
+maturity would be on Bloomberg.
+
+**Working conclusion: the ISIN recorded in `bond_maturities.csv` is wrong, or
+the bond does not exist as recorded.** The $500mn 2026-09-08 maturity-wall entry
+— which `/domino2` counts down to, and which conditioned the rollover_wall
+signal — needs re-sourcing from a primary document (CBB/MOF issuance records or
+the prospectus). Until then the countdown rests on a cbonds row that Bloomberg
+does not recognise.
+
+**Not actioned in code** — correcting `bond_maturities.csv` changes a domino-2
+input and belongs to the owner with provenance, per the manual-data rules.
+
+---
+
 ## 7. Still outstanding
 
 | Item | Status | Cost |
@@ -576,7 +629,7 @@ how much it can be made to forecast.**
 | ~~EUR quanto basis~~ | **RETIRED — no EUR CDS exists at any tenor** | — |
 | ~~Bahraini bank CDS~~ | **RETIRED — no CDS for NBB, loans only** | — |
 | Bond prices via BDH | **XS2384406612 did not resolve — see 6d flag** | — |
-| Verify a Sep-2026 Bahrain maturity exists | **BLOCKING for /domino2 countdown** | 2 min |
+| Re-source XS2384406612 from primary docs | **ESCALATED — Bloomberg does not recognise it (2 methods); owner action** | — |
 | Equities via BDH (`BHSEASI Index`) | untested — **likely works** | 2 min |
 | CDS term structure history | not captured — **1Y/2Y/3Y/5Y/7Y/10Y all confirmed to exist** | ~36 pp for 3 crisis years |
 | 2024–2026 from CMAN (removes source join) | not captured | ~15 pp |
