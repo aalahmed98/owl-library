@@ -457,17 +457,96 @@ The `bhrain cds` search surfaced only the USD 5Y in Top Results; the
 
 ---
 
+## 6e. Instrument enumeration — what exists, and what does not
+
+`bhrain cds` search → `Fixed Income (132)` tab → `See All in SECF`.
+
+### CDS: six real tenors, all USD
+
+```
+1Y  2Y  3Y  5Y  7Y  10Y                      real traded tenors
+0M  1Y3M  1Y9M  4Y3M  4Y6M  5Y3M  5Y6M       Bloomberg curve interpolations
+```
+
+44 CDS instruments enumerated. **Every one is USD.**
+
+### ✗ T2.2 RETIRED — there is no EUR-denominated Bahrain CDS
+
+The quanto basis was ranked in the acquisition plan as *"the instrument P2-L2
+should have used instead of BHIBOR"* and was the **single best candidate for a
+genuinely new signal**. It does not exist. Bahrain's redenomination and peg risk
+is not quoted as a separate instrument at any tenor.
+
+P2-L2's rejection therefore stands with no better instrument available to
+replace it. Domino 6's channel has no direct market price.
+
+### Bond curve — twelve live maturities against five in `BONDS`
+
+| Maturity | Coupon | Issuer |
+|---|---|---|
+| 2027-09-16 | 3.95 | CBB Sukuk |
+| 2028-10-12 | 7 | Govt Intl |
+| 2029-09-20 | 6¾ | Govt Intl |
+| 2030-05-14 | 7⅜ | Govt Intl |
+| 2031-02-12 | 6 | CBB Sukuk |
+| 2032-09-16 | 5.45 | Govt Intl |
+| 2033-07-07 | 6¼ | CBB Sukuk |
+| 2034-02-06 | 5.8735 | CBB Sukuk |
+| 2036-06-10 | 7⅛ | Govt Intl |
+| 2036-02-12 | 7½ | Govt Intl |
+| 2044-09-19 | 6 | Govt Intl |
+| 2047-09-20 | 7½ | Govt Intl |
+
+78 government bonds in total per SECF. **The 2036 / 2044 / 2047 maturities
+resolve handover item 6 outright** — they survive the pull-to-par trim for a
+decade, where the current `BONDS` set dies after 2030-03-29 and takes
+`slope_20d` with it.
+
+Also enumerated for the first time: **Bahrain sovereign syndicated loans**
+(`BF…` deal / `BL…` term-loan tickers, maturities 2029–2032). Not a model input;
+recorded because the loan stack has never been visible before.
+
+### Still unresolved
+
+The `See All in SECF (78)` bond enumeration did not navigate, so **no September
+2026 maturity has been confirmed or ruled out**. The `XS2384406612` flag in §6d
+stands. Next route to try: `BHRAIN <CORP key> <GO>` for the issuer's bond list.
+
+---
+
+## 6f. Strategic read — what kind of win this was
+
+Set against the acquisition plan's tier list, the terminal delivered a **much
+better measurement of things already in the model**, and almost **no new signal**:
+
+| Candidate | Verdict |
+|---|---|
+| T1.1/T1.2 real CDS + bid | **delivered** — 8.6 years, replaces the Ariva proxy |
+| T1.4 quoted recovery | dead — ISDA convention, carries no market view |
+| T2.2 EUR quanto basis | **dead — instrument does not exist** |
+| T2.7 ratings as signal | dead — coin flips; confirms the registry's existing call |
+| T2.4 bank CDS | unverified |
+| T2.1 CDS term structure | **alive** — but a better measure of Domino 3, not a new domino |
+
+This matters for the exhaustion clause. Re-slicing Bahrain's existing ~126 desk
+items is closed off, and new external data was the stated route forward. **The
+terminal has now largely closed that route too.** What remains is measurement
+quality — which is real, and is what changed two published claims today — but it
+is not the same as finding new predictive content.
+
+---
+
 ## 7. Still outstanding
 
 | Item | Status | Cost |
 |---|---|---|
 | ~~Rating action history~~ | **DONE — exported, 2008-2026** | — |
-| `BHRAIN CDS EUR SR 5Y` exists? | **unverified — guessed ticker failed, search tab not opened** | 1 min |
+| ~~EUR quanto basis~~ | **RETIRED — no EUR CDS exists at any tenor** | — |
 | Bahraini bank CDS (NBB/BBK/AUB) exists? | **unverified — same** | 1 min |
 | Bond prices via BDH | **XS2384406612 did not resolve — see 6d flag** | — |
 | Verify a Sep-2026 Bahrain maturity exists | **BLOCKING for /domino2 countdown** | 2 min |
 | Equities via BDH (`BHSEASI Index`) | untested — **likely works** | 2 min |
-| CDS term structure history (2Y, 10Y) | not captured | ~36 pp for 3 crisis years |
+| CDS term structure history | not captured — **1Y/2Y/3Y/5Y/7Y/10Y all confirmed to exist** | ~36 pp for 3 crisis years |
 | 2024–2026 from CMAN (removes source join) | not captured | ~15 pp |
 | GCC peer CDS | deliberately deferred | ~5 × 52 pp |
 
