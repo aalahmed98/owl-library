@@ -3388,6 +3388,51 @@ deleted) per the no-curation rule.
 component 2 (this section). Adoption was unconditional and stands. The site
 serves post-G-R1 grades as of 2026-08-10.
 
+## Registered decision P2-C9 — desk composition v4: below-base rules leave the action list (2026-08-10, spec BEFORE the run)
+
+**Owner-directed 2026-08-10: "first we remove dead rules. and then we will see
+what changes."** This is the legitimate form of per-domino improvement:
+SUBTRACTION justified by new external data (the G-R1 real reference), not
+threshold tuning. The exhaustion clause bars refinements from re-slicing the
+desk items; this decision derives from the re-grade against new data and is
+therefore in bounds — stated, and contestable.
+
+### Frozen criterion (written before computing the excluded set)
+
+A rule is **demoted from the action list** when its era-2 (bbg,
+2019-07-01→2026-08-10) **flag-level hit rate on resolved flags is strictly
+below its tier's matched achieved base rate**:
+
+| Tier / speed | Matched base (G-R1 solved, achieved) |
+|---|---|
+| curve (60d) | 14.14% |
+| fundamental (180d) | 17.84% |
+| recovery fast — curve_uninversion, trend_reversal (60d, tighten) | 13.86% |
+| recovery slow — market_access, oil_above_breakeven (180d, tighten) | 17.84% |
+
+- **Scope**: curve, fundamental, recovery tiers. **Oil tier out of scope** —
+  Brent-graded, record unchanged by G-R1. Escalations are never rule-demoted.
+  Already-rejected/experimental rules keep their existing gates.
+- **Small n applied as-is, n published.** A rule demoted on tiny n keeps
+  generating and grading on the watch list; a FUTURE spec may reinstate it if
+  its live record accumulates above base. Demotion is reversible by spec only.
+- **Demoted ≠ hidden**: flags move to the watch list with an explicit
+  "demoted — below-base on real reference (P2-C9)" label. Nothing is deleted.
+- Composition becomes **v4 = v3 (P2-C7) + this rule-level exclusion**, stored
+  as a param (`composition_v4`); v1/v2/v3 remain defined and citable.
+- **Retrodicted effect is DESCRIPTIVE ONLY; the binding verdict is
+  prospective** (same standing as P2-C7's demotions).
+
+### Honesty limit, stated up front
+
+The excluded set is computed from the G-R1 results, which are already
+published — this spec cannot pretend outcome-blindness about WHICH rules will
+fail the criterion (slope_20d's 0.57× is on the record). What is frozen here is
+the CRITERION and its scope, so the set cannot be cherry-picked rule by rule.
+
+### Single run (to follow immediately): compute per-rule era-2 records →
+excluded set → store param → implement placement → publish retrodicted diff.
+
 ## APIs & data sources in use
 
 | Source | What | URL / notes |
