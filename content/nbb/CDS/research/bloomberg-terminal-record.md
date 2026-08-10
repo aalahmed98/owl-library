@@ -616,8 +616,21 @@ signal — needs re-sourcing from a primary document (CBB/MOF issuance records o
 the prospectus). Until then the countdown rests on a cbonds row that Bloomberg
 does not recognise.
 
-**Not actioned in code** — correcting `bond_maturities.csv` changes a domino-2
-input and belongs to the owner with provenance, per the manual-data rules.
+**RESOLVED 2026-08-10 (owner-directed P0): REFUTED and suspended.** Third
+independent route closed it: the sqxbonds full enumeration of Bahrain's USD
+curve shows only Jan-2026 maturities (XS2496695714 2026-01-05, XS1324931895
+2026-01-26) and no September-2026 instrument; the CBB sukuk programme has none
+either. The wall-CSV row's issued field was blanked (the issued-gate excludes
+it, fail-closed) with the refutation recorded in its source_note; the row
+stays visible per the no-curation rule. The /domino2 countdown now points to
+the real next large maturity, 2027-03-30 $1,000mn. Bonus from the same
+enumeration: ISINs for the whole missing curve — 2030 7.375% XS2172965282
+(matches the CDS REF obligation exactly), 2032 5.45% XS2226916216, 2033 5.5%
+XS2649148090, 2034 5.625% XS2408003064, 2035 7.75% XS2611617700, 2036 7.5%
+XS2764424813 — candidates for future fitOnly densification and, via a
+pre-registered slope-leg spec, the 2030 data-cliff fix. The XS1324931895
+maturity fix (→2026-01-26) also shipped with its regression run: zero outcome
+changes on 577 alerts, one new marginal historical flag (FP), classified.
 
 ---
 
