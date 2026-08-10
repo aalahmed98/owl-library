@@ -259,6 +259,21 @@ NEW DATA: FRED `BAMLH0A0HYM2` (US HY OAS, daily) + `NFCI` (Chicago Fed, weekly).
   acceptance bar itself: a bonus can only ADD flags, so precision can only
   improve if the added flags are predominantly hits OVX-era scoring missed.
 
+**C9 AMENDMENT (2026-08-10, same day, BEFORE any evaluation — data-availability
+class, same as the J-R0 amendment):** at fetch time, FRED's keyless CSV
+endpoint returned only the trailing ~3 years of `BAMLH0A0HYM2` (ICE licensing
+cap; 2023-08→, covering none of the six crash events) while `NFCI` returned
+full 2010→ history. C9 is amended to the NFCI-only form — which is MORE
+faithful to the cited paper (BHK's headline left-tail predictor is the NFCI
+itself; HY spreads are among its 105 components): signal = trailing-3y
+percentile of NFCI (weekly, staleness ≤14d, ≥100 weekly obs warmup), gates =
+NFCI > 0 AND NFCI 4-obs (≈1 month) change > 0 (conditions tightening), bonus =
+clamp((nfciPct − 0.70)/(0.97 − 0.70), 0, 1) × 10, same bonus design. The
+revision-lookahead caveat stands. `fred.hy_oas` (2023-08→) stays stored for
+live context only — it is NOT part of the evaluated or any shipped signal.
+Discovered and amended before the evaluation script existed; no outcome was
+seen before this text was written.
+
 **C10 — OVX variance-risk premium bonus (queue #6).**
 NEW CONSTRUCTION from existing data: VRP = OVX² − RV21², where RV21 =
 annualized realized vol of `fred.brent` daily log returns over trailing 21 obs
