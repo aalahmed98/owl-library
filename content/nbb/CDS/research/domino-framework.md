@@ -305,9 +305,66 @@ live accumulation; derived series + UI follow.
 
 | Signal | Exact measure | Source (series) | Weight | Status |
 |---|---|---|---|---|
-| Forward gap | breakeven − market-expected Brent (~+6m) | `manual.breakeven_usd` − (`oil.deferred_usd` live; `fred.brent`×(1+`oil.contango_wti_pct`/100) hist proxy) | — | D0-H1, context only, unscored |
-| Gap trajectory | 20-obs change of forward gap; ±$2 → widening/stable/narrowing | `derived.gap_forward_chg20_usd` | — | D0-H1, frozen display classification, unscored |
-| Oil vol state | OVX 3y-percentile buckets 0.70/0.90; 6m band = spot·OVX·√0.5 | `fred.ovx` | — | D0-H1, uncertainty width only, never direction |
+| Forward gap | breakeven − market-expected Brent (~+6m) | `manual.breakeven_usd` − (`oil.deferred_usd` live; `fred.brent`×(1+`oil.contango_wti_pct`/100) hist proxy) | — | D0-H1, context only, unscored — **LIVE 2026-08-10** |
+| Gap trajectory | 20-obs change of forward gap; ±$2 → widening/stable/narrowing | `derived.gap_forward_chg20_usd` | — | D0-H1, frozen display classification, unscored — **LIVE 2026-08-10** |
+| Oil vol state | OVX 3y-percentile buckets 0.70/0.90; 6m band = spot·OVX·√0.5 | `fred.ovx` | — | D0-H1, uncertainty width only, never direction — **LIVE 2026-08-10** |
+
+### D0-H1 RESULTS + implementation record (single run, 2026-08-10; reproducible via `scripts/research/d0h1-descriptive.mjs`, raw output pinned in `scripts/research/d0h1-output.txt`)
+
+**Shipped** (same change as this results-commit, haircut-monitor branch
+`lenses-phase2`): `oil.deferred_usd` fetcher output (live accumulation began
+2026-08-10); `src/engine/gapTrajectory.ts` (pure, all D0-H1 constants frozen in
+one exported object); `derived.gap_forward_usd` + `derived.gap_forward_chg20_usd`
+per country (Bahrain 2,404 d and Oman 2,404 d, 2014-10-27 → 2024-04-12; Jordan
+none by construction); additive `gapTrajectory` blocks on `/api/oil` +
+`/api/domino1`; handoff cards on /oil + /domino1; 5 unit tests (105/105 green).
+
+**Implementation notes — declared refinements, letter→spirit (no re-run,
+recorded before first citation):**
+- The series begins **2014-10-27, not 2010**: the gap requires a breakeven
+  VINTAGE (first IMF REO vintage row), and the params fallback constant is
+  deliberately not used for history — that would be vintage-incorrect. The
+  spec's "2010→" described the curve data's own range.
+- **`trajMaxSpanDays = 60` guard added** (frozen with the other constants): the
+  spec's literal "null when <20 obs exist" would let the arrow difference
+  across the 2024→2026 data hole once live points accumulate — satisfying the
+  letter while violating the spec's own "the hole stays a hole" principle. The
+  arrow is additionally null when the 20-obs lookback spans >60 calendar days.
+- The API block reads Brent spot and OVX **as-of the gap's latest observation**
+  — today's spot is never mixed with the pre-hole 2024 tail to fabricate a band.
+
+**Descriptive measurement (the pre-registered ONE run, published as-is — NO
+verdict, NO adoption bar, NO skill claim; construction: symmetric 20-obs
+changes of each measure, first crossing of the frozen +$2, runway = episode
+start − 90 d):**
+- 2014-H2: both measures first crossed on the first computable observation
+  (2014-11-24) — **CENSORED at series birth; the "0-day lead" is an artifact,
+  not measured simultaneity.**
+- 2015-16 glut: both crossed 2015-02-02, one obs after the runway opened —
+  effectively censored at the boundary; same caveat.
+- 2018-Q4 slide: forward crossed 2018-07-03 (= the runway's first day, i.e.
+  already ≥$2 — the lead is a FLOOR) vs trailing 2018-11-27 → **forward led by
+  ≥147 calendar days.**
+- 2020 COVID/OPEC crash: forward 2019-10-03 (runway first day, floor) vs
+  trailing 2020-02-21 → **forward led by ≥141 calendar days.**
+- **Noise census (the cost side, equal prominence): 26 distinct widening
+  episodes** (≤30 d chaining) over 2014-11 → 2024-04; **8 touch a crash window
+  (incl. its 90 d runway), 18 do not** — the arrow points at nothing roughly
+  twice a year. Full episode list in the pinned output.
+- Honest summary sentence for any deck: *"the forward gap reaches its widening
+  threshold months before the backward-looking measure in the two grinding
+  declines (2018, 2020), is censored-simultaneous in the two 2014–16 windows,
+  and says 'widening' 26 times in ten years — it is a context arrow, not an
+  alarm."* The GUARD stands: no accuracy/precision number exists for this
+  object.
+
+**Regression guard (shipping acceptance): HELD.** 78 endpoint snapshots
+(26 endpoints × 3 countries): 69 byte-identical; 6 additive-only (`gapTrajectory`
+on /api/domino1 ×3, `gapTrajectory`+`gapForward`+`gapForwardProxy` on /api/oil
+×3 — /api/oil ignores country by design, its three snapshots are identical
+copies); 3 calibration endpoints differ only in the `fittedAt` re-run timestamp
+(the known deliberate class). Jordan's `gapTrajectory` serves `null` (J-R0).
+`npm test` 105/105.
 
 ## Domino 1 — Oil below the fiscal breakeven
 
