@@ -4400,3 +4400,34 @@ alarm or CDS/residual widening)" — ON 32% of days, 7/7 graded episode
 starts followed by a negative action within 90 days, honest lower bound
 1.86× chance. n is small and stated everywhere. No thresholds may be
 touched without a new spec.
+
+### ⚠ DG-R1 CORRECTION ADDENDUM (2026-08-10, same day, before any external quotation): same-day self-credit removed from PRECISION — verdicts unchanged, intervals now honest
+
+**What was wrong.** The spec froze a ≥2-day minimum lead ("a same-day
+signal is reaction, not warning"), but the evaluation script applied it
+only to RECALL. PRECISION credited an episode if an event fell on the
+episode's START day — and staging episodes are often SWITCHED ON by an
+outlook cut, so the cut credited itself (concretely: the live composite
+episode began 2026-04-18, the day of Moody's outlook cut, and counted that
+cut as its own hit). Found while wiring the live state; the script was
+aligned to the spec as written and re-executed — an implementation-bug fix
+against the frozen spec, not a re-tune; both outputs are pinned
+(`dgr1-output-v1-selfcredit.txt` / `dgr1-output.txt`).
+
+**Corrected PRECISION cells (90d primary; RECALL identical throughout):**
+- outlook_neg_state: 4/4 → **3/4 = 75% vs 34% · CI lift 1.46–2.93× — still
+  EXCLUDES 1×**, and the interval is now informative rather than degenerate.
+- composite_staging_plus_market: 7/7 → **6/7 = 86% vs 34% · CI 1.67–2.93×
+  — still EXCLUDES 1×.** The single miss is the OPEN 2026-04-18 episode:
+  the warning has been ON ~114 days without a subsequent action — that
+  fact now sits honestly on the record instead of being counted as a win.
+- cds_widening_60d 45d precision: 9/20 → 8/20 = 40% vs 20%, CI 1.25–3.00×
+  — still excludes 1×.
+- regime_alarm unchanged (2/7). residual 90d precision 28→27-ish/60 band:
+  23/25%-cells shifted ≤2 hits; no verdict flips anywhere.
+
+**Verdicts under the frozen acceptance rule: UNCHANGED.** Both winners keep
+LIVE (recall CIs unchanged and excluding 1×; corrected precision CIs also
+exclude 1×, making the earlier Clopper–Pearson annex superfluous — kept
+for the record). All below-base and ungradable verdicts stand. The UI
+quotes the corrected cells only.
