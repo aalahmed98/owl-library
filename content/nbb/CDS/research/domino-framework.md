@@ -4159,3 +4159,67 @@ record — no re-evaluation occurred:
   scoreboard, transitions, desk items, escalation-vs-downgrade lead/lag)
   recompute against the v2 event set; the base-rate-completion table for
   EX-R1c was computed on v1 escalations and is version-stamped as such.
+
+## Registered spec RT-R1 (2026-08-10): the downgrade-window warning — written BEFORE any data collection or evaluation
+
+**Motivation (owner-directed, desk-facing).** Everything graded so far targets
+spread-widening; agency actions were never the exam. The EX-R1c base-rate
+completion showed why that matters: "a flag preceded the downgrade" is
+worthless when flags are frequent (any-day baseline 97%), while the
+escalation-only form shows modest lift (~1.4×, n=14). RT-R1 builds the first
+warning whose TARGET is the agency action itself, from three ingredients that
+are the agencies' own announcements plus one market check:
+
+**Signal construction (frozen):** the downgrade-window state for agency A is
+ON when ALL THREE hold —
+1. **A has a negative outlook or negative watch on the Bahrain sovereign**
+   (from the ratings history / live agency publications; outlook state is the
+   agency's own announced pipeline);
+2. **A's next published sovereign review date for Bahrain is within 60
+   calendar days** (EU/US CRA regulation obliges S&P, Moody's and Fitch to
+   publish sovereign review calendars a year ahead; calendar rows hand-
+   maintained in `data/manual/rating_calendar_bh.csv` with per-row source
+   URLs and retrieved-on dates; rows are publication-gated — a calendar only
+   counts from the date we could have known it);
+3. **The live regime is ≥ watch** (market corroboration from the system's own
+   graded object — v2 as of the same-day adoption; version named in every
+   grade).
+
+**Claim & grading:** while the state is ON for agency A, the system claims "a
+negative action (downgrade, or outlook/watch deterioration) by A within the
+window's review date + 14 calendar days." Graded per (agency × review-date)
+event: HIT if A takes a negative action in that span; FP if the review passes
+with affirmation/no action; pending until the span closes. Episode unit = the
+(agency, review-date) pair — no re-fire chatter is possible by construction.
+
+**Base rate (pre-committed method):** share of ALL published review dates
+(2014→, both outlook states) that produced a negative action within +14d —
+computed from the ratings history against the reconstructed calendar; the
+conditional claim must beat this unconditional rate. Backward calendar
+reconstruction uses agency press archives/wayback where available; review
+dates that cannot be sourced are censused, never inferred from the action
+dates themselves (that would be outcome-derived).
+
+**Acceptance for going LIVE as a desk surface (frozen):** (a) ≥ 10 gradable
+historical (agency × review) events after censusing, else TOO SPARSE — the
+rule ships as a LIVE-ONLY accumulator with no historical claim; (b) if
+gradable: precision > the unconditional review-date base rate at point
+estimate, with the seeded bootstrap CI published either way (n will be small;
+the CI including 1× is expected and stated). One run. Either way the LIVE
+state (current outlooks: Moody's NEG + CI NEG; next review dates once the
+calendar CSV is seeded) ships as a context card on /domino4 labeled with
+whatever record exists.
+
+**Honest expectations, recorded now:** downgrades cluster in crisis arcs
+(~5 waves in 15 years); review calendars only became mandatory-published in
+2013-2014; the composite (outlook AND calendar AND regime) will have few ON
+days outside arcs — which is the point: a RARE, well-calibrated window claim,
+the opposite failure mode of the 24/25 statistic. GUARD: this spec's output
+is a WINDOW WARNING for desk attention; it must never be quoted as "we
+predict downgrades" and never feeds scoring, placement, or grading of any
+other object.
+
+**Implementation order (future session):** seed `rating_calendar_bh.csv`
+(agency press pages + wayback for history) → outlook-state series from
+`ratings_bh.csv` → evaluation script + ONE run → results-commit →
+/domino4 card.
