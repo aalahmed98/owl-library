@@ -710,6 +710,38 @@ WTI-curve-shape proxy (D0-H1's declared construction); v2 ≡ v1 inside the data
 hole; both the strip and the REO breakeven vintages are publication-dated (no
 revision lookahead of the NFCI kind).
 
+### D1-R1 RESULT (single run, 2026-08-10; reproducible via `scripts/research/d1r1-evaluate.mjs`, output pinned) — **NOT ADOPTED**
+
+Acceptance (i) failed: fundamental FPs rose 6 → 9. (ii) passed — escalation
+record identical (5h/13fp, two dates shifted ≤1 day). (iii) passed — the
+2015-08-31 hit is unchanged. Verdict: **v1 trailing stand-in stays live; the
+D0-H1 handoff remains display-only.**
+
+The full v2 picture, published because both halves matter:
+- **What the forward gap fixed:** it converted the front of the 2021 FP cluster
+  into two REAL hits — fired 2021-06-28 (+118bp follow-through) and 2021-07-06
+  (+91bp), ~two months before v1's August flags, both clearing the 90bp
+  real-CDS bar. bbg-era record 0h/6fp → 2h/9fp (0% → 18% flag precision).
+- **What killed it:** a NEW 2022 FP cluster (Feb→Jun ×5). Mechanism identified,
+  not hand-waved: in the 2022 spike the Brent curve sat in deep BACKWARDATION,
+  so the forward LEVEL read "gap wide" while spot was $110+ — the
+  convenience-yield / risk-premium bias. **This is precisely the bias the
+  D0-H1 trajectory definition differences out, and the level swap reintroduces
+  it.** The finding strengthens the original D0-H1 design choice (trend, not
+  level) and stands as the recorded reason a forward LEVEL is not a drop-in
+  replacement.
+- Harness note: the v1 replay reproduces 7 of the 9 stored breakeven_gap rows;
+  the two missing (2022-09-02, 2026-06-15) are legacy rows from earlier data
+  vintages (append-only drift class, disclosed at C9–11 too). The v1↔v2
+  comparison is machinery-identical and unaffected.
+- The inert `forwardGap` input in `signalsAt` stays in the engine (nothing
+  passes it), same class as the retained experiment helpers.
+- **No re-registration is proposed.** A precision-based bar would have read
+  this result favorably (0%→18%), but choosing a new bar after seeing the
+  result is the exact loop the protocol forbids; any revisit is an owner
+  decision that must carry this paragraph and the batch-multiplicity caveat
+  with it.
+
 ## Domino 2 — Reserves drain, debt piles up
 
 Deficits get financed by spending savings and borrowing. Each month of cheap oil:
