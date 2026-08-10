@@ -314,6 +314,44 @@ runs through NEW DATA ONLY: the Bloomberg Brent strip export (D0-H1 hole) and
 the standing CDS export. `fred.hy_oas` (2023-08→) and `fred.nfci` (2010→)
 remain fetched as context series; neither feeds any signal.
 
+### ADOPTION DECISION D0-C10 (2026-08-10, owner) — composite v2 = v1 + VRP bonus; lead time bought at a stated price
+
+The owner exercised the recorded option the same day: **C10 is ADOPTED** as an
+explicit lead-time-for-precision trade under the noise-aware rule's
+pre-committed-price clause. This is an OWNER DECISION on the already-published
+single run (no re-evaluation occurred, none was permitted); the accepted price
+is quoted verbatim from the C10 results above and must travel with every
+citation of the v2 record:
+
+- **Bought**: first-flag detection 1–9 days earlier in EVERY covered crash
+  (2014 −3d · 2015 −1d · 2018-Q4 −9d · 2020 −1d · 2026 −6d).
+- **Paid**: flag-level precision 30.8% → 24.5% (−6.2pp, still ≈1.6× the 15.2%
+  base rate); ≈15 additional false flags over 16 years (≈1/yr); episode
+  first-flag rate 26.7% → 25.0% on one more episode.
+- **Preserved**: 6/6 crash-event coverage; the OVX load-bearing gate; all
+  other components untouched.
+
+**Versioning (quote the version with every number):** the Domino Zero
+composite record is now VERSIONED like the desk composition — **v1 (frozen
+2026-08-07, final record 12h/27fp = 30.8%, episodes 4/15 first-flag)** is
+closed and stays citable; **v2 = v1 + C10 (live from 2026-08-10)** regenerates
+the historical flag set at 13h/40fp = 24.5% (54 flags, 16 episodes). The
+scoreboard on /oil serves v2 with the version note; v1's record lives here.
+
+**Downstream disclosure (consequences of adoption, accepted with it):** the 15
+new historical oil-tier rows feed every reader of tier='oil' alerts — the
+oil-precursor conditioner (P2-C7 placement) and the P2-C5 confluence badge
+counts recompute against the v2 flag set, so desk-item confirmation counts and
+the live tier chart shift slightly. **The P2-C5 measured ladder
+(10/21/34/43%) remains the published v1-flag-set measurement and is NOT
+re-derived** — re-deriving it against v2 flags would need its own spec.
+
+**Registry row (Domino Zero signal registry, appended):**
+
+| Signal | Exact measure | Source (series) | Weight | Status |
+|---|---|---|---|---|
+| OVX variance-risk premium | VRP = OVX² − RV21² (RV21 = 21-obs annualized realized vol of Brent log returns); trailing-3y percentile 0.70→0.97 → bonus 0..+10 OUTSIDE the renormalizing average (C3 bonus design) | `fred.ovx` + `fred.brent` (both already fetched) | +10 bonus | **ADOPTED 2026-08-10 (D0-C10, owner decision, price recorded)** — live v2 |
+
 **C10 — OVX variance-risk premium bonus (queue #6).**
 NEW CONSTRUCTION from existing data: VRP = OVX² − RV21², where RV21 =
 annualized realized vol of `fred.brent` daily log returns over trailing 21 obs
