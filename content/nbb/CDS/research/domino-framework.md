@@ -3352,6 +3352,38 @@ headline becomes *"regime-flag escalations (v2 hysteresis): 8/14 = 57% vs
 existed"* — alongside Oman inversion, that would make two graded results
 excluding no-skill.
 
+### ⚠ CORRECTION to the addendum above (2026-08-10, same day) — the 57.1% was PROXY-graded and is RETRACTED
+
+The component-2 sweep missed ONE grading call site: the C-R4v2 side-by-side in
+`apiDomino4.ts` still graded its events against the snapshot proxy. The
+addendum's **8/14 = 57.1% "excludes no-skill" figure was therefore measured on
+the proxy and is retracted.** The error was caught by per-event verification
+against both references before any adoption action was taken; the call site is
+fixed and the corrected numbers are served live.
+
+**C-R4v2 on the REAL reference: 5/14 = 35.7%, lift CI 0.80×–3.22× — INCLUDES
+1×.** The three flips vs the proxy reading: 2022-11-25 (+109 proxy → +15 real),
+2023-03-17 (+102 → +20), 2024-07-18 (+61 → +15) — all proxy artifacts, the
+same failure mode G-R1 exposed everywhere else.
+
+What legitimately survives of the addendum:
+
+- **v2 weakly dominates v1**: identical five hits (2018-05-21, COVID ×2,
+  2025-03-07, live 2026-07-03), four fewer false positives (14 events vs 18),
+  35.7% vs 27.8%. The dwell/exit design did remove v1's junk events.
+- The blanket statement the addendum "corrected" was in fact **right**: **no
+  Bahrain-graded CI excludes no-skill on the real reference.** Oman inversion
+  (5/9, 1.86×–4.34×) remains the only such result in the system.
+- The v2 adoption decision is back to being a modest-evidence call (cleaner
+  event set, same hits, CI still includes 1×), not the urgent evidence-changed
+  one the addendum claimed. The owner's 2026-08-10 directive to "go with the
+  real-data results" was given while the wrong figure was on record; the
+  adoption question is re-presented with corrected numbers.
+
+Correction-log note: the wrong figure lived in the record for under two hours,
+was never cited externally, and is preserved above (struck by this note, not
+deleted) per the no-curation rule.
+
 **G-R1 is COMPLETE.** Spec 6961b2f → gate → component 1 (5fa0f78) →
 component 2 (this section). Adoption was unconditional and stands. The site
 serves post-G-R1 grades as of 2026-08-10.

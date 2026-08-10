@@ -57,8 +57,9 @@ $1.33m of carry — **the moves are real but small relative to what standing
 protection costs on a wide-spread credit.** A better hit rate does not fix
 this: grading measures peak-within-window against a ~50–90bp bar, while
 break-even on carry alone needs ~+45bp *retained to expiry* — different
-quantities. (Whether hedging only C-R4v2 escalations — 8/14 = 57% on the real
-series — clears carry is an open, untested question; no claim is made.)
+quantities. (Whether hedging only C-R4v2 escalations — 5/14 = 35.7% on the real
+series, corrected 2026-08-10 — clears carry is an open, untested question; no
+claim is made.)
 
 Also retired with the proxy: the "$1.8m filter swing." On the real series the
 action list still ranks above hedging everything (−$1.79m vs −$2.63m, a $0.84m
