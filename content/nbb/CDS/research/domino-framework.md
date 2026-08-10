@@ -4131,3 +4131,31 @@ citable only as "in crisis clusters our escalations preceded agency actions
 by 20–120 days — modest, consistent, statistically unproven." The desk-brief
 ranking is corrected accordingly: the downgrade lead/lag is a supporting
 exhibit, not a headline.
+
+## ADOPTION DECISION C-R4v2 (2026-08-10, owner) — v2 becomes the LIVE Bahrain regime; v1 record closed and citable
+
+The owner adopted the pre-registered distress dwell/exit asymmetry (dwell 20bd
+/ exit −20) as the live Bahrain regime. Decision on the published side-by-side
+record — no re-evaluation occurred:
+
+- **Live record from this date: C-R4v2 — 5/14 = 35.7% on real CDS, 90% lift
+  CI 0.80×–3.22× (includes no-skill; quote the CI with the number).** Same 5
+  hits as v1 with 4 fewer false escalations; eliminates the two premature 2025
+  distress releases (each followed by +175/+185bp widenings).
+- **v1 (dwell 5 / exit −10) is CLOSED: final record 5/18 = 27.8%, CI
+  0.63×–2.50×** — stays citable and published permanently; the /domino4
+  side-by-side now shows v1 as the closed comparison under the live v2.
+- **SCOPE: BAHRAIN ONLY, implemented in the replay layer, NOT in the global
+  `regime_thresholds` parameter.** The parameter stays frozen at v1 for
+  Oman and Jordan — flipping it globally would silently re-cut the published
+  O-R1 and J-R1 transition records. This creates a STATED exception to the
+  identical-transfer principle: future cross-country regime comparisons are
+  Bahrain-v2 vs others-v1 until an Oman/Jordan v2 spec of their own; the
+  X-R1/J-R1 records as published remain v1-on-all-countries and are
+  unaffected.
+- Versioning discipline (as with desk composition and the D0 composite):
+  every citation of the regime record must name the version. Downstream
+  consequences accepted with adoption: escalation-derived surfaces (C-R4
+  scoreboard, transitions, desk items, escalation-vs-downgrade lead/lag)
+  recompute against the v2 event set; the base-rate-completion table for
+  EX-R1c was computed on v1 escalations and is version-stamped as such.
