@@ -662,6 +662,54 @@ review-remediation section below. The record was then re-derived once more under
 the vintage breakeven series (correction 4): **1/1 CDS era · 1/6 + 1 pending
 Ariva era** — the earlier pooled "3/3" stays retired.
 
+### Registered spec D1-R1 — the forward gap replaces the trailing stand-in (written 2026-08-10, BEFORE the evaluation run)
+
+**Motivation.** `signals.ts` has always labeled the trailing-60d Brent average a
+"phase-1 stand-in for the futures strip." D0-H1 built the strip series
+(`derived.gap_forward_usd`: vintage-correct breakeven − market-expected ~6m
+Brent). The stand-in's known pathology is the 2021–22 false-positive cluster:
+six `breakeven_gap` re-crossings while the rear-view average wobbled around
+$15/bbl at a time the market had already repriced oil far above it. This spec
+evaluates swapping the LEVEL input of the breakeven-gap signal from rear-view
+to forward — thresholds, weights, hysteresis, bars all UNCHANGED.
+
+**Change under evaluation (BAHRAIN ONLY):**
+- `signalsAt` gains an optional `forwardGap` input. v2 `breakevenGapUsd` = the
+  forward-gap value when a fresh observation exists (≤7d, the standard market
+  staleness); otherwise EXACTLY the v1 trailing computation (fallback, not
+  unavailable — the 2024→2026 data hole and pre-2014-10 history are v1 by
+  construction, so regime renormalization never changes where forward data
+  doesn't exist).
+- Every frozen threshold is untouched: gap scaling $15→$45 into 20 pts, siren
+  edge at gapFromUsd, hysteresis, era bars.
+- **Oman is explicitly OUT of scope** — its gap feeds the regime flag whose
+  O-R1 record is published; re-cutting it requires its own spec. Jordan N/A
+  (J-R0).
+
+**Evaluation — ONE run (`scripts/research/d1r1-evaluate.mjs`):**
+- Harness sanity: the v1 replay must reproduce the stored breakeven_gap and
+  escalation records before v2 is computed.
+- Compare full replays (2015-01-01→today), graded against the composed grading
+  reference with era bars: (a) `breakeven_gap` flag record, era-split
+  (fund bars 100/90/180, 180d window); (b) C-R4 regime escalations (era curve
+  bars, 60d window).
+- **ACCEPTANCE (all three, frozen):** (i) breakeven_gap hits per era ≥ v1's
+  AND total FPs ≤ v1's; (ii) escalation hits ≥ v1's AND escalation FPs ≤
+  v1's; (iii) the CDS-era hit is preserved (a hit flag within ±45 calendar
+  days of 2015-08-31). Any other outcome → NOT adopted, recorded as usual.
+- Descriptive (no bar): crossing-date shifts, and specifically the fate of the
+  2021–22 FP cluster.
+- If adopted: bundle passes `forwardGap` for Bahrain only; full regression
+  sweep with every diff classified; Domino 1 registry row updated with the
+  adoption date; on-page provenance text updated. The D0-H1 trajectory ARROW
+  stays display-only — this spec swaps the level input, it does NOT introduce
+  arrow conditioning.
+
+**Disclosed asymmetries:** the forward history 2014-10→2024-04 is the
+WTI-curve-shape proxy (D0-H1's declared construction); v2 ≡ v1 inside the data
+hole; both the strip and the REO breakeven vintages are publication-dated (no
+revision lookahead of the NFCI kind).
+
 ## Domino 2 — Reserves drain, debt piles up
 
 Deficits get financed by spending savings and borrowing. Each month of cheap oil:
