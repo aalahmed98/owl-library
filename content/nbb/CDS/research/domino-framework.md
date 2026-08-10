@@ -966,6 +966,29 @@ showcase acute-repricing catch. The 2017–2019 era stays 1/20 — the
 born-inverted period was genuinely uninformative, which the corrected section
 above now says out loud.
 
+### Registered decision C-RET1 (2026-08-10, owner-directed pruning) — below-base curve rules RETIRED from generation, Bahrain scope
+
+**Decision class (no evaluation run — cites already-published G-R1 numbers;
+same mechanism as the recovery-rules generation stop):**
+
+- **`slope_20d` RETIRED**: 8.1% hit rate vs the 14.1% matched base on the real
+  CDS reference — measured BELOW no-skill. Generation stops for rows dated
+  after 2026-08-10; every historical row keeps regenerating idempotently and
+  stays visible, labeled retired-below-base on all surfaces.
+- **`level_pct` RETIRED**: 17.9% vs the 17.76% base — exactly zero
+  information. Same treatment, same date.
+- **Scope: BAHRAIN ONLY.** The retirement evidence is Bahrain-graded (G-R1);
+  Oman and Jordan records are their own and their generation is untouched.
+  `inversion` is NOT retired anywhere — it remains the strongest Bahrain rule
+  (24.4%, 1.73×) and the Oman headline.
+- Regime-score inputs are UNTOUCHED: this retires the two standalone alert
+  RULES (flag generators), not the level/trend components inside the frozen
+  composite score — those were never independent claims.
+- The desk composition already demotes below-base rules from the action list
+  (P2-C9); this decision completes it by stopping fresh audit-noise rows.
+- **Jordan live-tracking freeze was considered and deliberately NOT decided
+  here** — pending an explicit owner call (recorded in HANDOVER).
+
 ## Domino 4 — The visible blowout
 
 Spreads gap, ratings act, mandate-driven forced sellers meet a no-bid market.
@@ -3406,6 +3429,14 @@ criterion 1.** Full record:
   ever surfaces) would require a new pre-registered spec — not iterated until
   it passes.
 
+**P2-L2 ADDENDUM (2026-08-10, owner-directed pruning): fetch stopped.** The
+lens was rejected 2026-08-08 and its inputs served nothing since: `SOFR` and
+`TB3MS` are removed from the FRED fetch list (their only consumer was this
+lens). The stored series, the derived differential, the /peg page, and the
+rejection verdict all stay exactly as published — the SERIES freezes at its
+last fetched observation rather than growing for no reader. Reinstating the
+fetch is trivial if a future peg spec is ever registered.
+
 ## Registered spec G-R1 (2026-08-09): grading-reference replacement — real CDS 2019-07→2026-08 replaces the Ariva proxy — written BEFORE the run
 
 **Owner-approved 2026-08-09 ("yes start G-R1"). This section is the spec-commit.
@@ -3909,3 +3940,76 @@ Its numbers must not feed back into any threshold or grading bar.
 
 Working state, open threads and pending owner decisions for the implementation:
 `~/nbb/haircut-monitor/HANDOVER.md`.
+
+## Registered spec DT-R1 (2026-08-10): DTCC trade-tape decoding + validation — written BEFORE any decoding or measurement
+
+**Source (found 2026-08-10, free-API recon after Bloomberg access ended):**
+DTCC SBSDR public price dissemination (SEC credits), Dodd-Frank-mandated, free.
+Rolling ~21-month public window — **preserved in full at
+`~/nbb/data-recon/cds-trade-tape/` (461 daily files, 2024-11-03→2026-08-07,
+sha-stable zips; `sweep.sh` re-runs idempotently to extend forward)**. Contains
+956 Kingdom-of-Bahrain and 542 Sultanate-of-Oman real CDS trade records —
+the only free trade-level sovereign CDS data in existence, overlapping BOTH
+the Bloomberg real-CDS era tail (2024-11→2026-08-10) and the live-proxy era.
+
+**Component 1 — construction (frozen before decoding):**
+- Universe: `Underlying Asset Name` ∈ {Kingdom of Bahrain, Sultanate of Oman}
+  (case-insensitive), `Action type` = NEWT only (MODI/TERM excluded from the
+  series; counted in a census table). Uncleared and cleared both eligible.
+- 5Y-equivalent filter: expiry − execution date ∈ [4.25y, 5.75y] (CDS roll
+  conventions put "5Y" trades in this band). Trades outside the band are
+  censused, not used.
+- Quote decoding: the disseminated economics fields (`Spread-Leg 1` with its
+  notation code, `Fixed rate-Leg 1`, upfront/other-payment fields where
+  populated) are decoded per the CFTC/SEC technical spec; every decode rule
+  used will be written into the results-commit BEFORE the validation numbers
+  are computed, with a worked example per rule. Records whose economics
+  cannot be decoded unambiguously are dropped and censused — never guessed.
+- Aggregation: weekly (ISO week) median of decoded 5Y-equivalent spreads per
+  sovereign → `cds_tape.bh.5y_wk` / `cds_tape.om.5y_wk` (data-recon CSVs
+  first; DB ingestion only after validation passes).
+
+**Component 2 — validation (ONE run, bars frozen now):**
+- Bahrain, overlap window 2024-11→2026-08-10 vs the Bloomberg real-CDS
+  reference: (a) weekly-change correlation ≥ 0.5 (the P2-V1 bar), (b) median
+  |level gap| reported with no bar (levels may embed venue/coupon effects —
+  reported, not gated), (c) ≥ 60% of overlap weeks have ≥1 decoded trade,
+  else the series is declared TOO SPARSE for validation and the spec stops.
+- PASS ⇒ the tape becomes an ADOPTED context/validation series: live-proxy-era
+  anchor (era-3 sanity surface) and the first-ever real check of Oman's
+  borrowed venue-gap ratio (r=0.455). Any GRADING use — era-3 bar re-solve,
+  reference re-composition — remains OUT of scope and needs its own spec.
+- FAIL ⇒ recorded, tape stays preserved raw data, nothing ingested.
+
+## Registered spec EX-R1 (2026-08-10): Bloomberg-export ingest — 10Y CDS, real bond prices, ratings history — written BEFORE ingestion or measurement
+
+All three parts are **context/display class — zero scoring, zero grading, zero
+placement effects**; each carries exactly one pre-registered DESCRIPTIVE
+measurement (no bar, published as-is). Source: the joined desktop folder
+(`bloomberg-2026-08-09-joined/`, built 2026-08-10; provenance + license notes
+inside; Bloomberg-derived — internal use only).
+
+- **EX-R1a — Bahrain 10Y CDS** (381 d, 2024-06-10→2026-08-10, CMAN) →
+  `cds.bh.10y`. With the 5Y reference this yields the first REAL-CDS curve
+  measure: `derived.cds_slope_5s10s_bp` (10Y − 5Y, positive = normal).
+  Display on /domino3 next to the bond-proxy slope. Descriptive measurement:
+  daily correlation + sign-agreement between the real 5s10s and the
+  bond-proxy slope over the overlap — the first external check of what the
+  bond slope actually measures. NOT a signal; any rule on it needs a spec.
+- **EX-R1b — real bond prices** (5 live Bahrain legs, 2025-02-11→2026-08-07)
+  → `px_bbg.<isin>`. Descriptive measurement: per-leg median |Ariva − BBG|
+  clean-price gap + weekly-change correlation — the bond-market analogue of
+  G-R1's venue-gap finding, sizing Ariva's live-era reliability per leg.
+  Feeds the standing "changes over levels" caveat with real numbers.
+- **EX-R1c — ratings history** (2,225 actions 2008→2026, all agencies,
+  sovereign + banks) → `data/manual/ratings_bh.csv` (publication-date keyed).
+  Surfaces: sovereign-action markers as an optional chart overlay
+  (/domino4), additive API field. Descriptive measurement: for each
+  sovereign long-term downgrade/outlook-negative action since 2015, the
+  lead/lag vs (i) the regime flag's preceding escalation and (ii) the first
+  preceding desk action-list item — the "did we lead the agencies" table,
+  presentation-grade, no accuracy claim, GUARD: never quotable as precision.
+
+Implementation order: EX-R1a/b/c ingestion + displays first (additive,
+regression-guarded like every phase-2 change), descriptive measurements run
+once at ingestion, results appended here.
