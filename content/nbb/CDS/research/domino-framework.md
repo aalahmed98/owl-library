@@ -3981,6 +3981,39 @@ the Bloomberg real-CDS era tail (2024-11→2026-08-10) and the live-proxy era.
   reference re-composition — remains OUT of scope and needs its own spec.
 - FAIL ⇒ recorded, tape stays preserved raw data, nothing ingested.
 
+### DT-R1 RESULTS (single run, 2026-08-10; script + pinned output in `~/nbb/data-recon/cds-trade-tape/dtr1-{decode.py,output.txt}`) — **TOO SPARSE, spec stop; nothing ingested. The DECODE itself validated strikingly well.**
+
+**Decode census (rules R1–R5 frozen in the script header before validation):**
+Bahrain 124 decoded of 772 NEWTs (drops: 223 no-UFRO-economics, 223 capped
+notionals, 105 off-tenor, 65 package, 31 EROR-cancelled, 1 non-USD); Oman 33
+of 390. Weekly series: Bahrain 48 ISO weeks, Oman 22. Worked example (R4):
+exec 2024-12-12, tenor 5.02y, upfront 3.38% → RD 4.296 → 178.6bp.
+
+**Frozen-bar outcomes:** overlap 93 weeks; tape coverage **50.5% < 60% → TOO
+SPARSE, spec stop** (the weekly-change corr, −0.34 on 29 pairs, would have
+failed independently: 1–3-trade weekly medians vs a daily quote mid are
+change-noise at calm-market move sizes). Nothing ingested, per spec.
+
+**What the run PROVED anyway (reported, no bar):** median |level gap| vs the
+Bloomberg real-CDS mid = **5.8bp** (signed −3.4bp) across 47 common weeks —
+the upfront→spread decode (R3/R4) lands on Bloomberg's mid almost exactly.
+The tape data is real and correctly interpreted; the SERIES design (weekly
+median of sparse trades) is what fails, not the decode.
+
+**Oman descriptive (first real evidence on the proxy's weakest link):** 20
+common weeks; tape median 100bp vs borrowed-ratio proxy median 145bp; median
+signed gap **−34.9bp — the r=0.455 borrowed-ratio proxy reads roughly a third
+TOO HIGH against real Oman trades.** Descriptive only: the Oman band level
+already carries an on-page caveat for exactly this assumption, and any ratio
+correction must be its own pre-registered spec. The regime flag and all
+graded Oman results are scale-invariant to the level — nothing re-cuts.
+
+**Recorded future options (not proposals, no runs):** (a) the tape as an
+ANCHOR rather than a series — sparse calibration checkpoints exploiting the
+5.8bp level accuracy (e.g., monthly medians, or per-trade spot checks of the
+live proxy); (b) an Oman ratio-recalibration spec citing the −35bp finding.
+Each would be a new spec with its own frozen bars.
+
 ## Registered spec EX-R1 (2026-08-10): Bloomberg-export ingest — 10Y CDS, real bond prices, ratings history — written BEFORE ingestion or measurement
 
 All three parts are **context/display class — zero scoring, zero grading, zero
