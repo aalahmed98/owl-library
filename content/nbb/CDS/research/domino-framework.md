@@ -3318,6 +3318,40 @@ proxy-based); the presentation narrative must lead with the Oman inversion +
 mechanism story rather than C-R4; C-R4v2's side-by-side re-derives live and
 needs its numbers re-read before anyone cites v2.
 
+
+### Component-2 ADDENDUM (same run, read from the same snapshot): C-R4v2 EXCLUDES no-skill on the real reference
+
+The blanket statement above — "no Bahrain-graded CI excludes no-skill" — is
+correct for **v1, the live citable version**, and WRONG if left unqualified.
+The pre-registered C-R4v2 (distress dwell 20bd / exit −20, spec 2026-08-08,
+served side-by-side on /domino4, **adoption still pending the owner**)
+re-derives on the real reference as:
+
+| | v1 (live) | **v2 (pre-registered, pending)** |
+|---|---|---|
+| Proxy record (pre-G-R1) | 8/17 = 47.1%, CI excl. 1× | 6/13 = 46.2% |
+| **Real record (post-G-R1)** | 5/18 = 27.8%, CI **incl. 1×** | **8/14 = 57.1%, CI 2.01×–4.42× — EXCLUDES 1×** |
+
+Full v2 event list (real reference): hits 2018-05-21 (+245), 2020-03-02
+(+536), 2020-03-10 (+387), 2022-11-25 (+109), 2023-03-17 (+102), 2024-07-18
+(+61), 2025-03-07 (+150), **2026-07-03 (+60, the live flag)**; FPs are all
+sub-25bp non-events (+3, −5, +5, +23, +9, +19).
+
+Why this is clean rather than convenient: **v2's spec predates the Bloomberg
+data entirely.** The dwell/exit asymmetry was registered 2026-08-08 against the
+observed 2025 premature de-escalations; the real reference then graded exactly
+v1's re-escalation events as false positives (2025-04-09, 2025-05-26,
+2025-12-23) — the failure mode v2 was designed to remove. On the proxy, v2
+looked like a wash (46% vs 47%) and the recommendation was "not now." On real
+data the comparison inverts decisively.
+
+**Owner decision C-R4v2 is hereby flagged as evidence-changed.** v1 remains
+LIVE and citable until the owner adopts; if adopted, the honest Bahrain
+headline becomes *"regime-flag escalations (v2 hysteresis): 8/14 = 57% vs
+~18% base, 90% lift CI 2.0×–4.4×, pre-registered before the reference data
+existed"* — alongside Oman inversion, that would make two graded results
+excluding no-skill.
+
 **G-R1 is COMPLETE.** Spec 6961b2f → gate → component 1 (5fa0f78) →
 component 2 (this section). Adoption was unconditional and stands. The site
 serves post-G-R1 grades as of 2026-08-10.
