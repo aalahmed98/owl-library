@@ -4046,3 +4046,52 @@ inside; Bloomberg-derived — internal use only).
 Implementation order: EX-R1a/b/c ingestion + displays first (additive,
 regression-guarded like every phase-2 change), descriptive measurements run
 once at ingestion, results appended here.
+
+### EX-R1 RESULTS (single run, 2026-08-10; `scripts/research/exr1-descriptive.mjs`, output pinned in `exr1-output.txt`; ingest `scripts/migrate/exr1-ingest.mts`, source sha256 be85e8f4… / 500c6a1b…)
+
+**Ingested (context class, live on-page):** `cds.bh.10y` 381d ·
+`px_bbg.<isin>` ×5 (~374d each) · `derived.cds_slope_5s10s_bp` 381d
+(2024-06-10→2026-08-10) on /domino3 · `data/manual/ratings_bh.csv`
+(git-ignored, Bloomberg-derived) with the negative-action overlay on /domino4
+(default-off toggle).
+
+**(a) THE HEADLINE — the bond-proxy "inversion" is NOT a CDS-curve
+inversion.** Over 366 common days: level correlation **−0.423** (negative!),
+daily-change correlation 0.134, inversion sign-agreement 41%. The bond-proxy
+slope read "inverted" on **59%** of overlap days; the REAL 5s10s CDS curve was
+inverted on **0%** — zero days. Today: bond-proxy +202bp "largest inversion on
+record" vs real 5s10s +21.9bp (a mildly flattening but NORMAL curve).
+**What this does and does not change:** the inversion rule's graded record
+(24.4%, 1.73×, the strongest Bahrain rule; Oman 5/9) is UNTOUCHED — it was
+graded against real-CDS outcomes, so whatever the bond slope measures, it
+predicted widenings at ~1.7× base. What changes is the MECHANISM story: the
+bond slope is a bond-market stress measure (curve-position, liquidity, venue
+and coupon effects — the O-R1 caveat class, now measured on Bahrain itself),
+not the term structure of default risk. Presentation language must say
+"mid-vs-long bond spread gap", never "the CDS curve is inverted". Any rule
+action on the real 5s10s needs its own spec; its window is frozen (ends with
+the export) so none is proposed.
+
+**(b) Ariva prices are ~14 POINTS below Bloomberg — consistently.** Median
+gap (Ariva−BBG): 2028 −14.39pt · 2029 −14.34pt · 2031 −13.77pt · 2047
+−14.46pt · 2044 −12.32pt (~364 common days each). Weekly-change correlation
+rises with duration: 0.41/0.48 (short/mid) → 0.83/0.84 (2047/2044). The
+"changes over levels" caveat now has numbers: Ariva LEVELS are retail-venue
+artifacts ~14pt deep; long-bond CHANGES track well, short-bond changes only
+loosely. Consequence noted (no re-cut): `price_compression`'s frozen <85
+threshold was solved outcome-blind ON Ariva's own level regime — internally
+consistent, but "avg price < 85" on Ariva ≈ "avg price < ~99" on real
+prints; the badge reads Ariva-market stress, not real-price distress.
+
+**(c) The agencies follow the system — 24/25 negative sovereign actions since
+2015 had a system first-flag in the preceding 180 days** (25 distinct
+date×agency events: 23 downgrades + 2 outlook cuts; 18 escalations; 76
+episode-first flags; stated deviation: (ii) used episode-first flags of any
+tier, a SUPERSET of the desk action list). Typical first-flag leads 20–90d;
+escalation leads 22–30d inside crisis clusters (2020-04 CI: escalation 24d
+prior; 2025-11 S&P: first-flag 25d prior; 2026-02 Fitch: 33d prior).
+**GUARD (spec): descriptive lead/lag, never quotable as precision — and the
+180d window is generous by construction (the system flags often; see the
+P2-C5 base-rate confounder). The honest presentation line: "agency actions
+rarely arrived without the monitor having flagged first" — not "we predict
+downgrades".**
