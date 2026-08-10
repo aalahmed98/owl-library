@@ -4108,3 +4108,26 @@ on /desk and /chain (scoped to oil-driven episodes), and the /domino4 audit
 trail (C-RET1 retirement labels). Every era-split record served by the APIs
 was verified equal to the alerts-table truth in the same audit. Nothing was
 re-graded; these were stale TEXT surfaces, not data.
+
+### EX-R1c BASE-RATE COMPLETION (2026-08-10, same day — hard rule 5, computed before any external quotation)
+
+The 24/25 lead/lag statistic REQUIRED its any-day baseline; computed
+(read-only, `scratchpad/baseline.mts` logic: share of all days passing the
+identical preceding-flag test):
+
+| Window | Events preceded by a first-flag | ANY-day baseline |
+|---|---|---|
+| 180d | 96% (24/25) | **97%** |
+| 90d | 84% | 79% |
+| 45d | 56% | 52% |
+
+**VERDICT: the first-flag form of the statistic has ZERO lift — the system
+flags often enough that essentially every day "precedes" a downgrade within
+180d. The 24/25 headline is DEAD as a skill claim and must never be quoted
+without this table.** The ESCALATION-only form retains modest apparent lift
+(180d: 11/14 = 79% vs 58% · 90d: 50% vs 36% · 45d: 36% vs 23% — ~1.4–1.5×
+across windows, n = 14, unproven): consistent with C-R4's general record, and
+citable only as "in crisis clusters our escalations preceded agency actions
+by 20–120 days — modest, consistent, statistically unproven." The desk-brief
+ranking is corrected accordingly: the downgrade lead/lag is a supporting
+exhibit, not a headline.
