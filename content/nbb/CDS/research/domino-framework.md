@@ -4223,3 +4223,60 @@ other object.
 (agency press pages + wayback for history) → outlook-state series from
 `ratings_bh.csv` → evaluation script + ONE run → results-commit →
 /domino4 card.
+
+### ⚠ DATA CORRECTION EX-R1c-d (2026-08-10, downgrade-radar build): phantom sovereign "downgrade" removed; five missing outlook cuts recovered
+
+**What was wrong (found by cross-checking the event list against three
+independent free sources — countryeconomy.com, TradingEconomics, FXEmpire):**
+
+1. **Phantom actions from country-ceiling rows.** The EX-R1c extractor
+   accepted EVERY rating type on a Kingdom-of-Bahrain row. Bloomberg type
+   `CC LT Foreign Curr Debt` is the COUNTRY CEILING, not the sovereign
+   rating: its 2020-12-07 move (Ba3u→B1u) and 2024-05-13 move back
+   (B1u→Ba3u) entered the record as a Moody's sovereign downgrade/upgrade.
+   Moody's sovereign issuer rating has been B2 continuously since 2018-08
+   (affirmed through both dates; all three externals agree). The extractor
+   is now type-filtered (long-term issuer/IDR/senior-debt only; ceilings,
+   deposits, short-term and counterparty scales excluded) and lives in one
+   shared module (`src/server/ratings.ts`) used by every surface.
+2. **Missing outlook history.** The Bloomberg export carries only a handful
+   of recent sovereign Outlook rows. Genuine NEG outlook cuts absent from
+   the record: Moody's 2009-01-06, S&P 2014-12-12, S&P 2017-06-02, Fitch
+   2017-06-12, **Moody's 2021-04-29, S&P 2021-05-28, Fitch 2025-02-24,
+   S&P 2025-04-24**. Seeded `data/manual/rating_outlook_bh.csv` (47
+   publication-dated state rows, per-row sources, committed — built from
+   free public sources; the Fitch 2025-02-24 row additionally verified
+   against Bloomberg News / Arab News / cbonds press coverage). CreditWatch
+   placements are now extracted from the export's `*-` suffix
+   (watch-negative: 2011-02-17 F / 2011-02-21 S&P / 2011-02-23 M /
+   2013-06-13 M / 2016-03-04 M).
+
+**Recomputed descriptive lead/lag (supersedes the EX-R1c base-rate
+completion figures; same method, corrected populations; escalations = the
+live v2 replay, n=14, 2017-06→):**
+
+| window | corrected export-only population (n=13, was 14) | complete population incl. watch + seeded outlook cuts (n=19) |
+|---|---|---|
+| 45d | 5/13 = 38% vs 18% base = **2.2×** | 5/19 = 26% vs 18% = **1.5×** |
+| 90d | 5/13 = 38% vs 30% = **1.3×** (was 6/14 = 43% = 1.4× — the phantom was one of the six) | 6/19 = 32% vs 30% = **1.05×** |
+| 180d | 6/13 = 46% vs 50% = **0.9×** | 7/19 = 37% vs 50% = **0.7×** |
+
+**The honest reading, recorded:** on the complete event list the regime
+flag's 90-day descriptive edge over chance essentially disappears. The
+events it misses are precisely the OUTLOOK CUTS THAT START clusters — both
+2021 cuts arrived with the flag at CALM, and Fitch's 2025-02-24 cut
+preceded the 2025-03-07 escalation. Agency staging signals lead our market
+composite at cluster onset; this is the empirical motivation for grading
+agency self-signals (outlook state, watch state, cross-agency momentum,
+review-calendar proximity) as first-class radar indicators (DG-R1, spec to
+follow separately). All figures above remain DESCRIPTIVE — n is small, no
+CI computed here, and nothing in this entry is a precision claim.
+
+**Surfaces:** shared extractor `src/server/ratings.ts`; `apiDomino4`
+delegates to it (its `/downgrades` page now serves corrected numbers
+computed live); new standalone Downgrade Radar site (branch
+`downgrade-radar`, port 8200: Radar / Indicators / Record / Method pages)
+computes everything live from the corrected merged event list.
+`ratings_bh.csv` stays git-ignored (Bloomberg license);
+`rating_outlook_bh.csv` is committed (free public sources, per-row
+provenance).
