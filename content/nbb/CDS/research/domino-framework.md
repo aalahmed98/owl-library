@@ -4361,3 +4361,42 @@ PRECISION beats outlook_neg_state alone at the cost of recall.
 
 **Script:** `scripts/research/dgr1-evaluate.mjs` (committed with this spec,
 UNRUN; output will be pinned to `dgr1-output.txt` in the results-commit).
+
+### DG-R1 RESULTS (single run, 2026-08-10; `scripts/research/dgr1-evaluate.mjs`, output pinned `dgr1-output.txt`) — agency staging beats chance; our own composite alarm confirmed near-base for THIS target
+
+Era 2017-06-01 → 2026-08-10, n = 19 target events. Verdicts under the
+frozen acceptance rule, 90d primary:
+
+| indicator | 90d RECALL | 90d PRECISION (episodes) | verdict |
+|---|---|---|---|
+| **outlook_neg_state** | **14/19 = 74% vs 49% · CI lift 1.19–1.84× EXCLUDES 1×** | 4/4 = 100% vs 35% | **LIVE — graded, beats chance** |
+| **composite_staging_plus_market** | **12/19 = 63% vs 38% · CI 1.11–2.07× EXCLUDES 1×** | 7/7 = 100% vs 35% | **LIVE — graded, beats chance** |
+| cds_widening_60d | 26% vs 23% (CI incl. 1×) | 45% vs 35% (CI incl. 1×); **45d precision 45% vs 20%, CI 1.23–3.19× excludes 1×** | measured — not proven (90d); its 45d precision is the strongest sub-90d market cell |
+| action_momentum_120d | 74% vs 56% (CI 0.94–1.60×) | 44% vs 35% (CI incl. 1×) | measured — not proven |
+| regime_alarm | 84% vs 70% (point 1.20×) | **29% vs 35% — BELOW base** | below-base for THIS target (prediction (ii) confirmed; C-R4v2's CDS-widening record unaffected) |
+| residual_widening_60d | 47% vs 58% (point 0.81×) | 47% vs 35% · CI 1.11–1.69× excludes 1× | below-base per the frozen rule (recall point ≤1×) — **recorded tension**: its precision cell is positive and CI-excluding; the frozen acceptance was recall∧precision and is applied as written |
+| wall_within_6m | 53% vs 67% (0.79×) | 38% vs 35% (1.07×) | below-base (recall ≤1×) |
+| watch_neg_state | no ON days in era | — | UNGRADABLE — zero CreditWatch placements since 2016; Bahrain's agencies have staged via OUTLOOK only in the modern era. Live monitoring continues; the literature's "90-day signal by design" simply hasn't occurred. |
+
+**Honesty annex (same run, no re-execution):** the two 100% precision cells
+are all-hit sets where the naive bootstrap is degenerate (CI 100–100%).
+Exact binomial (Clopper–Pearson) 90% lower bounds: 4/4 → ≥47.3% (lift
+≥1.35× vs the 35% base); 7/7 → ≥65.2% (lift ≥1.86×). Both still clear the
+base — the claim survives the honest interval, on tiny n, and is stated
+with it. DAYCOND companions (descriptive): outlook 56% vs 35%; composite
+63% vs 35% — consistent direction.
+
+**Predictions checked:** (i) CONFIRMED for outlook (largest recall lift);
+watch ungradable. (ii) CONFIRMED — regime_alarm precision below base.
+(iii) CONFIRMED as stated — CDS lead real at 45d precision, 90d CIs
+inclusive. (iv) CONFIRMED — composite precision 7/7 vs outlook's 4/4 at a
+recall cost (63% vs 74%).
+
+**What ships:** the radar front page's graded table (LIVE badges for the
+two winners with both baselines printed; below-base labels visible on the
+record page). The composite is THE radar headline object going forward:
+"agency has staged (fresh NEG outlook) AND the market confirms (regime
+alarm or CDS/residual widening)" — ON 32% of days, 7/7 graded episode
+starts followed by a negative action within 90 days, honest lower bound
+1.86× chance. n is small and stated everywhere. No thresholds may be
+touched without a new spec.
