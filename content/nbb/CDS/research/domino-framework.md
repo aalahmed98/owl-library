@@ -3433,6 +3433,40 @@ the CRITERION and its scope, so the set cannot be cherry-picked rule by rule.
 ### Single run (to follow immediately): compute per-rule era-2 records →
 excluded set → store param → implement placement → publish retrodicted diff.
 
+### P2-C9 RESULTS (single run, 2026-08-10; `scripts/research/p2c9-run.mjs`) — v4 LIVE; retrodicted effect essentially flat, published as-is
+
+**Excluded set (frozen criterion applied):**
+
+| Rule | Era-2 record | vs base | Verdict |
+|---|---|---|---|
+| curve/slope_20d | 5/62 = 8.1% | 14.14% | **DEMOTED** (solid n) |
+| fundamental/breakeven_gap | 1/8 = 12.5% | 17.84% | **DEMOTED** (small n) |
+| fundamental/rollover_wall | 0/3 | 17.84% | **DEMOTED** (tiny n) |
+| recovery/curve_uninversion | 0/3 | 13.86% | **DEMOTED** (tiny n) |
+| recovery/oil_above_breakeven | 0/1 | 17.84% | **DEMOTED** (already gated) |
+| curve/inversion | 10/41 = 24.4% | 14.14% | stays |
+| curve/level_pct | 5/28 = 17.9% | 14.14% | stays |
+| recovery/market_access | 3/15 = 20.0% | 17.84% | stays |
+| recovery/trend_reversal | 7/42 = 16.7% | 13.86% | stays |
+
+**Retrodicted v3→v4 diff (DESCRIPTIVE ONLY):** era-2 first-flag action items
+20 → 13. The seven demoted items carried **5 false positives and 2 hits** —
+including the **live 2026-06-15 breakeven_gap HIT (confluence 3)**. Action-list
+record 6/20 = 30% → 4/13 = **31%: essentially flat.** The criterion was
+frozen and is applied as written; the record is published as it landed, not as
+hoped. Any real gain must show up prospectively — that is the binding verdict.
+
+**Honest notes:** (i) breakeven_gap is demoted on n=8 with its most recent
+flag a live hit — the reinstatement path (future spec on live record) exists
+for exactly this case. (ii) The desk keeps Domino-1 coverage through the
+regime flag and oil tier (both out of scope); what leaves the action list is
+the rule's *first-flag card*, not the domino. (iii) Demoted flags render on
+the watch list under an explicit "below-base on the real reference (P2-C9)"
+label — nothing hidden.
+
+Composition history: v1 = P2-P1 · v2 = P2-P2 · v3 = P2-C7 · **v4 = P2-C9
+(LIVE 2026-08-10)**.
+
 ## APIs & data sources in use
 
 | Source | What | URL / notes |
