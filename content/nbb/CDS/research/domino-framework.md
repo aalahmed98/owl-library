@@ -4095,3 +4095,16 @@ prior; 2025-11 S&P: first-flag 25d prior; 2026-02 Fitch: 33d prior).
 P2-C5 base-rate confounder). The honest presentation line: "agency actions
 rarely arrived without the monitor having flagged first" — not "we predict
 downgrades".**
+
+### Correction-log entry (2026-08-10, presentation surfaces): pre-G-R1 claims scrubbed from the live pages
+
+An owner-directed page audit found the retired pre-G-R1 headline ("C-R4 47%,
+the only Bahrain lift CI excluding no-skill, audit-robust P≈1.2%") still
+displayed on /domino4's intro, the transition alert cards, and two API notes
+— all corrected to the real-CDS record (5/18 = 27.8%, CI 0.63×–2.50×,
+includes no-skill) with the retirement stated in place. Also corrected: the
+inversion claim text (EX-R1a bond-gap reframe), the cascade lead-time framing
+on /desk and /chain (scoped to oil-driven episodes), and the /domino4 audit
+trail (C-RET1 retirement labels). Every era-split record served by the APIs
+was verified equal to the alerts-table truth in the same audit. Nothing was
+re-graded; these were stale TEXT surfaces, not data.
