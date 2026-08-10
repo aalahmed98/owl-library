@@ -4280,3 +4280,84 @@ computes everything live from the corrected merged event list.
 `ratings_bh.csv` stays git-ignored (Bloomberg license);
 `rating_outlook_bh.csv` is committed (free public sources, per-row
 provenance).
+
+## Registered spec DG-R1 (2026-08-10): downgrade-radar indicator grading — written BEFORE the single evaluation run
+
+**Question.** Which of the indicators we hold (or have now seeded from free
+sources) actually lead Bahrain's negative rating actions at an ACTIONABLE
+horizon — early enough to act, not so early that the claim is luck?
+
+**Target variable (frozen).** Negative sovereign rating events = downgrade |
+watch-negative placement | outlook cut to NEG; one event per date×agency;
+corrected merged list (type-filtered Bloomberg extractor per EX-R1c-d +
+seeded `rating_outlook_bh.csv` transitions; dedup severity downgrade >
+watch > outlook). Era: **2017-06-01 → run date** (the regime flag and all
+market indicators exist; n = 19 as of spec date). Agencies: Moody's, S&P,
+Fitch, CI (Dagong coverage stale — excluded from state indicators, its
+2016 events remain in the target history).
+
+**Windows (frozen, the luck-trap design).** Primary **90d**; 45d reported
+alongside; **180d reported but BANNED as a headline** (unconditional chance
+≈ 50% — anything claimed there is luck dressed up). Minimum lead 2 days
+(indicator must be ON strictly 2–90d before the event; a same-day signal is
+reaction, not warning).
+
+**Per indicator, three measurements, each with its matched chance baseline:**
+- RECALL: share of target events with the indicator ON in [t−w, t−2d], vs
+  the any-day coverage of the same trailing condition (the EX-R1c method).
+- PRECISION: share of indicator ON-EPISODES (contiguous ON runs) whose
+  start is followed by ≥1 target event within w, vs the share of ALL days
+  followed by ≥1 event within w. Episodes younger than w are pending.
+- DAYCOND (descriptive companion, no CI): P(event within w | day ON) vs the
+  same unconditional forward base — reported because episode-start
+  precision under-credits long warning spells.
+90% bootstrap CIs on RECALL and PRECISION outcome sets (fixed-base lift
+bounds, same convention as the C-R4 records; seeded PRNG, printed n).
+
+**Indicator registry (ALL thresholds are frozen reuses of already-adopted
+objects or fixed constants declared here — nothing is tuned in this spec,
+and nothing may be adjusted after the run):**
+
+| id | definition | threshold provenance |
+|---|---|---|
+| outlook_neg_state | ≥1 of M/S&P/F/CI on NEG outlook, set ≤730d ago | freshness 730d fixed here |
+| watch_neg_state | ≥1 agency on CreditWatch/review-neg, set ≤365d ago | freshness 365d fixed here |
+| action_momentum_120d | ≥1 negative action (any agency) in trailing 120d | 120d fixed here; same-agency contribution included — stated limitation |
+| regime_alarm | live regime (C-R4v2 replay) in watch/distress | C-R4v2, adopted 2026-08-10 |
+| cds_widening_60d | 60d change in the composed grading-reference CDS ≥ era curve bar (50 CDS-era / 90 bbg-era) | C-R3 + G-R1 frozen bars |
+| residual_widening_60d | 60d change in derived.residual_bp ≥ stored residual_bars widen60 for the era (80/50/110) | P2-L1 stored param, read from DB at run time |
+| wall_within_6m | months_to_next_large_maturity ≤ 6 | P2-L3 frozen |
+| composite_staging_plus_market | outlook_neg_state AND (regime_alarm OR cds_widening_60d OR residual_widening_60d) | the ONE pre-registered composite — no other combination may be quoted |
+
+The review-calendar indicator is deliberately NOT graded here — it is
+RT-R1's registered object and keeps its own spec (live-only accumulator if
+history can't be reconstructed).
+
+**Note on inputs vs benchmark.** The CDS grading reference is used here as
+an INPUT because the target is agency actions, not CDS widening; hard rule
+2 (benchmark scoring-only) concerns flag-grading against `benchmark.*`,
+which this spec never touches. No indicator reads the target's future.
+Self-referential staging dynamics (watch placements are both target events
+and indicator state for LATER events) are inherent to "agencies stage their
+own actions" and are stated, not hidden; the ≥2d lead rule prevents an
+event from crediting itself.
+
+**Acceptance (frozen).** An indicator earns the LIVE "graded — beats
+chance" badge on the radar iff BOTH 90d RECALL and 90d PRECISION point
+lifts are > 1× AND ≥1 of the two 90% CIs excludes 1×. Point lifts > 1×
+with both CIs including 1× → "measured — not proven" badge. Any point lift
+≤ 1× at 90d → labeled below-base on the record page (kept visible, never
+deleted). Precision-vs-base-rate cannot degrade silently: every published
+number carries its base. ONE run; results-commit follows regardless of
+outcome.
+
+**Predictions on record (falsifiable).** (i) outlook_neg_state and
+watch_neg_state show the largest RECALL lifts (the literature's staging
+result: Fitch sovereign NEG-outlook→downgrade ~63% unconditional; watch ≈
+90d signal by design). (ii) regime_alarm 90d comes in near base per
+EX-R1c-d. (iii) cds_widening_60d shows a real but CI-inclusive lead
+(Ismailescu-Kazemi 1–3m EM result, n too small here). (iv) The composite's
+PRECISION beats outlook_neg_state alone at the cost of recall.
+
+**Script:** `scripts/research/dgr1-evaluate.mjs` (committed with this spec,
+UNRUN; output will be pinned to `dgr1-output.txt` in the results-commit).
