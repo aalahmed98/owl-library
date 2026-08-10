@@ -274,6 +274,46 @@ live context only — it is NOT part of the evaluated or any shipped signal.
 Discovered and amended before the evaluation script existed; no outcome was
 seen before this text was written.
 
+**C9/C10/C11 RESULTS (single run, 2026-08-10; reproducible via
+`scripts/research/d0c9-11-evaluate.mjs`, raw output pinned in
+`d0c9-11-output.txt`) — ALL THREE NOT ADOPTED.**
+
+Harness validation: the script's baseline reproduced the stored record exactly
+(39 flags = 39 stored `oil_stress` rows; 12h/27fp = 30.8%; episodes 15,
+first-flag hits 4).
+
+- **C9 (NFCI left-tail bonus): zero effect.** Flag set byte-identical to
+  baseline (39 flags, same dates). The three gates (NFCI > 0, tightening,
+  ≥70th pct) never coincided with a borderline composite day. Not adopted (no
+  change to adopt); the incrementality-over-OVX question is answered by
+  construction — none demonstrated.
+- **C10 (OVX variance-risk premium bonus): earlier but looser — fails the
+  bar.** 54 flags, 13 hits, precision 24.5% (−6.2pp; CI on the difference
+  −22.2…+9.7pp — inside noise, so not a CI-clearing degradation either, but
+  adoption required +5pp). The genuinely interesting DESCRIPTIVE result: C10
+  fired earlier in EVERY covered crash (2014: −3d, 2015: −1d, 2018-Q4: −9d,
+  2020: −1d, 2026: −6d) — the variance-risk premium does buy lead time, at the
+  price of ~15 extra false flags (≈1/yr) for 1 extra hit. NOT adopted. **Open
+  owner option, recorded for the future, NOT a recommendation:** the
+  noise-aware rule permits a spec that pre-commits an explicit
+  false-positive-vs-lead-time price; if earlier detection is ever valued at
+  ≈one extra false alarm per year, a C10 re-registration stating that price
+  would be protocol-legal. It would be a NEW spec with a NEW bar, not a
+  reopening of this one.
+- **C11 (crowding+unwind variant): a wash.** 40 flags, same 12 hits, 30.0%
+  (−0.8pp); episodes 14 with the same 4 first-flag hits (26.7%→28.6% — one
+  fewer episode, same hits). The GHR combination neither helped nor hurt at
+  crash scale. Not adopted (status quo holds on complexity grounds).
+
+**Standing conclusion after ELEVEN candidate experiments / 2 adoptions:** the
+four-component composite remains unbeaten by free data. The queue is now
+EXHAUSTED except #5 (Cushing×contango — manual capacity data) and the EIA-v2
+out-of-sample test (owner key). Crash-event coverage was preserved by all
+variants (6/6 incl. the contango-covered 2023-02). D0 accuracy improvement now
+runs through NEW DATA ONLY: the Bloomberg Brent strip export (D0-H1 hole) and
+the standing CDS export. `fred.hy_oas` (2023-08→) and `fred.nfci` (2010→)
+remain fetched as context series; neither feeds any signal.
+
 **C10 — OVX variance-risk premium bonus (queue #6).**
 NEW CONSTRUCTION from existing data: VRP = OVX² − RV21², where RV21 =
 annualized realized vol of `fred.brent` daily log returns over trailing 21 obs
