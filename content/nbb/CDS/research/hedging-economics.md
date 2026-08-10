@@ -1,271 +1,109 @@
 ---
 title: What Acting On These Warnings Is Actually Worth — Hedging Cost/Benefit
 tags: [cds, credit-risk, bahrain, banking]
-summary: Presentation notes. Break-even on a haircut-monitor flag is ~16%, far below 50%, because payoffs are asymmetric — now backed by a backtest on the ACTUAL record rather than assumed averages, and corrected for the gap between a graded hit and a tradeable win.
+summary: Presentation notes, rebuilt on the REAL CDS series (G-R1) with measured RPV01 and measured execution. Systematically buying protection on flags LOSES money under every configuration — the flags' value lives entirely in the free responses and in regime awareness. Every prior positive P&L figure in this doc's history was a proxy artifact and is retired.
 created: 2026-08-09
-updated: 2026-08-09
+updated: 2026-08-10
 status: draft
+space: shared
 ---
 
 # What Acting On These Warnings Is Actually Worth
 
-Presentation notes for the "but it's wrong most of the time" objection. Nothing
-here is a scoring input or a protocol object — it is decision framing built on
-top of the measured record, and its numbers must never feed back into any
-threshold or grading bar.
+Presentation notes for the "is this worth acting on" question. Nothing here is
+a scoring input or a protocol object — decision framing only; its numbers must
+never feed back into any threshold or grading bar.
 
-> **REVISION NOTE (2026-08-09).** This doc originally argued from per-trade
-> averages. Three findings from the same day forced corrections, all of which
-> make the argument *harder* to attack rather than softer:
-> 1. **A graded hit is not a tradeable win.** Grading measures the PEAK move
->    inside the window; a desk holding to expiry captures the END move. They
->    diverge badly, so the old per-trade figures were optimistic.
-> 2. **Part of the tier ladder is base-rate variation**, not signal.
-> 3. The old text repeated a claim — *"curve inversion ~9 months before the
->    2018 peak"* — that the framework **retired on 2026-08-08** as unverifiable.
->    Removed.
-> The headline conclusion survives all three, and is now backed by a backtest on
-> the actual record instead of assumed averages.
+> **REVISION v3 (2026-08-10) — SUPERSEDES EVERYTHING BELOW ITS OWN TABLES.**
+> Spec G-R1 replaced the grading reference with real Bloomberg CDS and exposed
+> a median 84.5bp proxy error. This doc's previous P&L — including the
+> "+$0.44m hold-to-expiry" and the "$1.8m filter swing" — was computed on that
+> proxy. The backtest is now REBUILT on the real series, with the measured
+> RPV01 curve (4.14→3.14 across the traded range, CDSW 2026-08-09) and
+> measured daily bid/ask execution, from a committed reproducible script
+> (`haircut-monitor/scripts/research/hedging-backtest.mjs`) instead of an
+> in-session analysis. Population: P2-P1 desk items (episode first-flags +
+> escalations) since Nov-2017; "action list" = confluence ≥2 (v2, retrodicted).
+> This population is defined more cleanly than the earlier ten-trade list, so
+> numbers are not item-for-item comparable with prior revisions — the script
+> reproduces the OLD frame's sign on the proxy (+$0.29m), confirming the
+> methodology, before showing what the real series does to it.
 
-## The objection, and why it misreads the number
+## The rebuilt backtest — real reference, measured costs
 
-> "43% means you're wrong more often than right — that's a coin flip."
+$10m notional, 6-month holds to expiry (no timing skill), enter on eligible
+item when no protection is on:
 
-**The comparison is to the base rate, not to 50%.** The grading bars are
-calibrated so a *random day* clears them ~18–20% of the time. A coin flip is 50%
-on a 50/50 event — zero information. 43% on an 18% event is information.
+| Configuration | Trades | Gross MTM | Carry | Execution | **NET** |
+|---|---|---|---|---|---|
+| **Action list (conf ≥2), real ref, measured RPV01 + execution** | 11 | +$0.30m | $1.33m | $0.76m | **−$1.79m (−17.9%)** |
+| Every desk item, same | 15 | +$0.30m | $1.83m | $1.09m | **−$2.63m (−26.3%)** |
+| Action list, real ref, flat 4.0, ZERO execution | 11 | +$0.35m | $1.33m | — | **−$0.97m** |
+| Action list, PROXY ref, flat 4.0, zero execution *(the old frame)* | 11 | +$1.38m | $1.09m | — | **+$0.29m** |
 
-**And 50% is not the break-even.** The payoffs are asymmetric, so the threshold
-for "worth acting on" is far lower — and computable.
+**The old positive number only ever existed on the proxy.** On the real series
+the strategy loses money before execution costs are even charged, and the loss
+deepens with every measured correction applied.
 
-## The break-even hit rate
+Winners: 3 of 11. The 2020-02-03 contango_flip remains the genuine article
+(+$436k net of all costs, 167→327bp). Everything else bleeds.
 
-Acting on a flag has positive expected value when
+## Why it loses — structural, not fixable by accuracy
 
-```
-    hit_rate  >  cost_when_wrong ÷ (payoff_when_right + cost_when_wrong)
-```
+**Carry dominates.** Bahrain trades ~170–380bp; six months of protection costs
+$85–190k per $10m. The flags' realized six-month moves on the real series
+average far less than that. Gross MTM across eleven trades was +$0.30m against
+$1.33m of carry — **the moves are real but small relative to what standing
+protection costs on a wide-spread credit.** A better hit rate does not fix
+this: grading measures peak-within-window against a ~50–90bp bar, while
+break-even on carry alone needs ~+45bp *retained to expiry* — different
+quantities. (Whether hedging only C-R4v2 escalations — 8/14 = 57% on the real
+series — clears carry is an open, untested question; no claim is made.)
 
-On a $10m Bahrain position hedged with 5Y CDS protection for six months, at a
-~312bp proxy spread. Mark-to-market ≈ spread change × risky duration
-(RPV01 ≈ 4.0) × notional. Carry ≈ spread × time held.
+Also retired with the proxy: the "$1.8m filter swing." On the real series the
+action list still ranks above hedging everything (−$1.79m vs −$2.63m, a $0.84m
+difference), but **both sides are deeply negative** — the filter chooses the
+less bad way to lose money on premium. That is not a selling point.
 
-| Assumption set | Payoff when right | Cost when wrong | **Break-even** |
-|---|---|---|---|
-| **Conservative** — hit sized at the grading bar (180bp); cost = full carry + adverse mark-to-market + round-trip bid/ask on a thin name | ~$720k | ~$250k | **~26%** |
-| **Middle** — hit at 250bp; cost = full carry + modest execution | ~$1.00m | ~$190k | **~16%** |
-| **Optimistic** — hit at 300bp+; cost = carry only | ~$1.20m | ~$156k | **~11%** |
+## What actually survives — and it is the point, not a consolation
 
-**Break-even lands around 16%, plausibly 26% under pessimistic execution.** Every
-tier from 1 upward clears it; tier 0 does not.
-
-## But hit rate is an UPPER BOUND on win rate
-
-This is the correction that matters most, and it is better to raise it yourself
-than to have it raised for you.
-
-The system grades a flag a **hit** if the spread widens past the bar *at any
-point* inside the window. A desk that buys protection and holds it to expiry
-captures whatever the spread is doing *at the end*. Those are different numbers:
-
-> **2018-05-21**, regime watch→distress. Peak **+245bp** — an unambiguous hit by
-> the grading rules. The spread ended the window at **−105bp**. Held to expiry
-> that trade **lost $610,000.**
-
-So a 43% hit rate does not mean 43% of trades make money. It means 43% of flags
-were followed by a move that, *if you timed the exit*, would have paid.
-
-## The backtest — actual record, actual spreads, actual moves
-
-Every action-list item since Nov-2017, no assumed averages. Fifty items collapse
-to **ten trades**, because forty fired while protection was already on.
-
-| Exit assumption | Profitable | Premium paid | **Net P&L** | Worst drawdown |
-|---|---|---|---|---|
-| **Hold to expiry** (no timing skill) | 4/10 | $0.99m | **+$0.44m (+4.4%)** | −$0.97m |
-| Exit at half the peak | 7/10 | $0.99m | +$2.28m (+22.8%) | −$0.08m |
-| Exit at the peak (unachievable) | 9/10 | $0.99m | +$5.54m (+55.4%) | −$0.02m |
-
-**The honest planning case is the first row: +4.4% of notional over 8.5 years**,
-before execution costs. Modest — and positive.
-
-### The number that justifies the filter
-
-| Strategy | Trades | Premium | Net |
-|---|---|---|---|
-| **Action list only** | 10 | $0.99m | **+$0.44m** |
-| **Every desk item** | 19 | $2.14m | **−$1.36m** |
-
-Acting on everything the system surfaces **loses 13.6% of notional.** Acting on
-the filtered list breaks into profit. That **$1.8m swing** is the strongest
-evidence the action list has, and it is denominated in money rather than
-percentages.
-
-### Concentration — say this before someone finds it
-
-Two trades made everything: **2020-02-03** oil/contango_flip (+$1.03m) and
-**2025-01-27** rollover_wall (+$1.01m). The other eight together lost
-**−$1.60m**. That is normal for tail-hedging and survivable, but it means the
-strategy is two events wide. Miss those and the decade is negative.
-
-## Does the flag beat simply being hedged through the same period?
-
-The sharpest challenge to any of this: *if your conditioners just identify
-turbulent periods, why not stay hedged through them and skip the flags?*
-Measured — comparing each tier's hit rate against the base rate prevailing in
-the periods it fires in:
-
-| Tier | Act on the flag | Hedge the whole period | **Flag advantage** |
-|---|---|---|---|
-| 3+ | +$322k | +$62k | **+$260k** |
-| 2 | +$215k | +$61k | **+$154k** |
-| 1 | +$60k | +$17k | +$43k |
-| 0 | −$71k | −$111k | +$40k |
-
-**Tier 3+ fires in periods running a 21.2% background rate and hits 43%** — it
-roughly doubles the period, worth **+$260k per trade** over just sitting hedged.
-The selection is doing real work.
-
-## What that says about each tier
-
-| Tier | Hit rate | Conservative (BE 26%) | Middle (BE 16%) |
-|---|---|---|---|
-| 0 confirmations | 10% | loses money | loses money |
-| 1 confirmation | 21% | ~breaks even | marginal |
-| 2 confirmations | 34% | profitable | profitable |
-| 3+ confirmations | **43%** | **profitable** | **clearly profitable** |
-| Whole desk record | 24% | break-even at best | profitable |
-
-**Required caveat, to be stated wherever this ladder appears:** part of the
-gradient is base-rate variation, not signal. Compared to the base rate
-prevailing in each state, the individual conditioners are weaker than their raw
-splits suggest — oil precursor 2.19× vs 1.21× (genuinely strong), compression
-1.67× vs 1.41×, **wall proximity 1.71× vs 1.59× (marginal — its headline
-"33% vs 7%" is mostly period, not signal)**, and attribution is negative on
-average. The ladder's *ordering* is real and the tier-vs-period table above shows
-the selection adds value; the raw gradient overstates how much.
-
-## Sizing by tier — PROPOSED, THEN REFUTED BY THE RECORD
-
-> **This section originally recommended weighting the top tier more heavily. The
-> backtest was then run and CONTRADICTED it. The recommendation is withdrawn.
-> The workings are kept because the failure is more instructive than the
-> proposal was.**
-
-### What was proposed
-
-Expected value per unit of risk, from the measured tier hit rates:
-
-| Tier | Hit rate | EV per unit |
-|---|---|---|
-| 3+ | 43% | +$322k |
-| 2 | 34% | +$215k |
-| 1 | 21% | +$60k |
-| 0 | 10% | −$71k |
-
-On that arithmetic, weighting tier 3+ roughly 2.5× tier 2 looked like it should
-raise return per unit of capital by ~50–100% with no new data.
-
-### What the record actually says
-
-Same ten trades, same premium spent, only the weights changed:
-
-| Policy | Trades | Profitable | Premium | **Net P&L** |
-|---|---|---|---|---|
-| **Uniform (today's policy)** | 10 | 4/10 | $0.99m | **+$0.44m (+4.4%)** |
-| **Tier-sized (3+ at 2.5×)** | 10 | 4/10 | $0.99m | **−$0.30m (−3.0%)** |
-
-**Sizing by tier cost $0.73m.** The reason is visible in the trade list: all
-three tier-3+ trades LOST money (−$0.10m, −$0.39m, −$0.12m), while both of the
-large winners — 2020-02-03 contango_flip (+$1.03m) and 2025-01-27 rollover_wall
-(+$1.01m) — were **tier 2**. Weighting the top tier concentrated capital into
-the losers.
-
-### Why the EV model misled, and what it means
-
-This is the peak-versus-expiry problem again, in its most expensive form.
-
-**The confluence tier predicts whether a flag gets GRADED a hit — not whether
-the trade makes money.** Grading asks whether the spread touched the bar at any
-point inside the window; P&L asks where the spread was when you closed. A
-tier-3+ item can clear the bar on a spike, revert, and lose money. Across these
-ten trades that is exactly what happened.
-
-So the tier ladder is a **credibility** measure, not a **sizing** signal. It
-earns its place deciding *what reaches the desk* — the action-list filter is
-still worth $1.8m versus hedging everything — but it does not tell you how much
-to put behind each item.
-
-### On "skip tier 0" — already shipped, no gain available
-
-The other half of the original recommendation was redundant. Measured on the
-current composition:
-
-| Tier | On action list | On watch list |
-|---|---|---|
-| 0 | **0** | 20 |
-| 1 | **0** | 47 |
-| 2 | 29 | 9 |
-| 3+ | 21 | 0 |
-
-Composition v3 (P2-C7) already requires ≥2 confirmations, so **tiers 0 and 1 are
-entirely excluded from the action list today.** There was no gain to capture;
-the policy was already in force.
-
-### Honest limits on this refutation
-
-- **n = 3 tier-3+ trades.** That is far too few to prove sizing is harmful. What
-  it does establish is that the EV model's case is **not supported by the only
-  realised evidence available**, which is enough to withdraw a recommendation.
-- The mechanism (hit ≠ P&L) is not a small-sample artifact — it is structural,
-  and it argues the EV model was measuring the wrong thing regardless of n.
-- **Nothing here says tier 3+ is worse than tier 2.** It says the tier ordering
-  measured on grading outcomes does not carry over to trading outcomes, and that
-  a sizing policy built on it has no evidential support.
-
-**Disposition: sizing stays uniform across the action list.** Revisit only if a
-persistence measure (see the signal-search tracker, N7) ever makes graded
-outcomes and traded outcomes agree.
-
-## Two effects the tables understate
-
-1. **The cheapest responses cost nothing.** "Don't add to the position" and
-   "don't roll into the next maturity" are free. Most flags warrant only those;
-   the premium-paying response is reserved for the top tier.
-2. **The real edge is the PRICE of the same insurance, not whether you hold it.**
-   Hedging at ~312bp versus after the blowout (2020 peaked ~536bp wider) is
-   roughly half price for identical cover. The lead time that discount is made of
-   is the measured **oil→credit median ~12 days** — *not* any curve-inversion
-   lead claim, which the framework retired as unverifiable on 2026-08-08.
+1. **The free responses are untouched by every number above.** "Don't add
+   $10m before a widening", "don't roll into the next maturity", "don't price
+   new exposure off a stale haircut" avoid the same mark-to-market the CDS
+   would capture, at zero carry and zero execution. Every cost line in the
+   table above is a cost of the PAID response only. A bank that already holds
+   Bahrain risk gets the entire value of the signal through the free menu.
+2. **The price-of-insurance asymmetry is still real.** Cover bought at
+   167bp (Feb-2020) versus after the blowout at 300+ is roughly half price for
+   identical protection — the measured oil→credit lead (~12 days) is what that
+   discount is made of. This argues for *timing unavoidable hedges*, not for
+   discretionary premium spending.
+3. **The cost-to-act gauge** (from the L-R1 salvage): measured round-trip
+   execution ran 20–30bp in 2018–2022 vs ~10bp in 2025–26. When the quoted
+   cost is in its stressed regime, the paid response is off the table
+   arithmetically and the free menu is the whole menu.
 
 ## The one-sentence version
 
-> *"Hedging Bahrain indiscriminately over the last decade would have cost about
-> 14% of the position. Hedging on our filtered signals roughly broke even to
-> slightly positive — and you'd have owned protection through COVID and through
-> the 2025 blowout. The system doesn't make money. It makes the insurance
-> approximately free."*
-
-That is more defensible than any accuracy percentage, and it is what the record
-actually supports.
+> *"Buying protection on our flags would have lost money in every configuration
+> we can measure — carry eats the moves. The system's value is not a trading
+> edge: it is knowing when NOT to add exposure, when not to roll, and what a
+> defensible haircut mark is — actions that cost nothing and avoid the same
+> losses the hedge would have captured."*
 
 ## Caveats to state out loud
 
-- Illustrative and order-of-magnitude; real P&L depends on hedge ratio, tenor and
-  execution.
-- **The backtest models ZERO bid/ask.** Realistic execution on ten round trips in
-  a thin name could plausibly erase the entire +$0.44m. This is the single
-  weakest assumption here.
-- **n = 10 trades.** Far too few for a confidence interval.
-- It is a backtest over a period the thresholds were partly shaped on.
-- **Liquidity risk:** the payoff column assumes you can sell protection into a
-  widened market at screen levels. In a genuine panic that market may not exist.
-- A hedge blunts a loss, it does not erase one — partial hedging is the norm.
-- Hold-to-maturity books feel mark-to-market differently; for those the value
-  shifts to *not adding exposure late in the chain*.
-- Tier hit rates carry wide CIs (top tier 24–62%, n=21).
-- **On "better data would help":** an earlier draft claimed licensed data would
-  add ~10–15pts to tier accuracy. That was speculation and is withdrawn. Every
-  free-data candidate tested since has been rejected, so the honest statement is
-  that real CDS history would make the *grading reference* cleaner, with an
-  unknown effect on accuracy.
+- Decision framing on n=11 trades; no confidence intervals claimed.
+- RPV01 curve measured on the 2026-08-09 discount curve; near-zero 2020 rates
+  imply a somewhat higher duration then (direction certain, magnitude
+  approximate — recorded in `bloomberg-terminal-record.md` §6).
+- Carry approximated as S×t (upfront-standardized contracts amortize to
+  roughly this); execution = entry half-spread + exit half-spread, measured
+  daily, 2018 median (14.75bp) used for the two pre-2018 dates.
+- The action list here is composition v2 retrodicted; the live v3 list accrues
+  only from 2026-08-08 and has no resolved items yet.
+- Population differs from this doc's earlier ten-trade list (which was
+  proxy-based and not script-reproducible); the frame-reproduction row is the
+  bridge between the two.
+- Tier hit rates and their base-rate caveats now live in the G-R1 results
+  (post-G-R1 ladder 10/15/29/39%); nothing here uses them as inputs.
