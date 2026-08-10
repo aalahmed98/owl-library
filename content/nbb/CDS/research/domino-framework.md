@@ -205,6 +205,110 @@ window for this one rule — that would be tuning the exam to the student. Stand
 conclusion after 8 experiments / 2 adoptions: the composite + fair grading is the
 system; free-data additions keep failing to clear it. Domino Zero is closed.
 
+### Registered spec D0-H1 — the Domino 0 → Domino 1 gap-trajectory handoff (direction / size / shakiness) — written 2026-08-10, BEFORE any implementation or run
+
+**This spec does NOT reopen the closed crash-alarm optimization.** The 8-experiment
+record above stands untouched: `oil_stress` composite, its thresholds, its grading,
+and its scorecard do not change. D0-H1 changes what Domino 0 *passes downstream* —
+the interface, not the alarm.
+
+**Motivation (the level-saturation problem, already measured).** Bahrain's fiscal
+breakeven (~$125+/bbl) has exceeded Brent for essentially the whole sample, so the
+gap LEVEL is a near-constant offset: the regime flag's breakeven-gap component
+(trailing-60d Brent average, `signals.ts` — labeled a phase-1 stand-in in the code
+itself) carries almost no daily information, and the cascade measurement showed the
+same saturation from the alert side (88.5% of credit alerts preceded by oil flags
+vs an 87% any-day baseline). The information is in the EXPECTED CHANGE of the gap,
+not its level. The futures strip is the market's own published expectation of the
+oil path — reading it requires no forecasting skill and makes no skill claim.
+
+**The three-part handoff.** Domino 0 emits, per country with
+`hasFiscalBreakeven: true` (Bahrain, Oman; Jordan N/A by construction):
+
+1. **Direction + size** — new derived series:
+   - `oil.deferred_usd` (new fetcher output, live from first fetch): the Brent
+     ~+6m deferred contract LEVEL already fetched by `oil-curve` (today only its
+     ratio is stored as `oil.contango_pct`; the level rides in meta).
+   - `oil_expected_usd`: live = `oil.deferred_usd`; history 2010-01→2024-04 =
+     `fred.brent` × (1 + `oil.contango_wti_pct`/100) — the WTI curve SHAPE applied
+     to Brent spot. This is a PROXY (declared, flagged on every surface that shows
+     pre-2026 history). 2024-04→first-live-fetch: null — **the hole covers the 2025
+     crisis; recorded as a data limitation, not papered over.** Bloomberg wishlist
+     item added: Brent futures-strip history export (CURVE) closes it.
+   - `derived.gap_forward_usd` = breakeven (vintage-correct `manual.breakeven_usd`
+     asof publication date; `params.breakeven_usd` fallback) − `oil_expected_usd`.
+   - `derived.gap_forward_chg20_usd` = gap_forward_usd(t) − gap_forward_usd(t−20
+     observations); null when <20 obs of history exist.
+   - `gapTrajectory` ∈ {widening, stable, narrowing}: widening iff chg20 ≥ +2.0
+     $/bbl; narrowing iff ≤ −2.0; else stable. **±$2.0/20obs is FROZEN at
+     registration** (≈3% of current Brent; a display classification, not a graded
+     threshold — changing it later requires a new spec version).
+   - Sign-convention note (why direction is the TREND of the forward gap, not
+     spot-minus-strip): naive risk-neutral reading of contango (deferred > spot ⇒
+     "market expects higher prices" ⇒ gap narrowing) contradicts the measured
+     empirical role of contango as an OVERSUPPLY/bearish signal (it is a scored
+     stress component of the siren; the Feb-2020 contango flip preceded the crash).
+     Differencing the strip against its own recent past removes the level bias
+     (risk premium / convenience yield) and keeps the reading direction-correct:
+     if the whole strip is sinking vs breakeven, the market is repricing the
+     forward gap wider.
+
+2. **Shakiness (uncertainty, NEVER direction)** —
+   - `oilVolState` ∈ {calm, elevated, extreme}: OVX (`fred.ovx`) trailing-3y
+     percentile with the siren's ≥200-obs warmup; <0.70 calm (reuses the siren's
+     frozen scoring-start percentile), 0.70–0.90 elevated, ≥0.90 extreme (0.90
+     declared and FROZEN here).
+   - Display band: gap_forward ± Brent_spot × (OVX/100) × √0.5 (standard
+     annualized-implied-vol scaling to a 6-month horizon). Rendered as a cone on
+     the UI; not stored as a series, not a truth claim — the "bands, not points"
+     principle applied to the oil leg.
+   - Realized 20-obs Brent vol may be shown as context alongside; it is
+     backward-looking by construction (the record shows realized measures confirm
+     crashes, they do not lead them) and must never gate or scale anything.
+
+3. **Interface** — additive only: new fields on `/api/oil` and the Domino-1
+   context surfaces (arrow + expected size + band next to the fundamental tier).
+   The handoff NEVER feeds the frozen regime score, NEVER suppresses, reorders,
+   or places alerts (desk composition v4 untouched), and is NEVER an input to any
+   grading. Signal-registry rows added below, status **context, unscored**.
+
+**Explicitly out of scope (each would be its own future spec):**
+- (a) swapping the regime flag's scored breakeven-gap component from trailing-avg
+  to strip-based — touches frozen v1; needs its own spec, one run, episode
+  preservation, precision-vs-base-rate bar, full regression guard;
+- (b) any conditioner/confirmation claim for the arrow — a future evaluation must
+  use the P2-C8 frame and cite the **N2 REJECTION** (oil-score level as a desk
+  conditioner failed base-rate-confounded; the arrow is a different object but
+  faces the same confounder until shown otherwise);
+- (c) beyond-market prediction (VRP #6, HY/NFCI #4, crowding+unwind #7) — still
+  queued, still untested, unchanged by this spec.
+
+**GUARD: the arrow is an UNGRADED presentation object** — same class as the Desk
+view. No accuracy, precision, or lift number may ever be quoted for
+`gapTrajectory` without first pre-registering that evaluation as its own spec.
+
+**Pre-registered DESCRIPTIVE measurement (ONE run at implementation; published
+as-is in the results-commit; no verdict, no adoption bar, no skill claim):** on
+the WTI-proxy history (2010→2024-04): (i) for each of the three graded crash
+episodes plus the 2018-Q4 near-miss, the calendar-day lead/lag between
+gapTrajectory first turning "widening" and the existing trailing-60d gap measure
+moving by the same $2; (ii) the total count of distinct "widening" episodes over
+the sample (the noise census — how often the arrow points down at nothing).
+
+**Shipping acceptance (engineering, not skill):** Bahrain/Oman/Jordan regression
+guard — every pre-existing API response byte-identical except the deliberate
+additive fields; `npm test` green; provenance registry updated in the same
+change. Rollout: fetcher addition (`oil.deferred_usd`) may ship first to start
+live accumulation; derived series + UI follow.
+
+**Signal-registry additions (status: context, unscored):**
+
+| Signal | Exact measure | Source (series) | Weight | Status |
+|---|---|---|---|---|
+| Forward gap | breakeven − market-expected Brent (~+6m) | `manual.breakeven_usd` − (`oil.deferred_usd` live; `fred.brent`×(1+`oil.contango_wti_pct`/100) hist proxy) | — | D0-H1, context only, unscored |
+| Gap trajectory | 20-obs change of forward gap; ±$2 → widening/stable/narrowing | `derived.gap_forward_chg20_usd` | — | D0-H1, frozen display classification, unscored |
+| Oil vol state | OVX 3y-percentile buckets 0.70/0.90; 6m band = spot·OVX·√0.5 | `fred.ovx` | — | D0-H1, uncertainty width only, never direction |
+
 ## Domino 1 — Oil below the fiscal breakeven
 
 The budget-balancing oil price for Bahrain is well above $100/bbl. Brent below it =
