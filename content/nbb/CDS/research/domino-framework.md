@@ -205,6 +205,83 @@ window for this one rule — that would be tuning the exam to the student. Stand
 conclusion after 8 experiments / 2 adoptions: the composite + fair grading is the
 system; free-data additions keep failing to clear it. Domino Zero is closed.
 
+### Candidates 9–11 — EXACT SPECS, written 2026-08-10 BEFORE any data fetch or run (queue items #4, #6, #7 — the owner-directed reopening)
+
+**Why the closure is being reopened, and under what discipline.** The owner asked
+for improved D0 accuracy and earlier detection. The instruction "keep trying
+until it improves" is EXPLICITLY converted here into its protocol-compatible
+form: the remaining evidence-backed queue items (#4, #6, #7) get ONE
+pre-registered shot each, all three specs frozen in this single commit before
+any candidate data is fetched, then evaluated in one script run. When these
+three shots are spent, the free-data queue is EXHAUSTED except #5
+(Cushing×contango — needs manual semiannual capacity data; stays queued) and
+the EIA-v2-key out-of-sample test (owner action). There is no fourth shot
+hiding behind a re-parameterization; if all three fail, D0 improves only
+through new data.
+
+**Multiplicity disclosure (stated before the run):** three simultaneous
+one-shot candidates raise the chance that one clears its bar by luck. The
+adoption bar below (≥5pp flag-level precision improvement + all crash events
+preserved) is deliberately above the noise-aware floor for this reason, and
+this paragraph is the standing caveat to attach to any adoption from this
+batch.
+
+**Shared evaluation frame (all three candidates):**
+- Baseline = the LIVE composite exactly as served (oilStressAt, frozen v1
+  thresholds), recomputed in the script for exactness.
+- Each candidate evaluated INDEPENDENTLY on the baseline (never stacked).
+- Flags: edge-triggered at score ≥50 as live; graded Brent −15%/45d with the
+  FP coverage guard; era = days the score exists.
+- ACCEPTANCE (frozen): adopt iff (a) every historically covered crash event
+  (2014-H2, 2015-16, 2018-Q4, 2020, 2023-02, 2026-05) retains ≥1 hit flag
+  in-window, AND (b) flag-level precision improves by ≥5 percentage points
+  over the baseline's. Precision degradation beyond bootstrap-CI overlap =
+  reject (noise-aware rule); anything in between = NOT adopted (status quo —
+  complexity is a cost). One run, adopt/reject recorded either way.
+- Secondary DESCRIPTIVE record (no bar): per crash event, the first-flag date
+  shift vs baseline (the "earlier detection" question) — reported, never a
+  criterion (guards against trading precision for lead-time invisibly).
+
+**C9 — financial-stress left-tail bonus (queue #4; Bjørnland–Hardy–Korobilis).**
+NEW DATA: FRED `BAMLH0A0HYM2` (US HY OAS, daily) + `NFCI` (Chicago Fed, weekly).
+- hyPct = trailing-3y percentile of HY OAS (≥200 obs warmup, staleness ≤7d).
+- Gates: HY OAS 15-obs change > 0 (stress RISING — high-but-falling post-crisis
+  readings score nothing) AND latest NFCI > 0 (tighter-than-average conditions;
+  the index's own published neutral line, not a tuned number; staleness ≤14d).
+- Bonus = clamp((hyPct − 0.70)/(0.97 − 0.70), 0, 1) × 10, added OUTSIDE the
+  renormalizing average (C3's bonus design — can never dilute).
+- All scaling constants reuse the house OVX percentile convention (0.70/0.97) —
+  chosen by convention, not by search.
+- DISCLOSED CAVEAT: NFCI is a revised series; FRED serves current-vintage
+  history, so the >0 gate carries revision lookahead the backtest cannot remove.
+  Any adoption inherits this caveat on every surface.
+- Incrementality-over-OVX (the queue's requirement) is enforced by the
+  acceptance bar itself: a bonus can only ADD flags, so precision can only
+  improve if the added flags are predominantly hits OVX-era scoring missed.
+
+**C10 — OVX variance-risk premium bonus (queue #6).**
+NEW CONSTRUCTION from existing data: VRP = OVX² − RV21², where RV21 =
+annualized realized vol of `fred.brent` daily log returns over trailing 21 obs
+(std × √252 × 100, vol points; VRP in %²-annualized).
+- vrpPct = trailing-3y percentile of VRP (≥200 obs); bonus =
+  clamp((vrpPct − 0.70)/(0.97 − 0.70), 0, 1) × 10, same bonus design.
+- Mechanism (anticipatory): VRP high = crash insurance expensive RELATIVE to
+  actual movement = the market bracing before realized vol arrives — the
+  published fix for "extreme OVX levels alone predict poorly."
+
+**C11 — crowding + unwind, crowd-component VARIANT (queue #7;
+Gorton–Hayashi–Rouwenhorst).** No new data; new combination of stored
+`cftc.mm_net_pct` (post-B1 publication-gated).
+- crowd_v2 points (replaces the v1 percentile scaling INSIDE the evaluated
+  variant only; live v1 untouched unless adopted): full 20 iff BOTH
+  (i) the trailing-3y percentile of MM net length reached ≥0.90 at any
+  observation within the trailing 60 calendar days, AND (ii) net length
+  declined over the last 3 reporting weeks (value now < value 3 reports ago —
+  liquidation begun); else 0. Binary by the paper's finding: positions per se
+  do NOT predict; only extreme-crowding-plus-unwind does.
+- Score recomputed from the engine's own components with crowd replaced,
+  renormalization unchanged.
+
 ### Registered spec D0-H1 — the Domino 0 → Domino 1 gap-trajectory handoff (direction / size / shakiness) — written 2026-08-10, BEFORE any implementation or run
 
 **This spec does NOT reopen the closed crash-alarm optimization.** The 8-experiment
