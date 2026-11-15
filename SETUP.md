@@ -6,7 +6,7 @@ owl-library is hosted at **https://archive.owl-library.com**. This guide is for 
 
 1. Open https://archive.owl-library.com and enter the **library password** (ask the owner).
 2. Pick who you are — **Haman** or **Ali**.
-3. First visit: set a **personal password** (min 4 chars, entered twice). Only a salted hash is stored on the server — nobody, including the host, can read it back. After that, every visit asks for it.
+3. First visit: set a **personal password** (min 12 chars, entered twice). Only a salted hash is stored on the server — nobody, including the host, can read it back. After that, every visit asks for it.
 
 Your identity is fixed for the session; to switch person, log out (⏻ in the header) and go through the flow again.
 
@@ -47,5 +47,7 @@ Every edit — browser or Claude-via-MCP — writes straight to the one live `co
 
 - **Forgot your personal password?** There's no reset flow — the host deletes your entry from `.auth.json` on the server and you set a new one at the picker. (Old MCP connector headers stop working until updated.)
 - **Folder names are visible to both people** — only docs are hidden. A folder holding only the other person's private docs just looks empty.
-- **The library password is a soft outer gate** (shared, not rate-limited). Real per-person separation comes from the personal passwords, but treat the site as "small trusted circle", not hardened multi-tenant hosting.
+- **The library password is the shared outer gate.** The host sets it in the `ARCHIVE_PASSWORD` environment variable (at least 12 characters; there is no default, and sign-in is refused until it is set). Real per-person separation comes from the personal passwords.
+- **Wrong guesses lock you out for a while.** Five wrong passwords from one address, on the website or the MCP endpoint, block that address for 15 minutes. Twenty-five wrong guesses at one password from anywhere block new addresses for 15 minutes; addresses that have signed in before keep working.
+- Treat the site as "small trusted circle", not hardened multi-tenant hosting.
 - Server restarts log everyone out of the website (sessions are in-memory); MCP connectors are unaffected.

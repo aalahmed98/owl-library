@@ -32,7 +32,7 @@ ${inner}
 </html>`;
 }
 
-export function loginPage(next: string, error: boolean): string {
+export function loginPage(next: string, error?: string): string {
   return authShell("Sign in", `
   <h1>Sign in</h1>
   <p class="muted small">Enter the library password to continue.</p>
@@ -41,7 +41,7 @@ export function loginPage(next: string, error: boolean): string {
     <label class="field">Password
       <input type="password" name="password" autocomplete="current-password" autofocus required>
     </label>
-    ${error ? '<p class="banner banner-warn">Wrong password.</p>' : ""}
+    ${error ? `<p class="banner banner-warn">${esc(error)}</p>` : ""}
     <button class="btn btn-primary auth-submit" type="submit">Enter</button>
   </form>`);
 }
@@ -77,13 +77,13 @@ export function identityFormPage(who: Identity, label: string, claimed: boolean,
   </form>`
     : `
   <h1>Welcome, ${esc(label)}</h1>
-  <p class="muted small">Set a personal password for your private docs. Only a hash is stored; nobody (including the host) can read it back.</p>
+  <p class="muted small">Set a personal password of at least 12 characters for your private docs. Only a hash is stored; nobody (including the host) can read it back.</p>
   <form method="post" action="/pick/${who}">
     <label class="field">Choose a password
-      <input type="password" name="password" autocomplete="new-password" minlength="4" autofocus required>
+      <input type="password" name="password" autocomplete="new-password" minlength="12" autofocus required>
     </label>
     <label class="field">Repeat it
-      <input type="password" name="confirm" autocomplete="new-password" minlength="4" required>
+      <input type="password" name="confirm" autocomplete="new-password" minlength="12" required>
     </label>
     ${error ? `<p class="banner banner-warn">${esc(error)}</p>` : ""}
     <button class="btn btn-primary auth-submit" type="submit">Set password &amp; enter</button>
