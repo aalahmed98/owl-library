@@ -30,7 +30,7 @@ Metadata: `.md` uses YAML frontmatter; `.html` uses `<title>` + `<meta name="arc
 
 ## MCP: Claude Code
 
-Registered via the project's `.mcp.json` — just open Claude Code in this repo and approve the `owl-library` server. Tools: `list_tree`, `read_doc`, `create_doc`, `update_doc`, `edit_doc`, `set_meta`, `delete_node` (→ trash), `move_node`, `create_folder`, `search`, `list_tags`.
+Registered via the project's `.mcp.json` — just open Claude Code in this repo and approve the `owl-library` server. Tools: `list_tree`, `read_doc`, `create_doc`, `update_doc`, `edit_doc`, `set_meta`, `delete_node` (→ trash), `move_node`, `create_folder`, `search`, `list_tags`. The local stdio server runs as admin (set `ARCHIVE_ROLE=guest` for a read-only one).
 
 Safety model: all paths are jailed to `content/`; deletes go to `content/.trash/`; every content write requires the `contentHash` from a fresh `read_doc`, so concurrent edits (e.g. the browser editor) are rejected as conflicts instead of clobbered.
 
@@ -59,9 +59,9 @@ Claude Desktop runs on Windows; this repo lives in WSL. The bridge is `bin/mcp.s
 - Re-run `npm run build` after changing `src/core` or `src/mcp` so Desktop picks up the new code (Claude Code uses `tsx` and always runs the latest source).
 - Sanity check from a Windows terminal: `wsl.exe -d Ubuntu -e /home/haman/nbb/owl-library/bin/mcp.sh`, then paste one line: `{"jsonrpc":"2.0","id":1,"method":"initialize","params":{"protocolVersion":"2025-06-18","capabilities":{},"clientInfo":{"name":"t","version":"0"}}}` — you should get a single-line JSON reply.
 
-## Remote access (second user, own machine)
+## Remote access (admin and guest)
 
-Site is hosted at `https://archive.owl-library.com` behind two-stage auth: a shared library password (`ARCHIVE_PASSWORD` env var, at least 12 characters, **no default**: website sign-in is refused until the host sets one), then a per-person identity (Haman/Ali) with a personal password (at least 12 characters) stored only as a scrypt hash in the gitignored `.auth.json`. Wrong guesses are rate-limited: 5 from one address, or 25 against one password from any addresses, lock that password check for 15 minutes (website and `/mcp` alike). Identity is an access boundary — each person's private docs (`space` field in doc metadata) are invisible to the other across the site and the MCP endpoint. See **[SETUP.md](SETUP.md)** for the walkthrough and `src/server/auth.ts` for the mechanics.
+Site is hosted at `https://archive.owl-library.com`. There are no user accounts, just two roles with one password each: **admin** (`ARCHIVE_ADMIN_PASSWORD`) may create, edit, move, rename and remove any doc or folder; **guest** (`ARCHIVE_GUEST_PASSWORD`) is read-only. Both passwords are set by the host as environment variables, must be at least 12 characters and must differ; there are **no defaults**, so a role whose password is missing cannot sign in. Read-only is enforced on the server for every route (a guest session may only send GET requests) and on `/mcp` (a guest connection only gets the read tools). Wrong guesses are rate-limited: 5 from one address, or 25 against one role from any addresses, lock that role's sign-in for 15 minutes. See **[SETUP.md](SETUP.md)** for the walkthrough and `src/server/auth.ts` for the mechanics.
 
 ## Troubleshooting
 

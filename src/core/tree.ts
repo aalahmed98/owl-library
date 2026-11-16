@@ -2,7 +2,7 @@ import fs from "node:fs/promises";
 import path from "node:path";
 import { CONTENT_DIR, TRASH_DIR_NAME, formatOf, DocFormat } from "./config.js";
 import { resolveContentPath, toRelPath, isSidecar } from "./paths.js";
-import { extractDoc, DEFAULT_SPACE, DocSpace, Identity, visibleTo } from "./meta.js";
+import { extractDoc } from "./meta.js";
 
 export interface DocNode {
   kind: "doc";
@@ -17,8 +17,6 @@ export interface DocNode {
   created?: string;
   /** File mtime, YYYY-MM-DD — fallback recency signal when `created` is absent. */
   modified: string;
-  /** Draft/published tab this doc shows under; falls back to DEFAULT_SPACE when unset. */
-  space: DocSpace;
 }
 
 export interface FolderNode {
@@ -71,30 +69,15 @@ export async function buildTree(rel = "", depth = Infinity): Promise<FolderNode>
         status: meta.status,
         created: meta.created,
         modified,
-        space: meta.space ?? DEFAULT_SPACE,
       });
     } catch {
       node.children.push({
         kind: "doc", name: e.name, path: childRel, format: fmt,
-        title: e.name, tags: [], modified, space: DEFAULT_SPACE,
+        title: e.name, tags: [], modified,
       });
     }
   }
   return node;
-}
-
-/**
- * Prune docs this person cannot see. Folders are shared structure and always
- * remain visible (one containing only the other person's private docs shows as empty).
- */
-export function filterTreeVisible(root: FolderNode, identity: Identity): FolderNode {
-  return {
-    ...root,
-    children: root.children.flatMap((c): TreeNode[] => {
-      if (c.kind === "folder") return [filterTreeVisible(c, identity)];
-      return visibleTo(c.space, identity) ? [c] : [];
-    }),
-  };
 }
 
 /** All docs in a built tree, flattened. */

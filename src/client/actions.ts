@@ -1,5 +1,6 @@
-// Archive mutations from the browser: move dialog, rename, new folder, and
-// the "Organize" button on raw notes docs. Buttons are matched by js-* classes.
+// Archive mutations from the browser: move dialog, rename, delete, new folder,
+// and the "Organize" button on raw notes docs. Buttons are matched by js-* classes
+// and are only rendered for the admin; the server rejects these calls from a guest.
 
 function escHtml(s: string): string {
   return s.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;");
@@ -101,16 +102,15 @@ async function newFolder(parent: string): Promise<void> {
   }
 }
 
-async function toggleSpace(btn: HTMLButtonElement): Promise<void> {
-  const path = btn.dataset.path ?? "";
-  const next = btn.dataset.next ?? "shared";
-  btn.disabled = true;
+async function deleteNode(path: string, kind: string): Promise<void> {
+  const what = kind === "folder" ? `the folder "${path}" and everything in it` : `"${path}"`;
+  if (!confirm(`Delete ${what}?\n\nIt is moved to the trash on the server, not erased.`)) return;
   try {
-    await api("/api/space", { path, space: next });
-    location.reload();
+    await api("/api/delete", { path });
+    const parent = path.includes("/") ? path.slice(0, path.lastIndexOf("/")) : "";
+    location.href = parent ? `/folder/${encodeURI(parent)}` : "/";
   } catch (err) {
-    alert(`Change failed: ${err instanceof Error ? err.message : err}`);
-    btn.disabled = false;
+    alert(`Delete failed: ${err instanceof Error ? err.message : err}`);
   }
 }
 
@@ -136,5 +136,5 @@ document.addEventListener("click", (e) => {
   else if (btn.classList.contains("js-rename")) void renameNode(btn.dataset.path ?? "", btn.dataset.kind ?? "doc");
   else if (btn.classList.contains("js-newfolder")) void newFolder(btn.dataset.parent ?? "");
   else if (btn.classList.contains("js-organize")) void organize(btn as HTMLButtonElement);
-  else if (btn.classList.contains("js-space")) void toggleSpace(btn as HTMLButtonElement);
+  else if (btn.classList.contains("js-delete")) void deleteNode(btn.dataset.path ?? "", btn.dataset.kind ?? "doc");
 });

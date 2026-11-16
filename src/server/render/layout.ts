@@ -1,3 +1,5 @@
+import { ROLE_LABEL, type Role } from "../../core/role.js";
+
 export function esc(s: string): string {
   return s
     .replace(/&/g, "&amp;")
@@ -17,12 +19,12 @@ export interface LayoutOptions {
   scripts?: string;
   /** Right rail (e.g. TOC); omitted = two-column layout. */
   rail?: string;
-  /** The signed-in person; identity is fixed per session (switching = logout). */
-  identity: "haman" | "ali";
+  /** How this session is signed in; fixed per session (switching = logout). */
+  role: Role;
 }
 
 export function layout(o: LayoutOptions): string {
-  const label = o.identity === "ali" ? "Ali" : "Haman";
+  const label = ROLE_LABEL[o.role];
   return `<!doctype html>
 <html lang="en">
 <head>
@@ -48,7 +50,7 @@ export function layout(o: LayoutOptions): string {
     <input id="search-input" type="search" placeholder="Search the library…" autocomplete="off">
     <div id="search-results" class="search-results" hidden></div>
   </div>
-  <span class="whoami" title="Switch person by logging out">${label}</span>
+  <span class="whoami" title="${o.role === "admin" ? "Full access" : "Read only"}. Log out to switch.">${label}</span>
   <button id="theme-toggle" class="icon-btn" title="Toggle theme" aria-label="Toggle theme">◐</button>
   <form class="logout-form" method="post" action="/logout"><button class="icon-btn" type="submit">Log out</button></form>
 </header>

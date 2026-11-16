@@ -6,16 +6,6 @@ import { formatOf } from "./config.js";
 import { sidecarPathFor, resolveContentPath, toRelPath } from "./paths.js";
 
 export type DocStatus = "draft" | "final" | "archived";
-export type DocSpace = "haman" | "ali" | "shared";
-export type Identity = "haman" | "ali";
-/** Untagged docs (everything predating the visibility system) are Haman's private docs. */
-export const DEFAULT_SPACE: DocSpace = "haman";
-
-/** Whether a doc with this space is visible to this person. Private docs are only visible to their owner. */
-export function visibleTo(space: DocSpace | undefined, identity: Identity): boolean {
-  const s = space ?? DEFAULT_SPACE;
-  return s === "shared" || s === identity;
-}
 
 export interface DocMeta {
   title: string;
@@ -26,8 +16,6 @@ export interface DocMeta {
   status?: DocStatus;
   source?: string;
   authors?: string[];
-  /** Visibility: "haman"/"ali" = that person's private doc (invisible to the other), "shared" = both. Missing = DEFAULT_SPACE. */
-  space?: DocSpace;
 }
 
 export interface ExtractedDoc {
@@ -37,7 +25,7 @@ export interface ExtractedDoc {
   headings: string[];
 }
 
-const HTML_META_KEYS = ["tags", "summary", "created", "updated", "status", "source", "authors", "space"] as const;
+const HTML_META_KEYS = ["tags", "summary", "created", "updated", "status", "source", "authors"] as const;
 
 function titleFromFilename(absPath: string): string {
   return path.basename(absPath).replace(/\.(md|html?|pdf)$/i, "").replace(/[-_]+/g, " ");
@@ -49,7 +37,6 @@ function normalizeMeta(raw: Record<string, unknown>, absPath: string): DocMeta {
   const asStr = (v: unknown): string | undefined =>
     typeof v === "string" && v.trim() ? v.trim() : v instanceof Date ? v.toISOString().slice(0, 10) : undefined;
   const status = asStr(raw.status);
-  const space = asStr(raw.space);
   return {
     title: asStr(raw.title) ?? titleFromFilename(absPath),
     tags: asArray(raw.tags).map((t) => t.toLowerCase()),
@@ -59,7 +46,6 @@ function normalizeMeta(raw: Record<string, unknown>, absPath: string): DocMeta {
     status: status === "draft" || status === "final" || status === "archived" ? status : undefined,
     source: asStr(raw.source),
     authors: asArray(raw.authors).length ? asArray(raw.authors) : undefined,
-    space: space === "haman" || space === "ali" || space === "shared" ? space : undefined,
   };
 }
 

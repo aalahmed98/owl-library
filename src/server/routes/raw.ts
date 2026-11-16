@@ -2,9 +2,6 @@ import type { FastifyInstance } from "fastify";
 import fs from "node:fs";
 import path from "node:path";
 import { resolveContentPath, isInTrash, PathError, toRelPath } from "../../core/paths.js";
-import { formatOf } from "../../core/config.js";
-import { extractDoc, visibleTo } from "../../core/meta.js";
-import { currentIdentity } from "../auth.js";
 
 const MIME: Record<string, string> = {
   ".html": "text/html; charset=utf-8",
@@ -22,6 +19,8 @@ const MIME: Record<string, string> = {
   ".txt": "text/plain; charset=utf-8",
 };
 
+// Readable by any signed-in session (admin or guest); the auth preHandler
+// has already turned away anyone who is not signed in.
 export function registerRawRoutes(app: FastifyInstance): void {
   app.get<{ Params: { "*": string } }>("/raw/*", async (req, reply) => {
     const rel = req.params["*"];
@@ -34,12 +33,6 @@ export function registerRawRoutes(app: FastifyInstance): void {
     }
     if (isInTrash(toRelPath(abs))) return reply.code(404).send("not found");
     if (!fs.existsSync(abs) || !fs.statSync(abs).isFile()) return reply.code(404).send("not found");
-    // documents carry visibility metadata; other assets (images etc.) don't and pass through
-    if (formatOf(abs)) {
-      const identity = currentIdentity(req);
-      const { meta } = await extractDoc(abs);
-      if (!identity || !visibleTo(meta.space, identity)) return reply.code(404).send("not found");
-    }
     const mime = MIME[path.extname(abs).toLowerCase()] ?? "application/octet-stream";
     reply.header("content-type", mime);
     // belt & braces alongside the iframe sandbox attribute

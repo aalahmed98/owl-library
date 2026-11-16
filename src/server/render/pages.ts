@@ -4,16 +4,10 @@ import { SearchHit } from "../../core/search.js";
 import { TocEntry } from "../markdown.js";
 import { isRawNotesDoc } from "../organize.js";
 import { esc, layout } from "./layout.js";
+import { canWrite, type Role } from "../../core/role.js";
 
 const FORMAT_LABEL: Record<string, string> = { md: "Markdown", html: "Interactive", pdf: "PDF" };
 
-type Identity = "haman" | "ali";
-
-function spaceBadge(space: string): string {
-  return space === "shared"
-    ? '<span class="badge badge-shared">Shared</span>'
-    : '<span class="badge badge-private">Private</span>';
-}
 
 function tagChips(tags: string[]): string {
   if (!tags.length) return "";
@@ -32,10 +26,9 @@ function breadcrumbs(relPath: string): string {
   return `<nav class="breadcrumbs"><a href="/">library</a>${links.map((l) => " / " + l).join("")}</nav>`;
 }
 
-function docRow(d: DocNode, opts?: { showSpace?: boolean }): string {
-  const space = opts?.showSpace === false ? "" : spaceBadge(d.space);
+function docRow(d: DocNode): string {
   return `<a class="index-row" href="/doc/${encodeURI(d.path)}">
-<span class="ix-main"><span class="ix-title">${esc(d.title)}</span> <span class="badge badge-${d.format}">${FORMAT_LABEL[d.format]}</span>${space}</span>
+<span class="ix-main"><span class="ix-title">${esc(d.title)}</span> <span class="badge badge-${d.format}">${FORMAT_LABEL[d.format]}</span></span>
 <span class="ix-date" title="${d.created ? "created" : "modified"}">${esc(d.created ?? d.modified)}</span>
 <span class="ix-path">${esc(d.path)}</span>
 </a>`;
@@ -66,29 +59,27 @@ export function homePage(
   sidebar: string,
   root: FolderNode,
   tagList: { tag: string; count: number }[],
-  sharedRecent: DocNode[],
-  personalRecent: DocNode[],
-  identity: Identity,
+  recent: DocNode[],
+  role: Role,
 ): string {
-  return layout({
-    title: "Home",
-    sidebar,
-    identity,
-    content: `
-<div class="page-head">
-  <h1>Owl Library</h1>
+  const actions = canWrite(role)
+    ? `
   <div class="doc-actions">
     <a class="btn btn-primary" href="/new">+ New doc</a>
     <button class="btn js-newfolder" data-parent="">+ New folder</button>
-  </div>
+  </div>`
+    : "";
+  return layout({
+    title: "Home",
+    sidebar,
+    role,
+    content: `
+<div class="page-head">
+  <h1>Owl Library</h1>${actions}
 </div>
 <section class="home-section">
-${catalogH("Shared", sharedRecent.length, "Visible to both of you.")}
-${indexList(sharedRecent.map((d) => docRow(d, { showSpace: false })), "Nothing shared yet.")}
-</section>
-<section class="home-section">
-${catalogH("Private", personalRecent.length, "Only you can see these. Use “Make shared” on a doc when it's ready.")}
-${indexList(personalRecent.map((d) => docRow(d, { showSpace: false })), "No private docs yet.")}
+${catalogH("Recent", recent.length)}
+${indexList(recent.map((d) => docRow(d)), "Nothing here yet.")}
 </section>
 <section class="home-section">
 ${catalogH("Browse", root.children.length)}
@@ -99,37 +90,36 @@ ${catalogH("Tags", tagList.length)}
   });
 }
 
-export function folderPage(sidebar: string, folder: FolderNode, identity: Identity): string {
-  return layout({
-    title: folder.name,
-    sidebar,
-    identity,
-    content: `
-${breadcrumbs(folder.path + "/x")}
-<div class="page-head">
-  <h1>${esc(folder.name)}/</h1>
+export function folderPage(sidebar: string, folder: FolderNode, role: Role): string {
+  const actions = canWrite(role)
+    ? `
   <div class="doc-actions">
     <a class="btn btn-primary" href="/new?folder=${encodeURIComponent(folder.path)}">+ New doc</a>
     <button class="btn js-newfolder" data-parent="${esc(folder.path)}">+ New folder</button>
-    <button class="btn js-move" data-path="${esc(folder.path)}" data-kind="folder">Move…</button>
-    <button class="btn js-rename" data-path="${esc(folder.path)}" data-kind="folder">Rename</button>
-  </div>
+    ${nodeActions(folder.path, "folder")}
+  </div>`
+    : "";
+  return layout({
+    title: folder.name,
+    sidebar,
+    role,
+    content: `
+${breadcrumbs(folder.path + "/x")}
+<div class="page-head">
+  <h1>${esc(folder.name)}/</h1>${actions}
 </div>
 ${indexList(nodeRows(folder.children), "This folder is empty.")}`,
   });
 }
 
 function docHeader(doc: DocRead, actions: string): string {
-  const isShared = doc.meta.space === "shared";
-  const toggleBtn = `<button class="btn js-space" data-path="${esc(doc.path)}" data-next="${isShared ? "private" : "shared"}" title="${isShared ? "Only you will see this doc" : "Both of you will see this doc"}">${isShared ? "Make private" : "Make shared"}</button>`;
   return `${breadcrumbs(doc.path)}
 <div class="doc-header">
   <h1 class="doc-title">${esc(doc.meta.title)}</h1>
-  <div class="doc-actions">${toggleBtn}${actions}</div>
+  <div class="doc-actions">${actions}</div>
 </div>
 <p class="doc-meta">
   <span class="badge badge-${doc.format}">${FORMAT_LABEL[doc.format]}</span>
-  ${spaceBadge(doc.meta.space ?? "private")}
   ${doc.meta.status ? `<span class="badge">${esc(doc.meta.status)}</span>` : ""}
   ${doc.meta.updated ? `<span class="muted">updated ${esc(doc.meta.updated)}</span>` : ""}
   ${tagChips(doc.meta.tags)}
@@ -140,25 +130,27 @@ ${doc.meta.summary ? `<p class="doc-summary">${esc(doc.meta.summary)}</p>` : ""}
 
 const fullscreenBtn = `<button id="fullscreen-btn" class="btn" title="Fullscreen (f)">Fullscreen</button>`;
 
+/** Move / rename / delete controls. Only ever rendered for the admin. */
 function nodeActions(relPath: string, kind: "doc" | "folder"): string {
-  return `<button class="btn js-move" data-path="${esc(relPath)}" data-kind="${kind}">Move…</button><button class="btn js-rename" data-path="${esc(relPath)}" data-kind="${kind}">Rename</button>`;
+  return `<button class="btn js-move" data-path="${esc(relPath)}" data-kind="${kind}">Move…</button><button class="btn js-rename" data-path="${esc(relPath)}" data-kind="${kind}">Rename</button><button class="btn js-delete" data-path="${esc(relPath)}" data-kind="${kind}">Delete</button>`;
 }
 
-export function markdownDocPage(sidebar: string, doc: DocRead, html: string, toc: TocEntry[], identity: Identity): string {
+export function markdownDocPage(sidebar: string, doc: DocRead, html: string, toc: TocEntry[], role: Role): string {
+  const admin = canWrite(role);
   const rail = toc.length
     ? `<div class="toc"><p class="toc-title">On this page</p>
 ${toc.map((t) => `<a class="toc-link toc-d${t.depth}" href="#${esc(t.id)}">${esc(t.text)}</a>`).join("\n")}
 </div>`
     : undefined;
-  const organizeBtn = isRawNotesDoc(doc.content)
+  const organizeBtn = admin && isRawNotesDoc(doc.content)
     ? `<button class="btn btn-primary js-organize" data-path="${esc(doc.path)}" title="Organize these raw notes with AI">Organize</button>`
     : "";
   return layout({
     title: doc.meta.title,
     sidebar,
     rail,
-    identity,
-    content: `${docHeader(doc, `${organizeBtn}${fullscreenBtn}${nodeActions(doc.path, "doc")}<a class="btn" href="/edit/${encodeURI(doc.path)}">Edit</a>`)}
+    role,
+    content: `${docHeader(doc, `${organizeBtn}${fullscreenBtn}${admin ? `${nodeActions(doc.path, "doc")}<a class="btn" href="/edit/${encodeURI(doc.path)}">Edit</a>` : ""}`)}
 <div id="doc-view" class="doc-view">
 <article class="prose">
 ${html}
@@ -167,33 +159,33 @@ ${html}
   });
 }
 
-export function htmlDocPage(sidebar: string, doc: DocRead, identity: Identity): string {
+export function htmlDocPage(sidebar: string, doc: DocRead, role: Role): string {
   const raw = `/raw/${encodeURI(doc.path)}`;
   return layout({
     title: doc.meta.title,
     sidebar,
-    identity,
-    content: `${docHeader(doc, `${fullscreenBtn}${nodeActions(doc.path, "doc")}<a class="btn" href="${raw}" target="_blank" rel="noopener">Open raw ↗</a>`)}
+    role,
+    content: `${docHeader(doc, `${fullscreenBtn}${canWrite(role) ? nodeActions(doc.path, "doc") : ""}<a class="btn" href="${raw}" target="_blank" rel="noopener">Open raw ↗</a>`)}
 <iframe id="doc-view" class="paper-frame" sandbox="allow-scripts" src="${raw}" title="${esc(doc.meta.title)}"></iframe>`,
   });
 }
 
-export function pdfDocPage(sidebar: string, doc: DocRead, identity: Identity): string {
+export function pdfDocPage(sidebar: string, doc: DocRead, role: Role): string {
   const raw = `/raw/${encodeURI(doc.path)}`;
   return layout({
     title: doc.meta.title,
     sidebar,
-    identity,
-    content: `${docHeader(doc, `${fullscreenBtn}${nodeActions(doc.path, "doc")}<a class="btn" href="${raw}" target="_blank" rel="noopener">Open raw ↗</a>`)}
+    role,
+    content: `${docHeader(doc, `${fullscreenBtn}${canWrite(role) ? nodeActions(doc.path, "doc") : ""}<a class="btn" href="${raw}" target="_blank" rel="noopener">Open raw ↗</a>`)}
 <iframe id="doc-view" class="pdf-frame" src="${raw}" title="${esc(doc.meta.title)}"></iframe>`,
   });
 }
 
-export function searchPage(sidebar: string, query: string, hits: SearchHit[], identity: Identity): string {
+export function searchPage(sidebar: string, query: string, hits: SearchHit[], role: Role): string {
   return layout({
     title: query ? `Search: ${query}` : "Search",
     sidebar,
-    identity,
+    role,
     content: `
 <h1>Search</h1>
 <form method="get" action="/search" class="search-form">
@@ -207,7 +199,7 @@ ${
 <div class="index-list results">${hits
           .map(
             (h) => `<a class="index-row" href="/doc/${encodeURI(h.path)}">
-<span class="ix-main"><span class="ix-title">${esc(h.title)}</span> <span class="badge badge-${h.format}">${FORMAT_LABEL[h.format] ?? h.format}</span>${spaceBadge(h.space)}</span>
+<span class="ix-main"><span class="ix-title">${esc(h.title)}</span> <span class="badge badge-${h.format}">${FORMAT_LABEL[h.format] ?? h.format}</span></span>
 <span class="ix-path">${esc(h.path)}</span>
 <span class="ix-snippet">${esc(h.snippet)}</span>
 ${h.tags.length ? `<span class="ix-tags">${h.tags.map(esc).join(" · ")}</span>` : ""}
@@ -220,11 +212,11 @@ ${h.tags.length ? `<span class="ix-tags">${h.tags.map(esc).join(" · ")}</span>`
   });
 }
 
-export function editPage(sidebar: string, doc: DocRead, identity: Identity): string {
+export function editPage(sidebar: string, doc: DocRead, role: Role): string {
   return layout({
     title: `Edit: ${doc.meta.title}`,
     sidebar,
-    identity,
+    role,
     content: `${breadcrumbs(doc.path)}
 <div class="doc-header">
   <h1 class="doc-title">Editing ${esc(doc.meta.title)}</h1>
@@ -242,14 +234,14 @@ export function editPage(sidebar: string, doc: DocRead, identity: Identity): str
   });
 }
 
-export function newDocPage(sidebar: string, folders: string[], initialFolder: string, identity: Identity): string {
+export function newDocPage(sidebar: string, folders: string[], initialFolder: string, role: Role): string {
   const options = folders
     .map((f) => `<option value="${esc(f)}"${f === initialFolder ? " selected" : ""}>${f === "" ? "(root)" : esc(f)}</option>`)
     .join("");
   return layout({
     title: "New document",
     sidebar,
-    identity,
+    role,
     content: `
 <h1>New document</h1>
 <div id="new-doc" class="new-doc">
@@ -266,12 +258,6 @@ export function newDocPage(sidebar: string, folders: string[], initialFolder: st
   </label>
   <label class="field">Folder
     <select id="nd-folder">${options}</select>
-  </label>
-  <label class="field">Visibility
-    <select id="nd-space">
-      <option value="private" selected>Private: only you (${identity === "ali" ? "Ali" : "Haman"})</option>
-      <option value="shared">Shared: both of you</option>
-    </select>
   </label>
   <label class="field">Tags <span class="muted">(comma-separated, optional)</span>
     <input id="nd-tags" type="text" placeholder="repo, money-market">
@@ -292,11 +278,11 @@ export function newDocPage(sidebar: string, folders: string[], initialFolder: st
   });
 }
 
-export function errorPage(sidebar: string, status: number, message: string, identity: Identity): string {
+export function errorPage(sidebar: string, status: number, message: string, role: Role): string {
   return layout({
     title: `${status}`,
     sidebar,
-    identity,
+    role,
     content: `<h1>${status}</h1><p>${esc(message)}</p><p><a href="/">← back to the library</a></p>`,
   });
 }

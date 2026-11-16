@@ -12,7 +12,6 @@ if (host) {
   const titleEl = $<HTMLInputElement>("nd-title");
   const fileEl = $<HTMLInputElement>("nd-filename");
   const folderEl = $<HTMLSelectElement>("nd-folder");
-  const spaceEl = $<HTMLSelectElement>("nd-space");
   const tagsEl = $<HTMLInputElement>("nd-tags");
   const situationEl = $<HTMLTextAreaElement>("nd-situation");
   const notesEl = $<HTMLTextAreaElement>("nd-notes");
@@ -66,7 +65,7 @@ if (host) {
     createBtn.disabled = true;
     statusEl.textContent = "Creating…";
     try {
-      await api("/api/create", { path, content, meta: { title, tags, status: "draft", space: spaceEl.value } });
+      await api("/api/create", { path, content, meta: { title, tags, status: "draft" } });
     } catch (err) {
       createBtn.disabled = false;
       statusEl.textContent = "";

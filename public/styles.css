@@ -552,3 +552,9 @@ dialog.move-dialog code { font-family: var(--font-mono); font-size: 0.9em; backg
 
 /* ── misc ───────────────────────────────────────────── */
 .home-section { margin-bottom: var(--space-2); }
+
+/* sign-in role choice: the two cards are radio labels */
+.picker-choice { cursor: pointer; position: relative; }
+.picker-choice input { accent-color: var(--color-accent); margin: 0; }
+.picker-choice:has(input:checked) { border-color: var(--color-accent); background: var(--color-accent-soft); }
+.picker-choice:has(input:focus-visible) { outline: 2px solid var(--color-accent); outline-offset: 2px; }

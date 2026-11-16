@@ -7,12 +7,13 @@ import { createMcpServer } from "./server.js";
 
 async function main(): Promise<void> {
   fs.mkdirSync(CONTENT_DIR, { recursive: true });
-  // local stdio server runs as the host's identity; override with ARCHIVE_IDENTITY=ali
-  const identity = process.env.ARCHIVE_IDENTITY === "ali" ? "ali" : "haman";
-  const server = createMcpServer(new ArchiveIndex(), identity);
+  // the local stdio server runs on the host's own machine, so it is the admin;
+  // set ARCHIVE_ROLE=guest for a read-only local connection
+  const role = process.env.ARCHIVE_ROLE === "guest" ? "guest" : "admin";
+  const server = createMcpServer(new ArchiveIndex(), role);
   const transport = new StdioServerTransport();
   await server.connect(transport);
-  console.error(`[owl-library] MCP server ready (content root: ${CONTENT_DIR}, identity: ${identity})`);
+  console.error(`[owl-library] MCP server ready (content root: ${CONTENT_DIR}, role: ${role})`);
 }
 
 main().catch((err) => {

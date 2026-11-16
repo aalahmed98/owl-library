@@ -1,7 +1,7 @@
 import fs from "node:fs/promises";
 import MiniSearch from "minisearch";
 import { resolveContentPath } from "./paths.js";
-import { extractDoc, DEFAULT_SPACE, DocSpace } from "./meta.js";
+import { extractDoc } from "./meta.js";
 import { listDocPaths } from "./tree.js";
 import { formatOf } from "./config.js";
 
@@ -13,7 +13,6 @@ interface IndexedDoc {
   body: string;
   format: string;
   summary: string;
-  space: DocSpace;
 }
 
 export interface SearchHit {
@@ -23,14 +22,11 @@ export interface SearchHit {
   format: string;
   score: number;
   snippet: string;
-  space: DocSpace;
 }
 
 export interface SearchOptions {
   tags?: string[];
   folder?: string;
-  /** Only return docs whose space is in this set (visibility filter). Omit = no filtering. */
-  spaces?: DocSpace[];
   limit?: number;
 }
 
@@ -88,7 +84,6 @@ export class ArchiveIndex {
         body: bodyText,
         format: formatOf(rel)!,
         summary: meta.summary ?? "",
-        space: meta.space ?? DEFAULT_SPACE,
       };
       if (this.mini.has(rel)) this.mini.discard(rel);
       this.mini.add(doc);
@@ -130,7 +125,6 @@ export class ArchiveIndex {
       const docTags = doc.tags ? doc.tags.split(" ") : [];
       if (opts.tags?.length && !opts.tags.every((t) => docTags.includes(t.toLowerCase()))) continue;
       if (opts.folder && !(r.id as string).startsWith(opts.folder.replace(/^\/+|\/+$/g, "") + "/")) continue;
-      if (opts.spaces && !opts.spaces.includes(doc.space)) continue;
       hits.push({
         path: r.id as string,
         title: doc.title,
@@ -138,17 +132,15 @@ export class ArchiveIndex {
         format: doc.format,
         score: r.score,
         snippet: doc.summary || makeSnippet(doc.body, q),
-        space: doc.space,
       });
       if (hits.length >= limit) break;
     }
     return hits;
   }
 
-  listTags(spaces?: DocSpace[]): { tag: string; count: number }[] {
+  listTags(): { tag: string; count: number }[] {
     const counts = new Map<string, number>();
     for (const doc of this.docs.values()) {
-      if (spaces && !spaces.includes(doc.space)) continue;
       for (const t of doc.tags.split(" ")) {
         if (t) counts.set(t, (counts.get(t) ?? 0) + 1);
       }
