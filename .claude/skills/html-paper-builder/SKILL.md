@@ -21,7 +21,7 @@ Papers are single, fully self-contained `.html` files that render correctly in t
 2. If the paper's topic already has docs, `search` + `list_tags` to link related notes and reuse tags.
 3. Write the prose first — a paper is mainly text; widgets illustrate, not decorate. Use `.widget` blocks only where a parameter genuinely changes understanding.
 4. Build interactions from `components.md` snippets (slider + `lineChart`/`barChart`, derivation `<details>`, figures). Keep every widget wired: a slider without a visible effect is a bug.
-5. Theme-check both modes: the app iframe sets no `data-theme` on your document, so standalone dark mode comes from the `prefers-color-scheme` block already in the template — don't remove it. Verify colors only ever come from `var(--…)` tokens.
+5. Theme-check both modes. On the library site the paper is framed, and the site sets `data-theme="light"` or `"dark"` on your `<html>` to match its own light/dark switch, so every color must respond to `[data-theme="dark"]`. Opened on its own there is no `data-theme`, and dark mode comes from the `prefers-color-scheme` block already in the template; don't remove either. Verify colors only ever come from `var(--…)` tokens.
 6. Create via `create_doc`; then open `http://localhost:7333/doc/<path>` to verify it renders and interacts inside the sandbox (scripts run, but `window.parent` access will throw — never rely on the parent page).
 
 ## Quality bar

@@ -4,10 +4,26 @@ import "./newdoc.js";
 
 // ── theme ────────────────────────────────────────────
 const themeBtn = document.getElementById("theme-toggle");
+// Interactive docs render in a sandboxed frame, so the site can't reach into
+// them. Instead it posts the current theme; the snippet the server adds to an
+// embedded doc (see routes/raw.ts) applies it as data-theme on the doc's root.
+const paperFrame = document.querySelector<HTMLIFrameElement>("iframe.paper-frame");
+function sendThemeToDoc(): void {
+  const theme = document.documentElement.dataset.theme === "dark" ? "dark" : "light";
+  paperFrame?.contentWindow?.postMessage({ type: "owl-theme", theme }, "*");
+}
+window.addEventListener("message", (e) => {
+  if (paperFrame && e.source === paperFrame.contentWindow && (e.data as { type?: string } | null)?.type === "owl-theme-request") {
+    sendThemeToDoc();
+  }
+});
+paperFrame?.addEventListener("load", sendThemeToDoc);
+
 themeBtn?.addEventListener("click", () => {
   const next = document.documentElement.dataset.theme === "dark" ? "light" : "dark";
   document.documentElement.dataset.theme = next;
   localStorage.setItem("archive-theme", next);
+  sendThemeToDoc();
 });
 
 // ── sidebar tree expand-state persistence ────────────

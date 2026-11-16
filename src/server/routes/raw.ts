@@ -19,6 +19,15 @@ const MIME: Record<string, string> = {
   ".txt": "text/plain; charset=utf-8",
 };
 
+/**
+ * Added to an interactive doc only when the site frames it (`?embed=1`). It
+ * asks the parent page for the site's theme and sets it as `data-theme` on the
+ * doc's root, then keeps listening so the doc switches when the site does. The
+ * doc is untouched on disk, and opening it on its own leaves it following the
+ * browser's own light/dark setting.
+ */
+const THEME_SYNC = `<script>(function(){function a(t){if(t==="light"||t==="dark")document.documentElement.setAttribute("data-theme",t)}addEventListener("message",function(e){var d=e.data;if(d&&d.type==="owl-theme")a(d.theme)});try{if(parent!==window)parent.postMessage({type:"owl-theme-request"},"*")}catch(e){}})();</script>`;
+
 // Readable by any signed-in session (admin or guest); the auth preHandler
 // has already turned away anyone who is not signed in.
 export function registerRawRoutes(app: FastifyInstance): void {
@@ -33,10 +42,17 @@ export function registerRawRoutes(app: FastifyInstance): void {
     }
     if (isInTrash(toRelPath(abs))) return reply.code(404).send("not found");
     if (!fs.existsSync(abs) || !fs.statSync(abs).isFile()) return reply.code(404).send("not found");
-    const mime = MIME[path.extname(abs).toLowerCase()] ?? "application/octet-stream";
+    const ext = path.extname(abs).toLowerCase();
+    const mime = MIME[ext] ?? "application/octet-stream";
     reply.header("content-type", mime);
     // belt & braces alongside the iframe sandbox attribute
     reply.header("x-content-type-options", "nosniff");
+    // shown inside the site's frame: add the theme listener so the doc follows the site's light/dark switch
+    if ((ext === ".html" || ext === ".htm") && (req.query as { embed?: string }).embed === "1") {
+      const src = await fs.promises.readFile(abs, "utf8");
+      const at = src.search(/<\/head>/i);
+      return reply.send(at === -1 ? THEME_SYNC + src : src.slice(0, at) + THEME_SYNC + src.slice(at));
+    }
     return reply.send(fs.createReadStream(abs));
   });
 }

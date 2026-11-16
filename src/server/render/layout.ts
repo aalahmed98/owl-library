@@ -30,6 +30,7 @@ export function layout(o: LayoutOptions): string {
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="robots" content="noindex, nofollow">
 <title>${esc(o.title)} · Owl Library</title>
 <link rel="stylesheet" href="/assets/design/tokens.css">
 <link rel="stylesheet" href="/assets/vendor/katex/katex.min.css">
@@ -47,12 +48,12 @@ export function layout(o: LayoutOptions): string {
 <header class="topbar">
   <a class="brand" href="/">${owlMark}<span>Owl Library</span></a>
   <div class="searchbox">
-    <input id="search-input" type="search" placeholder="Search the library…" autocomplete="off">
+    <input id="search-input" type="search" placeholder="Search the library" aria-label="Search the library" autocomplete="off">
     <div id="search-results" class="search-results" hidden></div>
   </div>
-  <span class="whoami" title="${o.role === "admin" ? "Full access" : "Read only"}. Log out to switch.">${label}</span>
-  <button id="theme-toggle" class="icon-btn" title="Toggle theme" aria-label="Toggle theme">◐</button>
-  <form class="logout-form" method="post" action="/logout"><button class="icon-btn" type="submit">Log out</button></form>
+  <span class="whoami is-${o.role}" title="${o.role === "admin" ? "Full access" : "Read only"}. Log out to switch.">${label}</span>
+  <button id="theme-toggle" class="icon-btn" title="Switch between light and dark" aria-label="Switch between light and dark"><svg viewBox="0 0 20 20" aria-hidden="true"><circle cx="10" cy="10" r="7" fill="none" stroke="currentColor" stroke-width="1.8"/><path d="M10 3a7 7 0 0 0 0 14z" fill="currentColor"/></svg></button>
+  <form class="logout-form" method="post" action="/logout"><button class="btn" type="submit">Log out</button></form>
 </header>
 <div class="shell${o.rail ? " has-rail" : ""}">
   <nav class="sidebar" id="sidebar">

@@ -12,31 +12,49 @@
   <style>
     /* ==tokens== (synced from design/tokens.css — do not edit inside the markers) */
     :root {
-      --color-bg: #faf9f7;
-      --color-surface: #ffffff;
-      --color-fg: #1a1a1e;
-      --color-muted: #6b6b76;
-      --color-border: #e4e2dd;
-      --color-accent: #2f6fed;
-      --color-accent-fg: #ffffff;
-      --color-accent-soft: #e8effd;
-      --color-danger: #c4483c;
-      --color-warn-bg: #fdf6e3;
-      --color-code-bg: #f2f1ee;
-      --color-mark: #fff3bf;
-      --font-body: "Charter", "Georgia", "Cambria", "Times New Roman", serif;
-      --font-ui: system-ui, -apple-system, "Segoe UI", sans-serif;
-      --font-mono: "SFMono-Regular", "Cascadia Code", "Consolas", "Menlo", monospace;
+      /* color — light (warm paper) */
+      --color-bg: #F5F2EA;
+      --color-surface: #FFFDF9;
+      --color-surface-2: #ECE8DD;
+      --color-raise: #FFFDF9;
+      --color-fg: #1A1917;
+      --color-fg-2: #47443E;
+      --color-muted: #6B675F;
+      --color-border: #DCD7CA;
+      --color-border-strong: #B8B2A3;
+      --color-grid: #E6E1D5;
+      --color-accent: #0B6B5F;
+      --color-accent-fg: #FFFFFF;
+      --color-accent-soft: #D8EEE9;
+      --color-second: #C8640F;
+      --color-second-fg: #93440A;
+      --color-second-soft: #F8E6D3;
+      --color-danger: #A8321F;
+      --color-danger-soft: #F9E1DB;
+      --color-warn-fg: #735400;
+      --color-warn-bg: #F6ECCB;
+      --color-code-bg: #ECE8DD;
+      --color-mark: #F3E3A6;
+
+      /* typography */
+      --font-display: "Newsreader", "Iowan Old Style", "Palatino Linotype", Georgia, serif;
+      --font-body: "IBM Plex Sans", system-ui, -apple-system, "Segoe UI", sans-serif;
+      --font-ui: "IBM Plex Sans", system-ui, -apple-system, "Segoe UI", sans-serif;
+      --font-mono: "IBM Plex Mono", ui-monospace, Menlo, Consolas, monospace;
       --text-xs: 0.75rem;
       --text-sm: 0.875rem;
-      --text-base: 1.0625rem;
-      --text-lg: 1.25rem;
-      --text-xl: 1.5rem;
+      --text-base: 1rem;
+      --text-lg: 1.1875rem;
+      --text-xl: 1.4375rem;
       --text-2xl: 1.875rem;
-      --text-3xl: 2.375rem;
+      --text-3xl: 2.5rem;
       --leading-body: 1.65;
-      --leading-tight: 1.25;
+      --leading-tight: 1.15;
       --measure: 68ch;
+      --track-tight: -0.016em;
+      --track-caps: 0.1em;
+
+      /* spacing */
       --space-1: 0.25rem;
       --space-2: 0.5rem;
       --space-3: 0.75rem;
@@ -44,48 +62,79 @@
       --space-5: 1.5rem;
       --space-6: 2rem;
       --space-7: 3rem;
-      --space-8: 4rem;
-      --radius-sm: 4px;
-      --radius-md: 8px;
-      --radius-lg: 12px;
-      --shadow-sm: 0 1px 2px rgba(20, 20, 25, 0.06);
-      --shadow-md: 0 2px 8px rgba(20, 20, 25, 0.1);
+      --space-8: 4.5rem;
+
+      /* misc */
+      --radius-sm: 6px;
+      --radius-md: 10px;
+      --radius-lg: 14px;
+      --radius-pill: 999px;
+      --shadow-sm: 0 1px 2px rgba(26, 25, 23, 0.14);
+      --shadow-md: 0 1px 2px rgba(26, 25, 23, 0.05), 0 10px 28px -14px rgba(26, 25, 23, 0.16);
     }
+
     [data-theme="dark"] {
-      --color-bg: #16161a;
-      --color-surface: #1e1e24;
-      --color-fg: #e8e6e3;
-      --color-muted: #9a98a0;
-      --color-border: #32323a;
-      --color-accent: #6b9bff;
-      --color-accent-fg: #10101c;
-      --color-accent-soft: #23304d;
-      --color-danger: #e0685c;
-      --color-warn-bg: #2e2a1e;
-      --color-code-bg: #24242b;
-      --color-mark: #4d4425;
-      --shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.4);
-      --shadow-md: 0 2px 8px rgba(0, 0, 0, 0.5);
+      --color-bg: #121110;
+      --color-surface: #1B1A18;
+      --color-surface-2: #252321;
+      --color-raise: #36332F;
+      --color-fg: #EDEAE4;
+      --color-fg-2: #BDB8AE;
+      --color-muted: #938E84;
+      --color-border: #2E2C29;
+      --color-border-strong: #4B4842;
+      --color-grid: #292725;
+      --color-accent: #5FCDB9;
+      --color-accent-fg: #06201B;
+      --color-accent-soft: #14322D;
+      --color-second: #F0953F;
+      --color-second-fg: #F1A968;
+      --color-second-soft: #38281A;
+      --color-danger: #F0907F;
+      --color-danger-soft: #3A1F1A;
+      --color-warn-fg: #E4C45C;
+      --color-warn-bg: #322A13;
+      --color-code-bg: #252321;
+      --color-mark: #5A4A14;
+      --shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.5);
+      --shadow-md: 0 1px 2px rgba(0, 0, 0, 0.4), 0 10px 28px -14px rgba(0, 0, 0, 0.7);
     }
     /* ==/tokens== */
 
     /* When opened standalone (not in the app frame), follow the OS theme. */
     @media (prefers-color-scheme: dark) {
       :root:not([data-theme]) {
-        --color-bg: #16161a;
-        --color-surface: #1e1e24;
-        --color-fg: #e8e6e3;
-        --color-muted: #9a98a0;
-        --color-border: #32323a;
-        --color-accent: #6b9bff;
-        --color-accent-fg: #10101c;
-        --color-accent-soft: #23304d;
-        --color-danger: #e0685c;
-        --color-warn-bg: #2e2a1e;
-        --color-code-bg: #24242b;
-        --color-mark: #4d4425;
+        --color-bg: #121110;
+        --color-surface: #1B1A18;
+        --color-surface-2: #252321;
+        --color-raise: #36332F;
+        --color-fg: #EDEAE4;
+        --color-fg-2: #BDB8AE;
+        --color-muted: #938E84;
+        --color-border: #2E2C29;
+        --color-border-strong: #4B4842;
+        --color-grid: #292725;
+        --color-accent: #5FCDB9;
+        --color-accent-fg: #06201B;
+        --color-accent-soft: #14322D;
+        --color-second: #F0953F;
+        --color-second-fg: #F1A968;
+        --color-second-soft: #38281A;
+        --color-danger: #F0907F;
+        --color-danger-soft: #3A1F1A;
+        --color-warn-fg: #E4C45C;
+        --color-warn-bg: #322A13;
+        --color-code-bg: #252321;
+        --color-mark: #5A4A14;
+        --shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.5);
+        --shadow-md: 0 1px 2px rgba(0, 0, 0, 0.4), 0 10px 28px -14px rgba(0, 0, 0, 0.7);
       }
     }
+
+    /* Site webfonts: used when the paper is opened on the library site; elsewhere the system stacks above apply. */
+    @font-face { font-family: "Newsreader"; src: url("/assets/vendor/fonts/newsreader.woff2") format("woff2"); font-weight: 200 800; font-display: swap; }
+    @font-face { font-family: "IBM Plex Sans"; src: url("/assets/vendor/fonts/ibm-plex-sans.woff2") format("woff2"); font-weight: 100 700; font-display: swap; }
+    @font-face { font-family: "IBM Plex Mono"; src: url("/assets/vendor/fonts/ibm-plex-mono-400.woff2") format("woff2"); font-weight: 400; font-display: swap; }
 
     * { box-sizing: border-box; }
     body {
@@ -101,15 +150,16 @@
       margin: 0 auto;
       padding: var(--space-6) var(--space-4) var(--space-8);
     }
-    h1 { font-size: var(--text-3xl); line-height: var(--leading-tight); margin: 0 0 var(--space-2); }
-    h2 { font-size: var(--text-xl); line-height: var(--leading-tight); margin: var(--space-6) 0 var(--space-3); border-bottom: 1px solid var(--color-border); padding-bottom: var(--space-2); }
-    h3 { font-size: var(--text-lg); margin: var(--space-5) 0 var(--space-2); }
+    h1, h2, h3 { font-family: var(--font-display); font-weight: 500; letter-spacing: var(--track-tight); line-height: var(--leading-tight); text-wrap: balance; }
+    h1 { font-size: clamp(2.25rem, 5.4vw, 3.5rem); line-height: 1.05; margin: 0 0 var(--space-3); }
+    h2 { font-size: 1.75rem; margin: var(--space-7) 0 var(--space-3); padding-top: var(--space-6); border-top: 1px solid var(--color-border-strong); }
+    h3 { font-size: var(--text-xl); margin: var(--space-6) 0 var(--space-2); }
     .byline { color: var(--color-muted); font-family: var(--font-ui); font-size: var(--text-sm); margin-bottom: var(--space-6); }
     a { color: var(--color-accent); }
     code { font-family: var(--font-mono); font-size: 0.88em; background: var(--color-code-bg); padding: 1px 5px; border-radius: var(--radius-sm); }
     pre { background: var(--color-code-bg); padding: var(--space-4); border-radius: var(--radius-md); overflow-x: auto; }
     pre code { background: none; padding: 0; font-size: var(--text-sm); }
-    blockquote { margin: var(--space-4) 0; padding: var(--space-2) var(--space-4); border-left: 3px solid var(--color-accent); background: var(--color-surface); color: var(--color-muted); }
+    blockquote { margin: var(--space-5) 0; padding: var(--space-4) var(--space-5); border-radius: var(--radius-md); background: var(--color-surface-2); color: var(--color-fg-2); }
 
     /* interactive widgets */
     .widget {
