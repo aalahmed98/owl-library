@@ -47,6 +47,11 @@ export function registerRawRoutes(app: FastifyInstance): void {
     reply.header("content-type", mime);
     // belt & braces alongside the iframe sandbox attribute
     reply.header("x-content-type-options", "nosniff");
+    // an HTML doc is someone's page, not part of the site: this keeps its scripts out of the
+    // site's origin (cookies, API) even when it is opened directly in a tab
+    if (ext === ".html" || ext === ".htm") {
+      reply.header("content-security-policy", "sandbox allow-scripts allow-popups allow-forms allow-modals allow-downloads");
+    }
     // shown inside the site's frame: add the theme listener so the doc follows the site's light/dark switch
     if ((ext === ".html" || ext === ".htm") && (req.query as { embed?: string }).embed === "1") {
       const src = await fs.promises.readFile(abs, "utf8");

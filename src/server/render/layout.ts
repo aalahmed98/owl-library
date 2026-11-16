@@ -21,6 +21,8 @@ export interface LayoutOptions {
   rail?: string;
   /** How this session is signed in; fixed per session (switching = logout). */
   role: Role;
+  /** Folder that files dropped on this page are uploaded into ("" = top level). Admin only. */
+  uploadFolder?: string;
 }
 
 export function layout(o: LayoutOptions): string {
@@ -44,7 +46,7 @@ export function layout(o: LayoutOptions): string {
 })();
 </script>
 </head>
-<body>
+<body${o.role === "admin" ? ` data-can-write="1" data-upload-folder="${esc(o.uploadFolder ?? "")}"` : ""}>
 <header class="topbar">
   <a class="brand" href="/">${owlMark}<span>Owl Library</span></a>
   <div class="searchbox">

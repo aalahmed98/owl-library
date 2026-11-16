@@ -1,5 +1,5 @@
 import type { FastifyInstance, FastifyReply, FastifyRequest } from "fastify";
-import { readDoc, updateDoc, createDoc, moveNode, createFolder, deleteToTrash, ConflictError } from "../../core/docs.js";
+import { readDoc, updateDoc, createDoc, moveNode, createFolder, deleteToTrash, saveUpload, ConflictError } from "../../core/docs.js";
 import { buildTree } from "../../core/tree.js";
 import { ArchiveIndex } from "../../core/search.js";
 import { PathError } from "../../core/paths.js";
@@ -97,6 +97,21 @@ export function registerApiRoutes(app: FastifyInstance, index: ArchiveIndex): vo
       }
     },
   );
+
+  // upload a finished file (.html, .md or .pdf) as a new doc; the browser sends it base64-encoded
+  app.post<{ Body: { folder?: string; filename?: string; data?: string } }>("/api/upload", async (req, reply) => {
+    const denied = denyUnlessAdmin(req, reply);
+    if (denied) return denied;
+    const { folder = "", filename, data } = req.body ?? {};
+    if (!filename || typeof data !== "string") return reply.code(400).send({ error: "filename and data required" });
+    try {
+      const res = await saveUpload(folder, filename, Buffer.from(data, "base64"));
+      await index.upsert(res.path, { silent: true });
+      return res;
+    } catch (err) {
+      return sendError(reply, err);
+    }
+  });
 
   app.post<{ Body: { path?: string } }>("/api/folder", async (req, reply) => {
     const denied = denyUnlessAdmin(req, reply);

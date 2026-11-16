@@ -66,6 +66,48 @@ async function guardHash(abs: string, relPath: string, baseHash: string): Promis
   return current;
 }
 
+export const MAX_UPLOAD_BYTES = 12 * 1024 * 1024;
+
+/**
+ * Save an uploaded file as a new doc, byte for byte. Never overwrites: if the
+ * name is taken, "-2", "-3"… is added before the extension. Returns the path used.
+ */
+export async function saveUpload(folderRel: string, fileName: string, data: Buffer): Promise<{ path: string }> {
+  const rawExt = path.extname(fileName).toLowerCase();
+  const ext = rawExt === ".htm" ? ".html" : rawExt;
+  const stem = path
+    .basename(fileName, path.extname(fileName))
+    .toLowerCase()
+    .replace(/['’]/g, "")
+    .replace(/[^a-z0-9]+/g, "-")
+    .replace(/^-+|-+$/g, "");
+  const folder = folderRel.replace(/\\/g, "/").replace(/^\/+|\/+$/g, "");
+  const relFor = (n: number): string => `${folder ? folder + "/" : ""}${stem || "untitled"}${n > 1 ? "-" + n : ""}${ext}`;
+
+  assertDocExtension(relFor(1));
+  if (isInTrash(relFor(1))) throw new PathError("cannot upload into the trash", relFor(1));
+  if (data.length === 0) throw new PathError("the file is empty", relFor(1));
+  if (data.length > MAX_UPLOAD_BYTES) {
+    throw new PathError(`the file is larger than ${MAX_UPLOAD_BYTES / 1024 / 1024} MB`, relFor(1));
+  }
+  if (ext === ".pdf" && data.subarray(0, 5).toString("latin1") !== "%PDF-") {
+    throw new PathError("this does not look like a PDF file", relFor(1));
+  }
+
+  for (let n = 1; n <= 200; n++) {
+    const rel = relFor(n);
+    const abs = resolveContentPath(rel);
+    await fs.mkdir(path.dirname(abs), { recursive: true });
+    try {
+      await fs.writeFile(abs, data, { flag: "wx" });
+      return { path: toRelPath(abs) };
+    } catch (err) {
+      if ((err as NodeJS.ErrnoException).code !== "EEXIST") throw err;
+    }
+  }
+  throw new PathError("too many documents with that name already exist here", relFor(1));
+}
+
 /** For .md, meta is serialized as frontmatter (content = body). For .html, content is the full file. */
 export async function createDoc(
   relPath: string,

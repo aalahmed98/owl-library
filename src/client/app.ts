@@ -1,6 +1,7 @@
 // Shared client behavior: theme toggle, tree persistence, live search, TOC scroll-spy.
 import "./actions.js";
 import "./newdoc.js";
+import "./upload.js";
 
 // ── theme ────────────────────────────────────────────
 const themeBtn = document.getElementById("theme-toggle");

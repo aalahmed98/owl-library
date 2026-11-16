@@ -1,6 +1,7 @@
 // /new page: create a plain text doc, or a notes-mode doc (situation + raw
 // bullets) which is saved first and then organized by the AI.
 import { api } from "./actions.js";
+import { uploadFiles, describeUploadError } from "./upload.js";
 
 // must match NOTES_RAW_MARKER in src/server/organize.ts
 const NOTES_RAW_MARKER = "<!-- notes-mode:raw -->";
@@ -32,15 +33,86 @@ if (host) {
     if (!filenameTouched) fileEl.value = kebab(titleEl.value) ? kebab(titleEl.value) + ".md" : "";
   });
 
+  const uploadFields = $<HTMLDivElement>("nd-upload-fields");
+  const textFields = $<HTMLDivElement>("nd-text-fields");
+  const actionsEl = $<HTMLDivElement>("nd-actions");
+  const dropzone = $<HTMLDivElement>("nd-dropzone");
+  const fileInput = $<HTMLInputElement>("nd-file");
+  const uploadList = $<HTMLUListElement>("nd-upload-list");
+
+  const HINTS: Record<string, string> = {
+    upload: "Add a finished document as it is: an interactive HTML page, a Markdown file or a PDF. You can also drop files onto any page of the library.",
+    text: "A plain markdown document; you'll land in the editor.",
+    notes: "Describe the situation, dump your raw bullets, and the AI organizes them: acronyms up top, logical flow, unclear fragments become open questions. Your raw notes are kept verbatim in an appendix.",
+  };
+  const applyMode = (): void => {
+    const m = mode();
+    uploadFields.hidden = m !== "upload";
+    textFields.hidden = m === "upload";
+    actionsEl.hidden = m === "upload";
+    notesFields.hidden = m !== "notes";
+    hintEl.textContent = HINTS[m] ?? "";
+  };
   for (const r of document.querySelectorAll<HTMLInputElement>('input[name="nd-mode"]')) {
-    r.addEventListener("change", () => {
-      const notes = mode() === "notes";
-      notesFields.hidden = !notes;
-      hintEl.textContent = notes
-        ? "Describe the situation, dump your raw bullets, and the AI organizes them: acronyms up top, logical flow, unclear fragments become open questions. Your raw notes are kept verbatim in an appendix."
-        : "A plain markdown document; you'll land in the editor.";
-    });
+    r.addEventListener("change", applyMode);
   }
+  if (new URLSearchParams(location.search).get("mode") === "upload") {
+    const u = document.querySelector<HTMLInputElement>('input[name="nd-mode"][value="upload"]');
+    if (u) u.checked = true;
+  }
+  applyMode();
+
+  // keep the page-wide drop target in step with the folder chosen here
+  const syncFolder = (): void => { document.body.dataset.uploadFolder = folderEl.value; };
+  folderEl.addEventListener("change", syncFolder);
+  syncFolder();
+
+  async function handleFiles(files: File[]): Promise<void> {
+    if (!files.length) return;
+    dropzone.classList.add("is-busy");
+    uploadList.innerHTML = "";
+    const rows = files.map((f) => {
+      const li = document.createElement("li");
+      li.textContent = f.name;
+      const st = document.createElement("span");
+      st.className = "upload-state";
+      st.textContent = "Uploading";
+      li.append(st);
+      uploadList.append(li);
+      return { li, st };
+    });
+    const results = await uploadFiles(files, folderEl.value, (i, r) => {
+      const row = rows[i];
+      if (!row) return;
+      row.li.classList.add(r.ok ? "is-done" : "is-failed");
+      row.st.textContent = r.ok ? "Added" : describeUploadError(r.error);
+    });
+    dropzone.classList.remove("is-busy");
+    const good = results.filter((r) => r.ok);
+    if (good.length === files.length) {
+      const first = good[0];
+      location.href = good.length === 1 && first?.path
+        ? `/doc/${encodeURI(first.path)}`
+        : folderEl.value ? `/folder/${encodeURI(folderEl.value)}` : "/";
+    }
+  }
+
+  dropzone.addEventListener("click", () => fileInput.click());
+  dropzone.addEventListener("keydown", (e) => {
+    if (e.key === "Enter" || e.key === " ") { e.preventDefault(); fileInput.click(); }
+  });
+  fileInput.addEventListener("change", () => {
+    void handleFiles([...(fileInput.files ?? [])]);
+    fileInput.value = "";
+  });
+  // the page-wide drop overlay (upload.ts) hands files dropped on this page to the same list
+  document.addEventListener("owl-upload-drop", (e) => {
+    e.preventDefault();
+    const upload = document.querySelector<HTMLInputElement>('input[name="nd-mode"][value="upload"]');
+    if (upload) upload.checked = true;
+    applyMode();
+    void handleFiles((e as CustomEvent<File[]>).detail);
+  });
 
   createBtn.addEventListener("click", async () => {
     const title = titleEl.value.trim();

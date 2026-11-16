@@ -8,6 +8,10 @@ import { canWrite, type Role } from "../../core/role.js";
 
 const FORMAT_LABEL: Record<string, string> = { md: "Markdown", html: "Interactive", pdf: "PDF" };
 
+function parentOf(relPath: string): string {
+  return relPath.includes("/") ? relPath.slice(0, relPath.lastIndexOf("/")) : "";
+}
+
 function plural(n: number, one: string, many = one + "s"): string {
   return `${n} ${n === 1 ? one : many}`;
 }
@@ -84,6 +88,7 @@ export function homePage(
     ? `
   <div class="doc-actions">
     <a class="btn btn-primary" href="/new">+ New doc</a>
+    <a class="btn" href="/new?mode=upload">Upload</a>
     <button class="btn js-newfolder" data-parent="">+ New folder</button>
   </div>`
     : "";
@@ -126,6 +131,7 @@ export function folderPage(sidebar: string, folder: FolderNode, role: Role): str
     ? `
   <div class="doc-actions">
     <a class="btn btn-primary" href="/new?folder=${encodeURIComponent(folder.path)}">+ New doc</a>
+    <a class="btn" href="/new?mode=upload&amp;folder=${encodeURIComponent(folder.path)}">Upload</a>
     <button class="btn js-newfolder" data-parent="${esc(folder.path)}">+ New folder</button>
     ${nodeActions(folder.path, "folder")}
   </div>`
@@ -134,6 +140,7 @@ export function folderPage(sidebar: string, folder: FolderNode, role: Role): str
     title: folder.name,
     sidebar,
     role,
+    uploadFolder: folder.path,
     content: `
 ${breadcrumbs(folder.path + "/x")}
 <div class="page-head">
@@ -189,6 +196,7 @@ ${toc.map((t) => `<a class="toc-link toc-d${t.depth}" href="#${esc(t.id)}">${esc
     sidebar,
     rail,
     role,
+    uploadFolder: parentOf(doc.path),
     content: `${docHeader(doc, `${organizeBtn}${adminActions}${fullscreenBtn}`)}
 <div id="doc-view" class="doc-view">
 <article class="prose">
@@ -214,6 +222,7 @@ export function htmlDocPage(sidebar: string, doc: DocRead, role: Role): string {
     title: doc.meta.title,
     sidebar,
     role,
+    uploadFolder: parentOf(doc.path),
     content: `${framedDocHeader(doc, role, raw)}
 <iframe id="doc-view" class="paper-frame" sandbox="allow-scripts" src="${raw}?embed=1" title="${esc(doc.meta.title)}"></iframe>`,
   });
@@ -225,6 +234,7 @@ export function pdfDocPage(sidebar: string, doc: DocRead, role: Role): string {
     title: doc.meta.title,
     sidebar,
     role,
+    uploadFolder: parentOf(doc.path),
     content: `${framedDocHeader(doc, role, raw)}
 <iframe id="doc-view" class="pdf-frame" src="${raw}" title="${esc(doc.meta.title)}"></iframe>`,
   });
@@ -296,6 +306,7 @@ export function newDocPage(sidebar: string, folders: string[], initialFolder: st
     title: "New document",
     sidebar,
     role,
+    uploadFolder: initialFolder,
     content: `
 <div class="page-head">
   <div class="head-text">
@@ -305,22 +316,34 @@ export function newDocPage(sidebar: string, folders: string[], initialFolder: st
 </div>
 <div id="new-doc" class="new-doc">
   <div class="mode-toggle" role="radiogroup" aria-label="Document mode">
-    <label class="radio-pill"><input type="radio" name="nd-mode" value="text" checked> Text</label>
+    <label class="radio-pill"><input type="radio" name="nd-mode" value="upload"> Upload a file</label>
+    <label class="radio-pill"><input type="radio" name="nd-mode" value="text" checked> Write text</label>
     <label class="radio-pill"><input type="radio" name="nd-mode" value="notes"> Notes mode</label>
   </div>
   <p id="nd-hint" class="muted small">A plain markdown document; you'll land in the editor.</p>
+  <label class="field">Folder
+    <select id="nd-folder">${options}</select>
+  </label>
+  <div id="nd-upload-fields" hidden>
+    <div id="nd-dropzone" class="dropzone" tabindex="0" role="button" aria-label="Choose files to upload">
+      <p class="dropzone-title">Drop files here</p>
+      <p class="dropzone-sub">or <span class="dropzone-link">choose files</span> from your computer</p>
+      <p class="dropzone-types">HTML pages, Markdown and PDF, up to 12 MB each</p>
+      <input id="nd-file" type="file" accept=".html,.htm,.md,.pdf" multiple hidden>
+    </div>
+    <ul id="nd-upload-list" class="upload-list"></ul>
+  </div>
+  <div id="nd-text-fields">
   <label class="field">Title
     <input id="nd-title" type="text" placeholder="How the repo market works" autofocus>
   </label>
   <label class="field">File name <span class="muted">(filled in from the title)</span>
     <input id="nd-filename" type="text" placeholder="how-the-repo-market-works.md">
   </label>
-  <label class="field">Folder
-    <select id="nd-folder">${options}</select>
-  </label>
   <label class="field">Tags <span class="muted">(comma-separated, optional)</span>
     <input id="nd-tags" type="text" placeholder="repo, money-market">
   </label>
+  </div>
   <div id="nd-notes-fields" hidden>
     <label class="field">Situation <span class="muted">(where and why you're taking these notes; context for the AI)</span>
       <textarea id="nd-situation" rows="3" placeholder="e.g. I am sitting at the bonds and T-bills desk of the bank, being taught how repo works"></textarea>
@@ -329,7 +352,7 @@ export function newDocPage(sidebar: string, folders: string[], initialFolder: st
       <textarea id="nd-notes" rows="16" placeholder="spread over SOFR&#10;repo vs reverse repo&#10;if the bond defaults i return the cash…"></textarea>
     </label>
   </div>
-  <div class="form-actions">
+  <div class="form-actions" id="nd-actions">
     <button id="nd-create" class="btn btn-primary">Create document</button>
     <span id="nd-status" class="muted small"></span>
   </div>

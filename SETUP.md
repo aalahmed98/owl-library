@@ -18,6 +18,14 @@ To switch between the two, log out (in the header) and sign in again.
 
 Removing a doc or folder moves it to a trash folder on the server. Nothing is erased, and the owner can restore it.
 
+### Adding documents (admin)
+
+- **Drag and drop:** drop HTML, Markdown or PDF files onto any page. They go into the folder you are looking at (or the top level from the home page). Dropping one file opens it; dropping several opens the folder.
+- **Upload page:** "Upload" on the home page or any folder opens the same thing as a form, with a folder picker and a "choose files" button.
+- **Write in the browser:** "+ New doc" creates a Markdown doc and opens the editor.
+
+Files are stored exactly as uploaded, up to 12 MB each. A file whose name is already taken is saved with "-2" added; nothing is overwritten.
+
 ## 2. Connect your own Claude
 
 This points your own Claude at the *same* live server — same content, same search index, same conflict protection, and the **same permissions** as the website.
